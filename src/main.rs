@@ -5,6 +5,9 @@ use rand::Rng;
 use std::path::Path;
 
 pub mod camera;
+pub mod canvas;
+pub mod math;
+pub mod coordinates;
 
 fn main() {
     let max_iterations = 256u16;
