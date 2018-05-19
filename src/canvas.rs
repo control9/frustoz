@@ -2,25 +2,49 @@ use coordinates::CameraCoordinates;
 use coordinates::CanvasPixel;
 
 pub struct Canvas {
-    width: i64,
-    height: i64,
-    pixels: Vec<i64>,
+    width: u32,
+    height: u32,
+    pixels: Vec<u64>,
 }
 
 impl Canvas {
-    pub fn new(width: i64, height: i64) -> Self {
-        Self { width, height, pixels: vec![0, width * height] }
+    pub fn new(width: u32, height: u32) -> Self {
+        Self { width, height, pixels: vec![0u64; (width * height) as usize] }
     }
 
-    pub fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
+    fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
         if !valid_coordinates(coordinates) {
             return None;
         }
         let &CameraCoordinates(x, y) = coordinates;
         Some(CanvasPixel(
-            (self.width as f64 * x) as i64,
-            (self.height as f64 * y) as i64,
+            (self.width as f64 * x) as u32,
+            (self.height as f64 * y) as u32,
         ))
+    }
+
+    pub fn project_and_update(&mut self, coordinates: &CameraCoordinates) {
+        let pixel = self.project(coordinates);
+        match pixel {
+            Some(p) => self.update(p),
+            None => ()
+        }
+    }
+
+    fn update(&mut self, CanvasPixel(x, y): CanvasPixel) {
+        let pixel_index: usize = (y * self.width + x) as usize;
+        self.update_pixel(pixel_index);
+    }
+
+    fn update_pixel(&mut self, index: usize) {
+        self.pixels[index] = self.pixels[index] + 1;
+    }
+
+    pub fn extract_pixels<F, T>(&self, func: F) -> Vec<T>
+        where F: FnMut(&u64) -> T {
+        self.pixels.iter()
+            .map(func)
+            .collect()
     }
 }
 
@@ -79,7 +103,7 @@ mod canvas_test {
         should_not_project_coordinates(CanvasSize(8, 5), CameraCoordinates(0.5, 1.0));
     }
 
-    struct CanvasSize(i64, i64);
+    struct CanvasSize(u32, u32);
 
     fn should_project_coordinates(expected: CanvasPixel, CanvasSize(width, height): CanvasSize, coordinates: CameraCoordinates) {
         let canvas = &Canvas::new(width, height);
