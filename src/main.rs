@@ -17,8 +17,8 @@ pub mod math;
 pub mod transforms;
 
 const WARMUP_ITERATIONS: u32 = 20;
-const WIDTH: u32 = 400;
-const HEIGHT: u32 = 400;
+const WIDTH: u32 = 600;
+const HEIGHT: u32 = 800;
 
 const QUALITY: u32 = 200;
 const ITERATIONS: u32 = QUALITY * WIDTH * HEIGHT;
@@ -30,11 +30,11 @@ fn main() {
     let ystart: f64 = rng.gen_range(0.0, 1.0);
 
     let mut point = RealPoint(xstart, ystart);
-    let camera = Camera::new(RealPoint(0.0, 0.0), 3.5, 3.5);
+    let camera = Camera::new(RealPoint(-6.0, -0.5), 12.0, 12.0);
     let mut canvas = Canvas::new(WIDTH, HEIGHT);
 
     let transformations = example::ExampleTransformations::new();
-    let variations = transformations.barn();
+    let variations = transformations.barnsley();
 
     for iteration in 1..ITERATIONS {
         let transform_seed: f64 = rng.gen_range(0.0, 1.0);
