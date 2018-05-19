@@ -3,26 +3,24 @@ extern crate rand;
 
 use camera::Camera;
 use canvas::Canvas;
-use math::RealPoint;
-use math::TransformMatrix;
-use math::ProjectivePoint;
 use image::ImageBuffer;
 use image::Luma;
+use math::RealPoint;
 use rand::Rng;
-use rand::ThreadRng;
 use std::path::Path;
 
 pub mod camera;
 pub mod canvas;
-pub mod math;
 pub mod coordinates;
+pub mod example;
+pub mod math;
 pub mod transforms;
 
 const WARMUP_ITERATIONS: u32 = 20;
 const WIDTH: u32 = 400;
 const HEIGHT: u32 = 400;
 
-const QUALITY: u32 = 800;
+const QUALITY: u32 = 200;
 const ITERATIONS: u32 = QUALITY * WIDTH * HEIGHT;
 
 fn main() {
@@ -32,13 +30,15 @@ fn main() {
     let ystart: f64 = rng.gen_range(0.0, 1.0);
 
     let mut point = RealPoint(xstart, ystart);
-    let camera = Camera::new(RealPoint(-1.0, -1.0), 2.5, 2.5);
+    let camera = Camera::new(RealPoint(0.0, 0.0), 3.5, 3.5);
     let mut canvas = Canvas::new(WIDTH, HEIGHT);
 
-    let variations = &transforms::SIERPINSKI_CARPET;
+    let transformations = example::ExampleTransformations::new();
+    let variations = transformations.barn();
 
     for iteration in 1..ITERATIONS {
-        point = apply(&point, &mut rng, variations);
+        let transform_seed: f64 = rng.gen_range(0.0, 1.0);
+        point = variations.apply_transform(transform_seed, &point);
         if iteration > WARMUP_ITERATIONS {
             let camera_coordinates = camera.project(&point);
             canvas.project_and_update(&camera_coordinates);
@@ -55,18 +55,6 @@ fn main() {
         Some(im) => image::ImageLuma8(im).save(path).expect("Failed to write file"),
         None => panic!("Unexpected error")
     };
-}
-
-fn apply(point: &RealPoint, rng: &mut ThreadRng, transforms: &[TransformMatrix]) -> RealPoint {
-    let count = transforms.len();
-    let var = rng.gen_range(0, count);
-
-    let pr : ProjectivePoint = point.into();
-
-    let transform : &TransformMatrix = transforms.get(var).expect("Generated incorrect transform ID");
-    let result_pr = &(transform * &pr);
-    let result : RealPoint = result_pr.into();
-    result
 }
 
 
