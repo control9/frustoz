@@ -3,7 +3,9 @@ extern crate rand;
 
 use camera::Camera;
 use canvas::Canvas;
-use coordinates::PlanePoint;
+use math::RealPoint;
+use math::TransformMatrix;
+use math::ProjectivePoint;
 use image::ImageBuffer;
 use image::Luma;
 use rand::Rng;
@@ -14,6 +16,7 @@ pub mod camera;
 pub mod canvas;
 pub mod math;
 pub mod coordinates;
+pub mod transforms;
 
 const WARMUP_ITERATIONS: u32 = 20;
 const WIDTH: u32 = 400;
@@ -28,12 +31,14 @@ fn main() {
     let xstart: f64 = rng.gen_range(0.0, 1.0);
     let ystart: f64 = rng.gen_range(0.0, 1.0);
 
-    let mut point = PlanePoint(xstart, ystart);
-    let camera = Camera::new(PlanePoint(-1.0, -1.0), 2.0, 2.0);
+    let mut point = RealPoint(xstart, ystart);
+    let camera = Camera::new(RealPoint(-1.0, -1.0), 2.5, 2.5);
     let mut canvas = Canvas::new(WIDTH, HEIGHT);
 
+    let variations = &transforms::SIERPINSKI_CARPET;
+
     for iteration in 1..ITERATIONS {
-        point = apply(point, &mut rng);
+        point = apply(&point, &mut rng, variations);
         if iteration > WARMUP_ITERATIONS {
             let camera_coordinates = camera.project(&point);
             canvas.project_and_update(&camera_coordinates);
@@ -42,7 +47,7 @@ fn main() {
 
     // Save the image as “fractal.png”
     let path = Path::new("fractal.png");
-    let mapper = |v: &u64| ((*v as f64).log2() * 8.0) as u8;
+    let mapper = |&v: &u64| ((v as f64).log2() * 8.0) as u8;
     let vec = canvas.extract_pixels(mapper);
 
     let res: Option<ImageBuffer<Luma<u8>, Vec<u8>>> = ImageBuffer::from_raw(WIDTH, HEIGHT, vec);
@@ -52,14 +57,16 @@ fn main() {
     };
 }
 
-fn apply(PlanePoint(x, y): PlanePoint, rng: &mut ThreadRng) -> PlanePoint {
-    let var = rng.gen_range(0, 3);
-    match var {
-        0 => PlanePoint(x / 2.0, y / 2.0),
-        1 => PlanePoint((x + 1.0) / 2.0, y / 2.0),
-        2 => PlanePoint(x / 2.0, (y + 1.0) / 2.0),
-        _ => PlanePoint(x, y)
-    }
+fn apply(point: &RealPoint, rng: &mut ThreadRng, transforms: &[TransformMatrix]) -> RealPoint {
+    let count = transforms.len();
+    let var = rng.gen_range(0, count);
+
+    let pr : ProjectivePoint = point.into();
+
+    let transform : &TransformMatrix = transforms.get(var).expect("Generated incorrect transform ID");
+    let result_pr = &(transform * &pr);
+    let result : RealPoint = result_pr.into();
+    result
 }
 
 
