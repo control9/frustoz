@@ -27,11 +27,11 @@ const B4: TM = TransformMatrix(
 );
 
 
-pub fn get_transform() -> Vec<(TM, f64)> {
+pub fn get_transform() -> Vec<(TM, f64, f64)> {
     vec![
-        (B1, 1.0),
-        (B2, 85.0),
-        (B3, 7.0),
-        (B4, 7.0),
+        (B1, 1.0, 0.5),
+        (B2, 85.0, 0.5),
+        (B3, 7.0, 0.5),
+        (B4, 7.0, 0.5),
     ]
 }

@@ -1,23 +1,23 @@
-use transforms::Transformation;
+use transforms::TransformSystem;
 
 mod sierpinsky;
 mod barnsley;
 
-pub struct ExampleTransformations(Vec<Transformation>);
+pub struct ExampleTransformations(Vec<TransformSystem>);
 
 impl ExampleTransformations {
     pub fn new() -> Self {
         ExampleTransformations(vec![
-            Transformation::new(sierpinsky::get_transform()),
-            Transformation::new(barnsley::get_transform()),
+            TransformSystem::new(sierpinsky::get_transform()),
+            TransformSystem::new(barnsley::get_transform()),
         ])
     }
 
-    pub fn sierpinski(&self) -> &Transformation {
+    pub fn sierpinski(&self) -> &TransformSystem {
         &self.0[0]
     }
 
-    pub fn barnsley(&self) -> &Transformation {
+    pub fn barnsley(&self) -> &TransformSystem {
         &self.0[1]
     }
 }
