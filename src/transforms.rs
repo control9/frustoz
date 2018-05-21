@@ -1,14 +1,14 @@
-use math::TransformMatrix;
-use math::RealPoint;
-use math::ProjectivePoint;
+use util::math::TransformMatrix;
+use util::math::RealPoint;
+use util::math::ProjectivePoint;
 
-pub struct Transform {
+pub struct WeightedTransform {
     affine: TransformMatrix,
     weight: f64,
     color: f64,
 }
 
-impl Transform {
+impl WeightedTransform {
     pub fn apply(&self, point: &RealPoint, color: f64) -> (RealPoint, f64) {
         let pr: &ProjectivePoint = &point.into();
         let result_pr = &(&self.affine * pr);
@@ -18,7 +18,7 @@ impl Transform {
     }
 }
 
-pub struct TransformSystem(Vec<Transform>);
+pub struct TransformSystem(Vec<WeightedTransform>);
 
 impl TransformSystem {
     pub fn new(weighted_transforms: Vec<(TransformMatrix, f64, f64)>) -> Self {
@@ -26,18 +26,18 @@ impl TransformSystem {
             .map(|&(_, weight, _)| weight)
             .sum();
 
-        let mut transforms: Vec<Transform> = vec![];
+        let mut transforms: Vec<WeightedTransform> = vec![];
 
         for (t, w, c) in weighted_transforms {
             transforms.push(
-                Transform { affine: t, weight: w / total_weight, color: c }
+                WeightedTransform { affine: t, weight: w / total_weight, color: c }
             );
         }
 
         TransformSystem(transforms)
     }
 
-    pub fn get_transformation(&self, seed: f64) -> &Transform {
+    pub fn get_transformation(&self, seed: f64) -> &WeightedTransform {
         assert!(seed >= 0.0, "seed should in [0, 1) range");
         let mut accumulated_weight = 0.0;
         for i in 0..self.0.len() {
@@ -52,7 +52,7 @@ impl TransformSystem {
     pub fn apply_transform(&self, seed: f64, point: &RealPoint) -> RealPoint {
         let pr: &ProjectivePoint = &point.into();
 
-        let transform: &Transform = self.get_transformation(seed);
+        let transform: &WeightedTransform = self.get_transformation(seed);
         let result_pr = &(&transform.affine * pr);
         let result: RealPoint = result_pr.into();
         result

@@ -1,9 +1,9 @@
 use template::flame_template::TransformTemplate;
-use builders::transform;
+use template::builders::transform;
 use template::flame_template::FlameTemplate;
 use template::flame_template::RenderConfig;
 use template::flame_template::CameraConfig;
-use math::RealPoint;
+use util::math::RealPoint;
 use example::green_palette;
 use template::palette::Palette;
 

@@ -1,4 +1,4 @@
-use math::RealPoint;
+use util::math::RealPoint;
 use template::palette::Palette;
 
 pub struct FlameTemplate {

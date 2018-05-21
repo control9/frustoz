@@ -1,5 +1,5 @@
-use math::RealPoint;
-use coordinates::CameraCoordinates;
+use util::math::RealPoint;
+use util::coordinates::CameraCoordinates;
 
 pub struct Camera {
     origin: RealPoint,

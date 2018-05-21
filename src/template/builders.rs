@@ -1,18 +1,17 @@
 use camera::Camera;
+use canvas::Canvas;
 use template::flame_template::CameraConfig;
 use template::flame_template::RenderConfig;
-use canvas::Canvas;
 use template::flame_template::TransformTemplate;
 use transforms::TransformSystem;
-use transforms::Transform;
-use math::TransformMatrix;
+use util::math::TransformMatrix;
 
 pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale)
 }
 
 pub fn canvas(config: &RenderConfig) -> Canvas {
-    Canvas::new(config.width, config.height)
+    Canvas::new(config.width, config.height, config.quality)
 }
 
 pub fn iterations(config: &RenderConfig) -> u32 {

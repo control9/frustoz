@@ -1,9 +1,9 @@
 use template::flame_template::TransformTemplate;
-use builders::transform;
+use template::builders::transform;
 use template::flame_template::FlameTemplate;
 use template::flame_template::RenderConfig;
 use template::flame_template::CameraConfig;
-use math::RealPoint;
+use util::math::RealPoint;
 use example::green_palette;
 use template::palette::Palette;
 
@@ -31,9 +31,9 @@ const B4: [f64; 6] = [
 fn get_transform_templates() -> Vec<TransformTemplate> {
     vec![
         transform(1.0, 0.7, B1),
-        transform(85.0, 0.5, B2),
-        transform(7.0, 0.6, B3),
-        transform(7.0, 0.6, B4),
+        transform(24.0, 0.8, B2),
+        transform(3.0, 0.9, B3),
+        transform(3.0, 0.9, B4),
     ]
 }
 
@@ -41,7 +41,7 @@ pub fn get_flame_template() -> FlameTemplate {
     let render: RenderConfig = RenderConfig {
         width: 600,
         height: 800,
-        quality: 100,
+        quality: 200,
         skip_iterations: 20,
     };
     let camera: CameraConfig = CameraConfig {

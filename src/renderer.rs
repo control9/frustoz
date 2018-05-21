@@ -1,24 +1,25 @@
 use template::flame_template::FlameTemplate;
-use math::RealPoint;
-use camera::Camera;
-use builders;
+use template::builders;
+use util::math::RealPoint;
 use rand;
 use rand::Rng;
 
 pub fn render(template: &FlameTemplate) -> Vec<u8> {
     let mut rng = rand::thread_rng();
 
-    let xstart: f64 = rng.gen_range(0.0, 1.0);
-    let ystart: f64 = rng.gen_range(0.0, 1.0);
-
-    let mut point = RealPoint(xstart, ystart);
-    let mut color : f64 = rng.gen_range(0.0, 1.0);
     let camera = builders::camera(&template.camera);
     let mut canvas = builders::canvas(&template.render);
+
     let variations = builders::transform_system(&template.transforms);
     let palette = &template.palette;
 
     let iterations = builders::iterations(&template.render);
+
+    let xstart: f64 = rng.gen_range(0.0, 1.0);
+    let ystart: f64 = rng.gen_range(0.0, 1.0);
+    let mut point = RealPoint(xstart, ystart);
+    let mut color : f64 = rng.gen_range(0.0, 1.0);
+
 
     for iteration in 1..iterations {
         let transform_seed: f64 = rng.gen_range(0.0, 1.0);

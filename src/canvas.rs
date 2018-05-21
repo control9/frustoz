@@ -1,5 +1,5 @@
-use coordinates::CameraCoordinates;
-use coordinates::CanvasPixel;
+use util::coordinates::CameraCoordinates;
+use util::coordinates::CanvasPixel;
 use template::palette::RGB;
 
 #[derive(Copy, Clone)]
@@ -8,12 +8,13 @@ pub struct ColorCounter(u64,u64,u64,u64);
 pub struct Canvas {
     width: u32,
     height: u32,
+    quality: u32,
     pixels: Vec<ColorCounter>,
 }
 
 impl Canvas {
-    pub fn new(width: u32, height: u32) -> Self {
-        Self { width, height, pixels: vec![ColorCounter(0,0,0,0); (width * height) as usize] }
+    pub fn new(width: u32, height: u32, quality: u32) -> Self {
+        Self { width, height,quality, pixels: vec![ColorCounter(0,0,0,0); (width * height) as usize] }
     }
 
     fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
@@ -35,6 +36,18 @@ impl Canvas {
         }
     }
 
+    pub fn extract_raw(&self) -> Vec<u8> {
+        let mut result: Vec<u8> = vec![];
+        for &ColorCounter(r,g,b,a) in &self.pixels {
+            let scale = (1.0 + a as f64).log10() / (255.0 * self.quality as f64);
+
+            result.push( (r as f64 * scale).min(255.0) as u8);
+            result.push( (g as f64 * scale).min(255.0) as u8);
+            result.push( (b as f64 * scale).min(255.0) as u8);
+        }
+        result
+    }
+
     fn update(&mut self, CanvasPixel(x, y): CanvasPixel, color: &RGB) {
         let pixel_index: usize = (y * self.width + x) as usize;
         self.update_pixel(pixel_index, color);
@@ -43,22 +56,6 @@ impl Canvas {
     fn update_pixel(&mut self, index: usize, &RGB(r,g,b) : &RGB) {
         let &ColorCounter(rc, gc, bc, a) = &self.pixels[index];
         self.pixels[index] = ColorCounter(rc + r as u64, gc + g as u64, bc + b as u64, a + 1);
-    }
-
-    pub fn extract_raw(&self) -> Vec<u8> {
-        let mut result: Vec<u8> = vec![];
-        for &ColorCounter(r,g,b,a) in &self.pixels {
-            let mut scale = (a as f64).log10() / (a as f64) * 0.1; //FixMe: temporary workaround for avoiding overflowing RGB values
-
-            if a == 0 {
-                scale = 1.0;
-            }
-
-            result.push( (r as f64 * scale) as u8);
-            result.push( (g as f64 * scale) as u8);
-            result.push( (b as f64 * scale) as u8);
-        }
-        result
     }
 
 }
@@ -121,14 +118,14 @@ mod canvas_test {
     struct CanvasSize(u32, u32);
 
     fn should_project_coordinates(expected: CanvasPixel, CanvasSize(width, height): CanvasSize, coordinates: CameraCoordinates) {
-        let canvas = &Canvas::new(width, height);
+        let canvas = &Canvas::new(width, height, 1);
         let actual = canvas.project(&coordinates);
 
         assert_eq!(Some(expected), actual);
     }
 
     fn should_not_project_coordinates(CanvasSize(width, height): CanvasSize, coordinates: CameraCoordinates) {
-        let canvas = &Canvas::new(width, height);
+        let canvas = &Canvas::new(width, height, 1);
         let actual = canvas.project(&coordinates);
         assert!(actual.is_none());
     }
