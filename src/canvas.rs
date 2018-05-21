@@ -1,15 +1,19 @@
 use coordinates::CameraCoordinates;
 use coordinates::CanvasPixel;
+use color::RGB;
+
+#[derive(Copy, Clone)]
+pub struct ColorCounter(u64,u64,u64,u64);
 
 pub struct Canvas {
     width: u32,
     height: u32,
-    pixels: Vec<u64>,
+    pixels: Vec<ColorCounter>,
 }
 
 impl Canvas {
     pub fn new(width: u32, height: u32) -> Self {
-        Self { width, height, pixels: vec![0u64; (width * height) as usize] }
+        Self { width, height, pixels: vec![ColorCounter(0,0,0,0); (width * height) as usize] }
     }
 
     fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
@@ -23,29 +27,40 @@ impl Canvas {
         ))
     }
 
-    pub fn project_and_update(&mut self, coordinates: &CameraCoordinates) {
+    pub fn project_and_update(&mut self, coordinates: &CameraCoordinates, color: &RGB) {
         let pixel = self.project(coordinates);
         match pixel {
-            Some(p) => self.update(p),
+            Some(p) => self.update(p, color),
             None => ()
         }
     }
 
-    fn update(&mut self, CanvasPixel(x, y): CanvasPixel) {
+    fn update(&mut self, CanvasPixel(x, y): CanvasPixel, color: &RGB) {
         let pixel_index: usize = (y * self.width + x) as usize;
-        self.update_pixel(pixel_index);
+        self.update_pixel(pixel_index, color);
     }
 
-    fn update_pixel(&mut self, index: usize) {
-        self.pixels[index] = self.pixels[index] + 1;
+    fn update_pixel(&mut self, index: usize, &RGB(r,g,b) : &RGB) {
+        let &ColorCounter(rc, gc, bc, a) = &self.pixels[index];
+        self.pixels[index] = ColorCounter(rc + r as u64, gc + g as u64, bc + b as u64, a + 1);
     }
 
-    pub fn extract_pixels<F, T>(&self, func: F) -> Vec<T>
-        where F: FnMut(&u64) -> T {
-        self.pixels.iter()
-            .map(func)
-            .collect()
+    pub fn extract_raw(&self) -> Vec<u8> {
+        let mut result: Vec<u8> = vec![];
+        for &ColorCounter(r,g,b,a) in &self.pixels {
+            let mut scale = (a as f64).log10() / (a as f64) * 0.1; //FixMe: temporary workaround for avoiding overflowing RGB values
+
+            if a == 0 {
+                scale = 1.0;
+            }
+
+            result.push( (r as f64 * scale) as u8);
+            result.push( (g as f64 * scale) as u8);
+            result.push( (b as f64 * scale) as u8);
+        }
+        result
     }
+
 }
 
 fn valid_coordinates(&CameraCoordinates(x, y): &CameraCoordinates) -> bool {

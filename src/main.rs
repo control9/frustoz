@@ -4,7 +4,6 @@ extern crate rand;
 use camera::Camera;
 use canvas::Canvas;
 use image::ImageBuffer;
-use image::Luma;
 use math::RealPoint;
 use rand::Rng;
 use std::path::Path;
@@ -14,13 +13,14 @@ pub mod canvas;
 pub mod coordinates;
 pub mod example;
 pub mod math;
+pub mod color;
 pub mod transforms;
 
 const WARMUP_ITERATIONS: u32 = 20;
 const WIDTH: u32 = 600;
 const HEIGHT: u32 = 800;
 
-const QUALITY: u32 = 200;
+const QUALITY: u32 = 800;
 const ITERATIONS: u32 = QUALITY * WIDTH * HEIGHT;
 
 fn main() {
@@ -30,29 +30,34 @@ fn main() {
     let ystart: f64 = rng.gen_range(0.0, 1.0);
 
     let mut point = RealPoint(xstart, ystart);
+    let mut color : f64 = rng.gen_range(0.0, 1.0);
     let camera = Camera::new(RealPoint(-6.0, -0.5), 12.0, 12.0);
     let mut canvas = Canvas::new(WIDTH, HEIGHT);
 
     let transformations = example::ExampleTransformations::new();
     let variations = transformations.barnsley();
+    let palette = example::green_palette::palette();
 
     for iteration in 1..ITERATIONS {
         let transform_seed: f64 = rng.gen_range(0.0, 1.0);
-        point = variations.apply_transform(transform_seed, &point);
+        let transform = variations.get_transformation(transform_seed);
+
+        let (new_point, new_color) = transform.apply(&point, color);
+        point = new_point;
+        color = new_color;
+
         if iteration > WARMUP_ITERATIONS {
             let camera_coordinates = camera.project(&point);
-            canvas.project_and_update(&camera_coordinates);
+            canvas.project_and_update(&camera_coordinates, palette.get_color(color));
         }
     }
 
-    // Save the image as “fractal.png”
     let path = Path::new("fractal.png");
-    let mapper = |&v: &u64| ((v as f64).log2() * 8.0) as u8;
-    let vec = canvas.extract_pixels(mapper);
+    let raw_image = canvas.extract_raw();
 
-    let res: Option<ImageBuffer<Luma<u8>, Vec<u8>>> = ImageBuffer::from_raw(WIDTH, HEIGHT, vec);
+    let res: Option<ImageBuffer<image::Rgb<u8>, Vec<(u8)>>> = ImageBuffer::from_vec(WIDTH, HEIGHT, raw_image);
     match res {
-        Some(im) => image::ImageLuma8(im).save(path).expect("Failed to write file"),
+        Some(im) => image::ImageRgb8(im).save(path).expect("Failed to write file"),
         None => panic!("Unexpected error")
     };
 }

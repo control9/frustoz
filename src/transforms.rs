@@ -2,12 +2,21 @@ use math::TransformMatrix;
 use math::RealPoint;
 use math::ProjectivePoint;
 
-struct Transform {
+pub struct Transform {
     affine: TransformMatrix,
     weight: f64,
     color: f64,
 }
 
+impl Transform {
+    pub fn apply(&self, point: &RealPoint, color: f64) -> (RealPoint, f64) {
+        let pr: &ProjectivePoint = &point.into();
+        let result_pr = &(&self.affine * pr);
+        let result: RealPoint = result_pr.into();
+        let result_color = (color + self.color) / 2.0;
+        (result, result_color)
+    }
+}
 
 pub struct TransformSystem(Vec<Transform>);
 
@@ -28,7 +37,7 @@ impl TransformSystem {
         TransformSystem(transforms)
     }
 
-    fn get_transformation(&self, seed: f64) -> &Transform {
+    pub fn get_transformation(&self, seed: f64) -> &Transform {
         assert!(seed >= 0.0, "seed should in [0, 1) range");
         let mut accumulated_weight = 0.0;
         for i in 0..self.0.len() {

@@ -2,6 +2,7 @@ use transforms::TransformSystem;
 
 mod sierpinsky;
 mod barnsley;
+pub mod green_palette;
 
 pub struct ExampleTransformations(Vec<TransformSystem>);
 
