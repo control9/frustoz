@@ -13,7 +13,7 @@ pub mod builders;
 pub mod output;
 
 fn main() {
-    let template = example::barnsley();
+    let template = example::sierpinsky();
     let raw = renderer::render(&template);
     output::write("fractal.png",raw, &template.render);
 }
