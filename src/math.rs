@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct RealPoint(pub f64, pub f64);
 
 #[derive(Debug, PartialEq)]

@@ -1,6 +1,6 @@
 use coordinates::CameraCoordinates;
 use coordinates::CanvasPixel;
-use color::RGB;
+use template::palette::RGB;
 
 #[derive(Copy, Clone)]
 pub struct ColorCounter(u64,u64,u64,u64);

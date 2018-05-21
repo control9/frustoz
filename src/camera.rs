@@ -3,20 +3,19 @@ use coordinates::CameraCoordinates;
 
 pub struct Camera {
     origin: RealPoint,
-    scale_x: f64,
-    scale_y: f64,
+    scale: f64,
 }
 
 
 impl Camera {
-    pub fn new(origin: RealPoint, scale_x: f64, scale_y: f64) -> Self {
-        Self { origin, scale_x, scale_y }
+    pub fn new(origin: RealPoint, scale: f64) -> Self {
+        Self { origin, scale }
     }
 
     pub fn project(&self, &RealPoint(point_x, point_y): &RealPoint) -> CameraCoordinates {
         let &RealPoint(origin_x, origin_y) = &self.origin;
-        let x = (point_x - origin_x) / self.scale_x;
-        let y = (point_y - origin_y) / self.scale_y;
+        let x = (point_x - origin_x) / self.scale;
+        let y = (point_y - origin_y) / self.scale;
         CameraCoordinates(x,y)
     }
 }
@@ -32,7 +31,7 @@ mod camera_test {
     fn should_project_identity_square() {
         let origin = RealPoint(-1.0, -1.0);
         let camera = Camera::new(
-            origin, 2.0, 2.0,
+            origin, 2.0
         );
 
         let point = RealPoint(-1.0, -1.0);
