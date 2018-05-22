@@ -11,7 +11,7 @@ pub mod output;
 pub mod util;
 
 fn main() {
-    let template = example::barnsley();
+    let template = example::spark();
     let raw = renderer::render(&template);
     output::write("fractal.png",raw, &template.render);
 }

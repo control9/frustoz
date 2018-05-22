@@ -3,7 +3,7 @@ use util::coordinates::CanvasPixel;
 use template::palette::RGB;
 
 #[derive(Copy, Clone)]
-pub struct ColorCounter(u64,u64,u64,u64);
+struct ColorCounter(u64,u64,u64,u64);
 
 pub struct Canvas {
     width: u32,

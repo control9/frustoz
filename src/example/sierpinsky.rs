@@ -9,14 +9,18 @@ use template::palette::Palette;
 
 const S1: [f64;6] =[
     0.5, 0.0, 0.0,
-    0.0, 0.5, 0.0];
+    0.0, 0.5, 0.0
+];
 
 const S2: [f64;6] = [
     0.5, 0.0, 0.5,
-    0.0, 0.5, 0.0];
+    0.0, 0.5, 0.0
+];
 
-const S3: [f64;6] = [0.5, 0.0, 0.0,
-    0.0, 0.5, 0.5];
+const S3: [f64;6] = [
+    0.5, 0.0, 0.0,
+    0.0, 0.5, 0.5
+];
 
 
 fn get_transform_templates() -> Vec<TransformTemplate> {

@@ -2,6 +2,7 @@ use template::flame_template::FlameTemplate;
 
 mod sierpinsky;
 mod barnsley;
+mod spark;
 pub mod green_palette;
 
 pub fn sierpinsky() -> FlameTemplate {
@@ -10,4 +11,8 @@ pub fn sierpinsky() -> FlameTemplate {
 
 pub fn barnsley() -> FlameTemplate {
     barnsley::get_flame_template()
+}
+
+pub fn spark() -> FlameTemplate {
+    spark::get_flame_template()
 }
