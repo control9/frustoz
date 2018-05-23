@@ -10,7 +10,7 @@ use util::math::TransformMatrix;
 use template::palette::Palette;
 
 pub fn camera(config: &CameraConfig) -> Camera {
-    Camera::new(config.origin, config.scale)
+    Camera::new(config.origin, config.scale_x, config.scale_y)
 }
 
 pub fn canvas(config: &RenderConfig) -> Canvas {

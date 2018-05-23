@@ -40,7 +40,8 @@ pub fn get_flame_template() -> FlameTemplate {
     };
     let camera: CameraConfig = CameraConfig {
         origin: RealPoint(-1.0, -1.0),
-        scale: 2.2,
+        scale_x: 2.2,
+        scale_y: 2.2,
     };
     let transforms = get_transform_templates();
     let palette: Palette = green_palette::palette();

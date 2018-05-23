@@ -16,8 +16,8 @@ pub struct TransformTemplate {
 
 pub struct CameraConfig {
     pub origin: RealPoint,
-    pub scale: f64,
-//    rotation: f64,
+    pub scale_x: f64,
+    pub scale_y: f64,
 }
 
 pub struct RenderConfig {

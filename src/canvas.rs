@@ -53,7 +53,7 @@ impl Canvas {
     pub fn extract_raw(&self) -> Vec<u8> {
         let mut result: Vec<u8> = vec![];
         for &ColorCounter(r, g, b, a) in &self.pixels {
-            let scale: f64 = 2.0 * (1.0 + 5.0 * a).log10() / self.quality as f64;
+            let scale: f64 = 2.5 * (1.0 + a).log10() / self.quality as f64;
             let mut new_a = a * scale;
             let gamma_scale;
             if new_a < EPSILON {
