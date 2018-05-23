@@ -1,18 +1,16 @@
 extern crate image;
 extern crate rand;
 
-pub mod camera;
-pub mod canvas;
+pub mod render;
 pub mod example;
 pub mod template;
 pub mod transforms;
-pub mod renderer;
 pub mod output;
 pub mod util;
 
 fn main() {
     let template = example::spark();
-    let raw = renderer::render(&template);
+    let raw = render::simple_renderer::render(&template);
     output::write("fractal.png",raw, &template.render);
 }
 

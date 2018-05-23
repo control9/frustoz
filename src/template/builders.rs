@@ -1,7 +1,7 @@
 extern crate hex;
 
-use camera::Camera;
-use canvas::Canvas;
+use render::camera::Camera;
+use render::canvas::Canvas;
 use template::flame_template::CameraConfig;
 use template::flame_template::RenderConfig;
 use template::flame_template::TransformTemplate;
@@ -14,7 +14,7 @@ pub fn camera(config: &CameraConfig) -> Camera {
 }
 
 pub fn canvas(config: &RenderConfig) -> Canvas {
-    Canvas::new(config.width, config.height, config.quality)
+    Canvas::new(config.width, config.height)
 }
 
 pub fn iterations(config: &RenderConfig) -> u32 {

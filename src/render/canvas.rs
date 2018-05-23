@@ -2,23 +2,19 @@ use util::coordinates::CameraCoordinates;
 use util::coordinates::CanvasPixel;
 use template::palette::RGB;
 use std::f64;
+use render::HDRPixel;
 
-#[derive(Copy, Clone)]
-struct ColorCounter(f64, f64, f64, f64);
-
-const GAMMA_FACTOR: f64 = 1.0 / 2.2;
-const EPSILON : f64 = 0.0000000001;
+pub type Histogram = Vec<HDRPixel>;
 
 pub struct Canvas {
     width: u32,
     height: u32,
-    quality: u32,
-    pixels: Vec<ColorCounter>,
+    pixels: Vec<HDRPixel>,
 }
 
 impl Canvas {
-    pub fn new(width: u32, height: u32, quality: u32) -> Self {
-        Self { width, height, quality, pixels: vec![ColorCounter(0.0, 0.0, 0.0, 0.0); (width * height) as usize] }
+    pub fn new(width: u32, height: u32) -> Self {
+        Self { width, height, pixels: vec![HDRPixel(0.0, 0.0, 0.0, 0.0); (width * height) as usize] }
     }
 
     fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
@@ -46,33 +42,13 @@ impl Canvas {
     }
 
     fn update_pixel(&mut self, index: usize, &RGB(r, g, b): &RGB) {
-        let &ColorCounter(rc, gc, bc, a) = &self.pixels[index];
-        self.pixels[index] = ColorCounter(rc + r as f64, gc + g as f64, bc + b as f64, a + 1.0);
+        let &HDRPixel(rc, gc, bc, a) = &self.pixels[index];
+        self.pixels[index] = HDRPixel(rc + r as f64, gc + g as f64, bc + b as f64, a + 1.0);
     }
 
-    pub fn extract_raw(&self) -> Vec<u8> {
-        let mut result: Vec<u8> = vec![];
-        for &ColorCounter(r, g, b, a) in &self.pixels {
-            let scale: f64 = 2.5 * (1.0 + a).log10() / self.quality as f64;
-            let mut new_a = a * scale;
-            let gamma_scale;
-            if new_a < EPSILON {
-                gamma_scale = 1.0;
-            } else {
-                let gamma_a = apply_gamma(new_a);
-                gamma_scale = gamma_a / new_a;
-            }
-
-            result.push((r * scale * gamma_scale) as u8);
-            result.push((g * scale * gamma_scale) as u8);
-            result.push((b * scale * gamma_scale) as u8);
-        }
-        result
+    pub fn histogram(self) -> Histogram {
+        self.pixels
     }
-}
-
-fn apply_gamma(color: f64) -> f64 {
-    (color / 255.0).min(1.0).max(0.0).powf(GAMMA_FACTOR) * 255.0
 }
 
 fn valid_coordinates(&CameraCoordinates(x, y): &CameraCoordinates) -> bool {
@@ -133,14 +109,14 @@ mod canvas_test {
     struct CanvasSize(u32, u32);
 
     fn should_project_coordinates(expected: CanvasPixel, CanvasSize(width, height): CanvasSize, coordinates: CameraCoordinates) {
-        let canvas = &Canvas::new(width, height, 1);
+        let canvas = &Canvas::new(width, height);
         let actual = canvas.project(&coordinates);
 
         assert_eq!(Some(expected), actual);
     }
 
     fn should_not_project_coordinates(CanvasSize(width, height): CanvasSize, coordinates: CameraCoordinates) {
-        let canvas = &Canvas::new(width, height, 1);
+        let canvas = &Canvas::new(width, height);
         let actual = canvas.project(&coordinates);
         assert!(actual.is_none());
     }
