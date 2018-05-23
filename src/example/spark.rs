@@ -27,8 +27,8 @@ fn get_transform_templates() -> Vec<TransformTemplate> {
 
 pub fn get_flame_template() -> FlameTemplate {
     let render: RenderConfig = RenderConfig {
-        width: 1024,
-        height: 768,
+        width: 960,
+        height: 540,
         quality: 100,
         skip_iterations: 20,
     };

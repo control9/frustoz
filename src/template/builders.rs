@@ -62,6 +62,6 @@ mod palette_builder_test {
         let size = 4;
 
         let result = super::palette(size, input);
-        assert_eq!(&RGB(185, 234, 235), result.get_color(0.0))
+        assert_eq!(&RGB(185.0 / 256.0, 234.0 / 256.0, 235.0 / 256.0), result.get_color(0.0))
     }
 }

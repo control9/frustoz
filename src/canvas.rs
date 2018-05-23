@@ -1,9 +1,13 @@
 use util::coordinates::CameraCoordinates;
 use util::coordinates::CanvasPixel;
 use template::palette::RGB;
+use std::f64;
 
 #[derive(Copy, Clone)]
-struct ColorCounter(u64,u64,u64,u64);
+struct ColorCounter(f64, f64, f64, f64);
+
+const GAMMA_FACTOR: f64 = 1.0 / 2.2;
+const EPSILON : f64 = 0.0000000001;
 
 pub struct Canvas {
     width: u32,
@@ -14,7 +18,7 @@ pub struct Canvas {
 
 impl Canvas {
     pub fn new(width: u32, height: u32, quality: u32) -> Self {
-        Self { width, height,quality, pixels: vec![ColorCounter(0,0,0,0); (width * height) as usize] }
+        Self { width, height, quality, pixels: vec![ColorCounter(0.0, 0.0, 0.0, 0.0); (width * height) as usize] }
     }
 
     fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
@@ -36,28 +40,39 @@ impl Canvas {
         }
     }
 
-    pub fn extract_raw(&self) -> Vec<u8> {
-        let mut result: Vec<u8> = vec![];
-        for &ColorCounter(r,g,b,a) in &self.pixels {
-            let scale = (1.0 + a as f64).log10() / (255.0 * self.quality as f64);
-
-            result.push( (r as f64 * scale).min(255.0) as u8);
-            result.push( (g as f64 * scale).min(255.0) as u8);
-            result.push( (b as f64 * scale).min(255.0) as u8);
-        }
-        result
-    }
-
     fn update(&mut self, CanvasPixel(x, y): CanvasPixel, color: &RGB) {
         let pixel_index: usize = (y * self.width + x) as usize;
         self.update_pixel(pixel_index, color);
     }
 
-    fn update_pixel(&mut self, index: usize, &RGB(r,g,b) : &RGB) {
+    fn update_pixel(&mut self, index: usize, &RGB(r, g, b): &RGB) {
         let &ColorCounter(rc, gc, bc, a) = &self.pixels[index];
-        self.pixels[index] = ColorCounter(rc + r as u64, gc + g as u64, bc + b as u64, a + 1);
+        self.pixels[index] = ColorCounter(rc + r as f64, gc + g as f64, bc + b as f64, a + 1.0);
     }
 
+    pub fn extract_raw(&self) -> Vec<u8> {
+        let mut result: Vec<u8> = vec![];
+        for &ColorCounter(r, g, b, a) in &self.pixels {
+            let scale: f64 = 2.0 * (1.0 + 5.0 * a).log10() / self.quality as f64;
+            let mut new_a = a * scale;
+            let gamma_scale;
+            if new_a < EPSILON {
+                gamma_scale = 1.0;
+            } else {
+                let gamma_a = apply_gamma(new_a);
+                gamma_scale = gamma_a / new_a;
+            }
+
+            result.push((r * scale * gamma_scale) as u8);
+            result.push((g * scale * gamma_scale) as u8);
+            result.push((b * scale * gamma_scale) as u8);
+        }
+        result
+    }
+}
+
+fn apply_gamma(color: f64) -> f64 {
+    (color / 255.0).min(1.0).max(0.0).powf(GAMMA_FACTOR) * 255.0
 }
 
 fn valid_coordinates(&CameraCoordinates(x, y): &CameraCoordinates) -> bool {
