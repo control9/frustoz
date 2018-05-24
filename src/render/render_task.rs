@@ -1,21 +1,19 @@
-use template::flame_template::FlameTemplate;
-use template::builders;
-use util::math::RealPoint;
 use rand;
 use rand::Rng;
 use render::camera::Camera;
 use render::canvas::Canvas;
+use render::canvas::Histogram;
+use template::builders;
+use template::flame_template::FlameTemplate;
 use template::palette::Palette;
 use transforms::TransformSystem;
-use rand::ThreadRng;
-use render::canvas::Histogram;
+use util::math::RealPoint;
 
-pub struct RenderTask <'a> {
-    rng: ThreadRng,
+pub struct RenderTask {
     camera: Camera,
     canvas: Canvas,
     variations: TransformSystem,
-    palette: &'a Palette,
+    palette: Palette,
     iterations: u32,
     iteration: u32,
     skip_iterations: u32,
@@ -23,16 +21,16 @@ pub struct RenderTask <'a> {
     color: f64,
 }
 
-impl <'a, 'b> RenderTask<'a> {
-    pub fn new(template: &'a FlameTemplate) -> Self {
+impl RenderTask {
+    pub fn new(template: &FlameTemplate, threads: u32) -> Self {
         let mut rng = rand::thread_rng();
 
         let camera = builders::camera(&template.camera);
         let canvas = builders::canvas(&template.render);
         let variations = builders::transform_system(&template.transforms);
-        let palette : &'a Palette = &template.palette;
+        let palette : Palette = (&template.palette).clone();
 
-        let iterations = builders::iterations(&template.render);
+        let iterations = builders::iterations(&template.render) / threads;
         let skip_iterations = &template.render.skip_iterations;
 
         let xstart: f64 = rng.gen_range(0.0, 1.0);
@@ -41,15 +39,16 @@ impl <'a, 'b> RenderTask<'a> {
         let color : f64 = rng.gen_range(0.0, 1.0);
 
         RenderTask {
-            rng, camera, canvas, variations, palette, iterations, iteration: 0, skip_iterations: *skip_iterations, point, color
+            camera, canvas, variations, palette, iterations, iteration: 0, skip_iterations: *skip_iterations, point, color
         }
 
     }
 
     pub fn render(mut self) -> Histogram {
+        let mut rng = rand::thread_rng();
         for iteration in 1..self.iterations {
             self.iteration = iteration;
-            let transform_seed: f64 = self.rng.gen_range(0.0, 1.0);
+            let transform_seed: f64 = rng.gen_range(0.0, 1.0);
             let transform = self.variations.get_transformation(transform_seed);
 
             let (new_point, new_color) = transform.apply(&self.point, self.color);

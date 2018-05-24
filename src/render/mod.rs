@@ -5,6 +5,7 @@ pub mod camera;
 pub mod render_task;
 pub mod simple_renderer;
 pub mod histogram_processor;
+pub mod multithreaded_renderer;
 
 #[derive(Copy, Clone)]
 pub struct HDRPixel(pub f64, pub f64, pub f64, pub f64);
