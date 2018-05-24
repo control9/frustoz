@@ -33,15 +33,16 @@ fn get_transform_templates() -> Vec<TransformTemplate> {
 
 pub fn get_flame_template() -> FlameTemplate {
     let render: RenderConfig = RenderConfig {
-        width: 400,
-        height: 400,
-        quality: 100,
+        width: 1920,
+        height: 1080,
+        quality: 800,
+        oversampling: 1,
         skip_iterations: 20,
     };
     let camera: CameraConfig = CameraConfig {
-        origin: RealPoint(-1.0, -1.0),
-        scale_x: 2.2,
-        scale_y: 2.2,
+        origin: RealPoint(-0.05, -0.05),
+        scale_x: 1.1,
+        scale_y: 1.1,
     };
     let transforms = get_transform_templates();
     let palette: Palette = green_palette::palette();

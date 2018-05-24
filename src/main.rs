@@ -1,5 +1,6 @@
 extern crate image;
 extern crate rand;
+extern crate rayon;
 
 use template::flame_template::FlameTemplate;
 use std::time::Instant;

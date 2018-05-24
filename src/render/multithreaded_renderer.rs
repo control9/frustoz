@@ -1,9 +1,9 @@
-use std::thread;
-use std::sync::mpsc::channel;
 use render::render_task::RenderTask;
 use template::flame_template::FlameTemplate;
 use render::histogram_processor::HistogramProcessor;
 use render::canvas::Histogram;
+use rayon::prelude::*;
+use rayon::ThreadPoolBuilder;
 
 pub struct Renderer {
     pub threads: u32,
@@ -11,21 +11,17 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn render(&self, flame: &FlameTemplate) -> Vec<u8> {
-        let (tx, rx) = channel();
-        for _i in 0..self.threads {
-            let task: RenderTask = RenderTask::new(&flame, self.threads);
-            let tx = tx.clone();
-            thread::spawn(move || tx.send(task.render()));
-        }
+        ThreadPoolBuilder::new().num_threads(self.threads as usize).build_global().expect("Failed to initialize pool");
+        let tasks : Vec<RenderTask> = (0..self.threads)
+            .map(|_| RenderTask::new(&flame, self.threads) )
+            .collect();
 
-        let mut histograms = vec![];
+        let histograms : Vec<Histogram> = tasks.into_par_iter()
+            .map(|t| t.render())
+            .collect();
 
-        for _i in 0..self.threads {
-            let hist : Histogram = rx.recv().unwrap();
-            histograms.push(hist);
-        }
-
-        let processor = HistogramProcessor::new(flame.render.quality);
+        let render = &flame.render;
+        let processor = HistogramProcessor::new(render.quality, render.width, render.height, render.oversampling);
         processor.process_to_raw(histograms)
     }
 }

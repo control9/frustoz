@@ -39,9 +39,10 @@ fn get_transform_templates() -> Vec<TransformTemplate> {
 
 pub fn get_flame_template() -> FlameTemplate {
     let render: RenderConfig = RenderConfig {
-        width: 600,
-        height: 800,
-        quality: 200,
+        width: 1920,
+        height: 1080,
+        quality: 400,
+        oversampling: 3,
         skip_iterations: 20,
     };
     let camera: CameraConfig = CameraConfig {

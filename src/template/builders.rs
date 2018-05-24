@@ -14,7 +14,7 @@ pub fn camera(config: &CameraConfig) -> Camera {
 }
 
 pub fn canvas(config: &RenderConfig) -> Canvas {
-    Canvas::new(config.width, config.height)
+    Canvas::new(config.width * config.oversampling, config.height * config.oversampling)
 }
 
 pub fn iterations(config: &RenderConfig) -> u32 {

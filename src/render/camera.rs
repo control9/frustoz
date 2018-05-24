@@ -21,7 +21,6 @@ impl Camera {
     }
 }
 
-
 #[cfg(test)]
 mod camera_test {
     use super::Camera;
@@ -42,4 +41,3 @@ mod camera_test {
         assert_eq!(CameraCoordinates(0.5, 1.0), camera.project(&point));
     }
 }
-
