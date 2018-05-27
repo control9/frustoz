@@ -1,7 +1,5 @@
 use render::log_scale_calculator::LogScaleCalculator;
-use render::canvas::HistogramLayer;
 use render::HDRPixel;
-use render::RGBACounter;
 
 pub struct LogFilter {
     pub scale_calculator: LogScaleCalculator,

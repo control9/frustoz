@@ -76,7 +76,7 @@ impl HistogramProcessor {
             self.width * self.oversampling + border * 2,
             self.height * self.oversampling + border * 2,
             self.oversampling);
-        hist.iter()
+        hist.par_iter()
             .map(|pixel| self.log_filter.apply(pixel))
             .map(|pixel| gamma_filter::apply(&pixel))
             .collect()
