@@ -2,7 +2,7 @@ use rand;
 use rand::Rng;
 use render::camera::Camera;
 use render::canvas::Canvas;
-use render::canvas::Histogram;
+use render::canvas::HistogramLayer;
 use template::builders;
 use template::flame_template::FlameTemplate;
 use template::palette::Palette;
@@ -44,7 +44,7 @@ impl RenderTask {
 
     }
 
-    pub fn render(mut self) -> Histogram {
+    pub fn render(mut self) -> HistogramLayer {
         let mut rng = rand::thread_rng();
         for iteration in 1..self.iterations {
             self.iteration = iteration;
@@ -61,7 +61,7 @@ impl RenderTask {
             }
         }
 
-        self.canvas.histogram()
+        self.canvas.extract_data()
     }
 }
 

@@ -2,6 +2,7 @@ extern crate hex;
 
 use render::camera::Camera;
 use render::canvas::Canvas;
+use render::spatial_filter;
 use template::flame_template::CameraConfig;
 use template::flame_template::RenderConfig;
 use template::flame_template::TransformTemplate;
@@ -13,8 +14,11 @@ pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale_x, config.scale_y)
 }
 
+// ToDo: Adjust after moving stuff to configs
 pub fn canvas(config: &RenderConfig) -> Canvas {
-    Canvas::new(config.width * config.oversampling, config.height * config.oversampling)
+    let filter = spatial_filter::create_filter(0, config.oversampling, 0.75);
+    let border = (filter.0 - config.oversampling as usize).max(0) as u32;
+    Canvas::new(config.width * config.oversampling + border * 2, config.height * config.oversampling + border * 2)
 }
 
 pub fn iterations(config: &RenderConfig) -> u32 {

@@ -4,12 +4,12 @@ use template::palette::RGB;
 use std::f64;
 use render::RGBACounter;
 
-pub type Histogram = Vec<RGBACounter>;
+pub type HistogramLayer = Vec<RGBACounter>;
 
 pub struct Canvas {
     width: u32,
     height: u32,
-    pixels: Vec<RGBACounter>,
+    pixels: HistogramLayer,
 }
 
 impl Canvas {
@@ -46,7 +46,7 @@ impl Canvas {
         self.pixels[index] = RGBACounter(rc + r as f64, gc + g as f64, bc + b as f64, a + 1);
     }
 
-    pub fn histogram(self) -> Histogram {
+    pub fn extract_data(self) -> HistogramLayer {
         self.pixels
     }
 }

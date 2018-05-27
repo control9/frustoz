@@ -1,7 +1,8 @@
 use render::render_task::RenderTask;
 use template::flame_template::FlameTemplate;
 use render::histogram_processor::HistogramProcessor;
-use render::canvas::Histogram;
+use render::canvas::HistogramLayer;
+use render::spatial_filter;
 use rayon::prelude::*;
 use rayon::ThreadPoolBuilder;
 
@@ -16,12 +17,13 @@ impl Renderer {
             .map(|_| RenderTask::new(&flame, self.threads) )
             .collect();
 
-        let histograms : Vec<Histogram> = tasks.into_par_iter()
+        let histograms : Vec<HistogramLayer> = tasks.into_par_iter()
             .map(|t| t.render())
             .collect();
 
         let render = &flame.render;
-        let processor = HistogramProcessor::new(render.quality, render.width, render.height, render.oversampling);
+        let filter = spatial_filter::create_filter(0, render.oversampling, 0.75);
+        let processor = HistogramProcessor::new(render.quality, render.width, render.height, render.oversampling, filter);
         processor.process_to_raw(histograms)
     }
 }
