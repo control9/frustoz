@@ -18,7 +18,7 @@ pub fn camera(config: &CameraConfig) -> Camera {
 pub fn canvas(config: &RenderConfig) -> Canvas {
     let filter = spatial_filter::create_filter(0, config.oversampling, 0.75);
     let border = (filter.0 - config.oversampling as usize).max(0) as u32;
-    Canvas::new(config.width * config.oversampling + border * 2, config.height * config.oversampling + border * 2)
+    Canvas::new(config.width * config.oversampling + border, config.height * config.oversampling + border)
 }
 
 pub fn iterations(config: &RenderConfig) -> u32 {

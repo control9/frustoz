@@ -73,8 +73,8 @@ impl HistogramProcessor {
             &histogram,
             self.width,
             self.height,
-            self.width * self.oversampling + border * 2,
-            self.height * self.oversampling + border * 2,
+            self.width * self.oversampling + border,
+            self.height * self.oversampling + border,
             self.oversampling);
         hist.par_iter()
             .map(|pixel| self.log_filter.apply(pixel))

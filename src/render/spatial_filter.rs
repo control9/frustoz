@@ -16,31 +16,33 @@ fn _sinc(x: f64) -> f64 {
 }
 
 fn gaussian(x: f64) -> f64 {
-    (-2.0 * x * x).exp() * (FRAC_2_PI)
+    (-2.0 * x * x).exp() * FRAC_2_PI.sqrt()
 }
 
 pub fn create_filter(_filter_type: u32, oversample: u32, radius: f64) -> (usize, Vec<f64>) {
+    let now = Instant::now();
     let fw: f64 = 2.0 * oversample as f64 * radius as f64 * GAUSS_SUPPORT;
+
     let mut filter_width = fw as usize + 1;
     if (filter_width as u32 ^ oversample) == 1 {
         filter_width += 1;
     }
 
-//    let size = filter_width * filter_width;
     let adjust = match fw {
         zero if zero < 0.00000001 => 1.0,
         fw => GAUSS_SUPPORT * filter_width as f64 / fw
     };
-
     let mut filter = vec![];
     for j in 0..filter_width {
         for i in 0..filter_width {
             let ii = adjust * ((2.0 * i as f64 + 1.0) / filter_width as f64 - 1.0);
             let jj = adjust * ((2.0 * j as f64 + 1.0) / filter_width as f64 - 1.0);
 
-            filter.push(gaussian(ii) + gaussian(jj));
+            filter.push(gaussian(ii) * gaussian(jj));
         }
     }
+    let elapsed = now.elapsed();
+    println!("Creating filter took: {:?}, filter width: {}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0), filter_width);
     (filter_width, filter)
 }
 
