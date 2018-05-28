@@ -29,7 +29,7 @@ pub fn get_flame_template() -> FlameTemplate {
     let render: RenderConfig = RenderConfig {
         width: 1920,
         height: 1080,
-        quality: 400,
+        quality: 100,
         oversampling: 3,
         skip_iterations: 20,
     };
