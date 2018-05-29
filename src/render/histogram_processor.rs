@@ -5,28 +5,33 @@ use render::HDRPixel;
 use render::Histogram;
 use render::log_filter::LogFilter;
 use render::log_scale_calculator::LogScaleCalculator;
+use render::pixel_filter::PixelFilter;
 use render::RGBACounter;
 use render::spatial_filter;
 
 pub struct HistogramProcessor {
-    width: u32,
-    height: u32,
+    image_width: u32,
+    image_height: u32,
+    histogram_width: u32,
+    histogram_height: u32,
     oversampling: u32,
-    spatial_filter: (usize, Vec<f64>),
+    spatial_filter: PixelFilter,
     log_filter: LogFilter,
 }
 
 impl HistogramProcessor {
-    pub fn new(quality: u32, width: u32, height: u32, oversampling: u32, spatial_filter: (usize, Vec<f64>)) -> Self {
+    pub fn new(quality: u32, image_width: u32, image_height: u32,
+               histogram_width: u32, histogram_height: u32,
+               oversampling: u32, spatial_filter: PixelFilter) -> Self {
         let scale_calculator = LogScaleCalculator::new(quality, oversampling);
         let log_filter = LogFilter {
             scale_calculator,
-            width,
-            height,
+            width: image_width,
+            height: image_height,
             oversampling,
             white_level: 240.0,
         };
-        HistogramProcessor { width, height, oversampling, spatial_filter, log_filter }
+        HistogramProcessor { image_width, image_height, histogram_width, histogram_height, oversampling, spatial_filter, log_filter }
     }
 
     pub fn process_to_raw(&self, histograms: Vec<HistogramLayer>) -> Vec<u8> {
@@ -54,9 +59,9 @@ impl HistogramProcessor {
 
         let histogram = HistogramProcessor::process_pixels(&self, histogram);
 
-        for j in 0..self.height {
-            for i in 0..self.width {
-                let HDRPixel(r, g, b, _a) = histogram[(i + j * self.width) as usize];
+        for j in 0..self.image_height{
+            for i in 0..self.image_width {
+                let HDRPixel(r, g, b, _a) = histogram[(i + j * self.image_width) as usize];
 
                 result.push((r * 255.0).min(255.0) as u8);
                 result.push((g * 255.0).min(255.0) as u8);
@@ -67,14 +72,13 @@ impl HistogramProcessor {
     }
 
     fn process_pixels(&self, histogram: Histogram) -> Histogram {
-        let border = (self.spatial_filter.0 - self.oversampling as usize).max(0) as u32;
         let hist = spatial_filter::apply_filter(
-            (&self.spatial_filter.0, &self.spatial_filter.1),
+            &self.spatial_filter,
             &histogram,
-            self.width,
-            self.height,
-            self.width * self.oversampling + border,
-            self.height * self.oversampling + border,
+            self.image_width,
+            self.image_height,
+            self.histogram_width,
+            self.histogram_height,
             self.oversampling);
         hist.par_iter()
             .map(|pixel| self.log_filter.apply(pixel))

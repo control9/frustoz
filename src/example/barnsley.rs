@@ -1,11 +1,13 @@
-use template::flame_template::TransformTemplate;
+use example::green_palette;
+use render::pixel_filter::FilterType;
 use template::builders::transform;
+use template::flame_template::CameraConfig;
+use template::flame_template::FilterConfig;
 use template::flame_template::FlameTemplate;
 use template::flame_template::RenderConfig;
-use template::flame_template::CameraConfig;
-use util::math::RealPoint;
-use example::green_palette;
+use template::flame_template::TransformTemplate;
 use template::palette::Palette;
+use util::math::RealPoint;
 
 const B1: [f64; 6] = [
     0.0, 0.0, 0.0,
@@ -44,14 +46,20 @@ pub fn get_flame_template() -> FlameTemplate {
         quality: 400,
         oversampling: 3,
         skip_iterations: 20,
+        border: 0,
     };
     let camera: CameraConfig = CameraConfig {
         origin: RealPoint(-6.0, -0.5),
         scale_x: 12.0,
         scale_y: 12.0,
     };
+
+    let filter: FilterConfig = FilterConfig {
+        filter_type: FilterType::Gaussian,
+        radius: 0.75,
+    };
     let transforms = get_transform_templates();
     let palette: Palette = green_palette::palette();
 
-    FlameTemplate { render, camera, transforms, palette }
+    FlameTemplate { render, camera, filter, transforms, palette }
 }

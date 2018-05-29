@@ -3,12 +3,12 @@ use rand::Rng;
 use render::camera::Camera;
 use render::canvas::Canvas;
 use render::canvas::HistogramLayer;
+use std::sync::mpsc::Sender;
 use template::builders;
 use template::flame_template::FlameTemplate;
 use template::palette::Palette;
 use transforms::TransformSystem;
 use util::math::RealPoint;
-use std::sync::mpsc::Sender;
 
 pub struct RenderTask {
     camera: Camera,
@@ -29,19 +29,26 @@ impl RenderTask {
         let camera = builders::camera(&template.camera);
         let canvas = builders::canvas(&template.render);
         let variations = builders::transform_system(&template.transforms);
-        let palette : Palette = (&template.palette).clone();
+        let palette: Palette = (&template.palette).clone();
 
         let skip_iterations = template.render.skip_iterations;
 
         let xstart: f64 = rng.gen_range(0.0, 1.0);
         let ystart: f64 = rng.gen_range(0.0, 1.0);
         let point = RealPoint(xstart, ystart);
-        let color : f64 = rng.gen_range(0.0, 1.0);
+        let color: f64 = rng.gen_range(0.0, 1.0);
 
         RenderTask {
-            camera, canvas, variations, palette, iterations, skip_iterations, progress_reporter, point, color
+            camera,
+            canvas,
+            variations,
+            palette,
+            iterations,
+            skip_iterations,
+            progress_reporter,
+            point,
+            color,
         }
-
     }
 
     pub fn render(mut self) -> HistogramLayer {

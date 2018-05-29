@@ -3,7 +3,6 @@ use render::render_task::RenderTask;
 use template::flame_template::FlameTemplate;
 use render::histogram_processor::HistogramProcessor;
 use render::canvas::HistogramLayer;
-use render::spatial_filter;
 use rayon::prelude::*;
 use rayon::ThreadPoolBuilder;
 
@@ -11,16 +10,26 @@ use std::time::Instant;
 use template::builders;
 use render::progress_bar;
 use std::sync::mpsc::Sender;
+use template::filter_builder;
+use template::flame_template::RenderConfig;
+use render::pixel_filter::PixelFilter;
 
 pub struct Renderer {
     pub threads: u32,
 }
 
 impl Renderer {
-    pub fn render(&self, flame: &FlameTemplate) -> Vec<u8> {
+    pub fn render(&self, flame: &mut FlameTemplate) -> Vec<u8> {
 
         let now = Instant::now();
         ThreadPoolBuilder::new().num_threads(self.threads as usize).build_global().expect("Failed to initialize pool");
+
+        let filter = filter_builder::filter(&flame.filter, flame.render.oversampling);
+        {
+            let render = &mut flame.render;
+            render.border = (filter.width - render.oversampling).max(0);
+        }
+        let processor = create_histogram_processor(&flame.render, filter);
 
         let iterations = builders::iterations(&flame.render);
         let iterations_per_thread = split(iterations, self.threads);
@@ -44,12 +53,19 @@ impl Renderer {
             .map(|t| t.render())
             .collect();
 
-        let render = &flame.render;
-        let filter = spatial_filter::create_filter(0, render.oversampling, 0.75);
-        let processor = HistogramProcessor::new(render.quality, render.width, render.height, render.oversampling, filter);
+
         processor.process_to_raw(histograms)
     }
 
+}
+
+fn create_histogram_processor(config: &RenderConfig, filter: PixelFilter) -> HistogramProcessor {
+    let histogram_width = config.width * config.oversampling + config.border;
+    let histogram_height = config.height * config.oversampling + config.border;
+
+    HistogramProcessor::new(
+        config.quality, config.width, config.height, histogram_width, histogram_height, config.oversampling, filter
+    )
 }
 
 fn split(iterations: u32, parts: u32) -> Vec<u32> {

@@ -5,8 +5,9 @@ pub mod simple_renderer;
 pub mod histogram_processor;
 pub mod multithreaded_renderer;
 
+pub mod pixel_filter;
 mod progress_bar;
-pub mod spatial_filter;
+mod spatial_filter;
 mod gamma_filter;
 mod log_filter;
 mod log_scale_calculator;

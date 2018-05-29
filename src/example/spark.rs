@@ -1,21 +1,22 @@
-use template::flame_template::TransformTemplate;
-use template::builders::transform;
+use render::pixel_filter::FilterType;
 use template::builders::palette;
+use template::builders::transform;
+use template::flame_template::CameraConfig;
+use template::flame_template::FilterConfig;
 use template::flame_template::FlameTemplate;
 use template::flame_template::RenderConfig;
-use template::flame_template::CameraConfig;
+use template::flame_template::TransformTemplate;
 use template::palette::Palette;
 use util::math::RealPoint;
 
 const T1: [f64; 6] = [
-    0.9398083605003169, -0.8990128677757641,1.3909810148054664,
+    0.9398083605003169, -0.8990128677757641, 1.3909810148054664,
     0.45393094546052914, 0.17251724552817665, 0.8074475159114657,
-
 ];
 
 const T2: [f64; 6] = [
-    0.7353743435248136,  -0.061067459186581186, -1.119570085087326,
-    -0.2510551099892795, 0.8032270759543487,  -0.2239140170174654,
+    0.7353743435248136, -0.061067459186581186, -1.119570085087326,
+    -0.2510551099892795, 0.8032270759543487, -0.2239140170174654,
 ];
 
 fn get_transform_templates() -> Vec<TransformTemplate> {
@@ -32,16 +33,22 @@ pub fn get_flame_template() -> FlameTemplate {
         quality: 100,
         oversampling: 3,
         skip_iterations: 20,
+        border: 0,
     };
     let camera: CameraConfig = CameraConfig {
         origin: RealPoint(-7.1282, -3.0393),
         scale_x: 12.355,
         scale_y: 6.95,
     };
+    let filter: FilterConfig = FilterConfig {
+        filter_type: FilterType::Gaussian,
+        radius: 0.75,
+    };
+
     let transforms = get_transform_templates();
     let palette: Palette = palette(256, PALETTE);
 
-    FlameTemplate { render, camera, transforms, palette }
+    FlameTemplate { render, camera, filter, transforms, palette }
 }
 
 const PALETTE: &str =

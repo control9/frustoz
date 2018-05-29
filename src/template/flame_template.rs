@@ -1,9 +1,11 @@
 use util::math::RealPoint;
 use template::palette::Palette;
+use render::pixel_filter::FilterType;
 
 pub struct FlameTemplate {
     pub render: RenderConfig,
     pub camera: CameraConfig,
+    pub filter: FilterConfig,
     pub transforms: Vec<TransformTemplate>,
     pub palette: Palette,
 }
@@ -26,4 +28,10 @@ pub struct RenderConfig {
     pub quality: u32,
     pub oversampling: u32,
     pub skip_iterations: u32,
+    pub border: u32,
+}
+
+pub struct FilterConfig {
+    pub filter_type: FilterType,
+    pub radius: f64,
 }
