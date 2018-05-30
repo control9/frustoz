@@ -1,5 +1,6 @@
 use std::f64::consts::FRAC_2_PI;
 use std::f64::consts::PI;
+use super::FilterType;
 
 const GAUSS_SUPPORT: f64 = 1.5;
 const HERMITE_SUPPORT: f64 = 1.0;
@@ -28,12 +29,6 @@ fn hermite(x: f64) -> f64 {
     }
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
-pub enum FilterType {
-    Gaussian,
-    Hermite,
-}
-
 impl FilterType {
     pub fn apply(&self, x: f64) -> f64 {
         match self {
@@ -48,9 +43,4 @@ impl FilterType {
             &FilterType::Hermite => HERMITE_SUPPORT,
         }
     }
-}
-
-pub struct PixelFilter {
-    pub width: u32,
-    pub coefficients: Vec<f64>,
 }

@@ -1,4 +1,4 @@
-use render::pixel_filter::FilterType;
+use render::filter::FilterType;
 use template::builders::palette;
 use template::builders::transform;
 use template::flame_template::CameraConfig;

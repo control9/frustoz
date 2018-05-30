@@ -1,13 +1,13 @@
 use rayon::prelude::*;
-use render::canvas::HistogramLayer;
-use render::gamma_filter;
+use render::filter::FilterKernel;
+use render::filter::LogFilter;
+use render::filter::LogScaleCalculator;
+use render::filter::spatial_filter;
+use render::filter::gamma_filter;
 use render::HDRPixel;
 use render::Histogram;
-use render::log_filter::LogFilter;
-use render::log_scale_calculator::LogScaleCalculator;
-use render::pixel_filter::PixelFilter;
+use render::histogram::canvas::HistogramLayer;
 use render::RGBACounter;
-use render::spatial_filter;
 
 pub struct HistogramProcessor {
     image_width: u32,
@@ -15,14 +15,14 @@ pub struct HistogramProcessor {
     histogram_width: u32,
     histogram_height: u32,
     oversampling: u32,
-    spatial_filter: PixelFilter,
+    spatial_filter: FilterKernel,
     log_filter: LogFilter,
 }
 
 impl HistogramProcessor {
     pub fn new(quality: u32, image_width: u32, image_height: u32,
                histogram_width: u32, histogram_height: u32,
-               oversampling: u32, spatial_filter: PixelFilter) -> Self {
+               oversampling: u32, spatial_filter: FilterKernel) -> Self {
         let scale_calculator = LogScaleCalculator::new(quality, oversampling);
         let log_filter = LogFilter {
             scale_calculator,
@@ -59,7 +59,7 @@ impl HistogramProcessor {
 
         let histogram = HistogramProcessor::process_pixels(&self, histogram);
 
-        for j in 0..self.image_height{
+        for j in 0..self.image_height {
             for i in 0..self.image_width {
                 let HDRPixel(r, g, b, _a) = histogram[(i + j * self.image_width) as usize];
 

@@ -1,9 +1,9 @@
-use render::pixel_filter::PixelFilter;
+use render::filter::FilterKernel;
 use std::time::Instant;
 use template::flame_template::FilterConfig;
 
 // ToDo: Normalize matrix!
-pub fn filter(&FilterConfig{filter_type, radius}: &FilterConfig, oversample: u32) -> PixelFilter {
+pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: u32) -> FilterKernel {
     let now = Instant::now();
     let fw: f64 = 2.0 * oversample as f64 * radius as f64 * filter_type.get_spatial_support();
 
@@ -27,5 +27,5 @@ pub fn filter(&FilterConfig{filter_type, radius}: &FilterConfig, oversample: u32
     }
     let elapsed = now.elapsed();
     println!("Creating filter took: {:?}, filter width: {}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0), filter_width);
-    PixelFilter { width: filter_width, coefficients: filter }
+    FilterKernel { width: filter_width, coefficients: filter }
 }

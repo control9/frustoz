@@ -1,7 +1,5 @@
-pub struct LogScaleCalculator {
-    k1: f64,
-    k2: f64,
-}
+use super::LogScaleCalculator;
+
 // TODO: inline me to log_filter
 impl LogScaleCalculator {
     pub fn new(quality: u32, oversampling: u32) -> Self {

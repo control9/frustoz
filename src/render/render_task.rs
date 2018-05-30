@@ -1,8 +1,8 @@
 use rand;
 use rand::Rng;
-use render::camera::Camera;
-use render::canvas::Canvas;
-use render::canvas::HistogramLayer;
+use render::histogram::Camera;
+use render::histogram::canvas::Canvas;
+use render::histogram::canvas::HistogramLayer;
 use std::sync::mpsc::Sender;
 use template::builders;
 use template::flame_template::FlameTemplate;

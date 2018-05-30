@@ -1,18 +1,17 @@
-use std::sync::mpsc;
-use render::render_task::RenderTask;
-use template::flame_template::FlameTemplate;
-use render::histogram_processor::HistogramProcessor;
-use render::canvas::HistogramLayer;
 use rayon::prelude::*;
 use rayon::ThreadPoolBuilder;
-
+use render::filter::FilterKernel;
+use render::histogram::canvas::HistogramLayer;
+use render::histogram_processor::HistogramProcessor;
+use render::progress_bar;
+use render::render_task::RenderTask;
+use std::sync::mpsc;
+use std::sync::mpsc::Sender;
 use std::time::Instant;
 use template::builders;
-use render::progress_bar;
-use std::sync::mpsc::Sender;
 use template::filter_builder;
+use template::flame_template::FlameTemplate;
 use template::flame_template::RenderConfig;
-use render::pixel_filter::PixelFilter;
 
 pub struct Renderer {
     pub threads: u32,
@@ -59,7 +58,7 @@ impl Renderer {
 
 }
 
-fn create_histogram_processor(config: &RenderConfig, filter: PixelFilter) -> HistogramProcessor {
+fn create_histogram_processor(config: &RenderConfig, filter: FilterKernel) -> HistogramProcessor {
     let histogram_width = config.width * config.oversampling + config.border;
     let histogram_height = config.height * config.oversampling + config.border;
 

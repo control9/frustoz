@@ -1,7 +1,8 @@
 use render::HDRPixel;
+use render::EPSILON;
 
 const GAMMA_FACTOR: f64 = 1.0 / 4.0;
-const EPSILON: f64 = 0.0000001;
+
 
 pub fn apply(&HDRPixel(r, g, b, a): &HDRPixel) -> HDRPixel {
     let new_a;

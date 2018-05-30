@@ -1,6 +1,6 @@
 use util::math::RealPoint;
 use template::palette::Palette;
-use render::pixel_filter::FilterType;
+use render::filter::FilterType;
 
 pub struct FlameTemplate {
     pub render: RenderConfig,

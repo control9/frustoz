@@ -1,13 +1,13 @@
 extern crate hex;
 
-use render::camera::Camera;
-use render::canvas::Canvas;
 use template::flame_template::CameraConfig;
 use template::flame_template::RenderConfig;
 use template::flame_template::TransformTemplate;
 use transforms::TransformSystem;
 use util::math::TransformMatrix;
 use template::palette::Palette;
+use render::histogram::Camera;
+use render::histogram::canvas::Canvas;
 
 pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale_x, config.scale_y)

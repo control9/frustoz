@@ -1,11 +1,6 @@
 use util::math::RealPoint;
 use util::coordinates::CameraCoordinates;
-
-pub struct Camera {
-    origin: RealPoint,
-    scale_x: f64,
-    scale_y: f64,
-}
+use super::Camera;
 
 
 impl Camera {

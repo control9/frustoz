@@ -1,13 +1,5 @@
-use render::log_scale_calculator::LogScaleCalculator;
 use render::HDRPixel;
-
-pub struct LogFilter {
-    pub scale_calculator: LogScaleCalculator,
-    pub width: u32,
-    pub height: u32,
-    pub oversampling: u32,
-    pub white_level: f64,
-}
+use super::LogFilter;
 
 
 impl LogFilter {

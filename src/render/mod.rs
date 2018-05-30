@@ -1,16 +1,13 @@
-pub mod canvas;
-pub mod camera;
+pub mod filter;
+pub mod histogram;
 pub mod render_task;
 pub mod simple_renderer;
 pub mod histogram_processor;
 pub mod multithreaded_renderer;
 
-pub mod pixel_filter;
 mod progress_bar;
-mod spatial_filter;
-mod gamma_filter;
-mod log_filter;
-mod log_scale_calculator;
+
+const EPSILON: f64 = 0.0000001;
 
 pub type Histogram = Vec<HDRPixel>;
 

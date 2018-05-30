@@ -1,5 +1,5 @@
 use example::green_palette;
-use render::pixel_filter::FilterType;
+use render::filter::FilterType;
 use template::builders::transform;
 use template::flame_template::CameraConfig;
 use template::flame_template::FilterConfig;
