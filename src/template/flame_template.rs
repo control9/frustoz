@@ -27,6 +27,7 @@ pub struct RenderConfig {
     pub height: u32,
     pub quality: u32,
     pub oversampling: u32,
+    pub brightness: f64,
     pub skip_iterations: u32,
     pub border: u32,
 }

@@ -23,7 +23,12 @@ pub fn render(flame: &mut FlameTemplate) -> Vec<u8> {
     let histogram_height = render.height * render.oversampling + render.border;
 
     let processor = HistogramProcessor::new(
-        render.quality, render.width, render.height, histogram_width, histogram_height, render.oversampling, filter
+        render.quality,
+        render.width, render.height,
+        histogram_width, histogram_height,
+        flame.camera.scale_x, flame.camera.scale_y,
+        render.oversampling, render.brightness,
+        filter
     );
 
     let task: RenderTask = RenderTask::new(flame, iterations, tx);

@@ -1,7 +1,6 @@
 use rayon::prelude::*;
 use render::filter::FilterKernel;
 use render::filter::LogFilter;
-use render::filter::LogScaleCalculator;
 use render::filter::spatial_filter;
 use render::filter::gamma_filter;
 use render::HDRPixel;
@@ -20,17 +19,19 @@ pub struct HistogramProcessor {
 }
 
 impl HistogramProcessor {
-    pub fn new(quality: u32, image_width: u32, image_height: u32,
+    pub fn new(quality: u32,
+               image_width: u32, image_height: u32,
                histogram_width: u32, histogram_height: u32,
-               oversampling: u32, spatial_filter: FilterKernel) -> Self {
-        let scale_calculator = LogScaleCalculator::new(quality, oversampling);
-        let log_filter = LogFilter {
-            scale_calculator,
-            width: image_width,
-            height: image_height,
+               view_width: f64, view_height: f64,
+               oversampling: u32, brightness: f64,
+               spatial_filter: FilterKernel) -> Self {
+        let log_filter = LogFilter::new(
+            quality,
             oversampling,
-            white_level: 240.0,
-        };
+            view_width,
+            view_height,
+            brightness
+        );
         HistogramProcessor { image_width, image_height, histogram_width, histogram_height, oversampling, spatial_filter, log_filter }
     }
 

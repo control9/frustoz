@@ -45,6 +45,7 @@ pub fn get_flame_template() -> FlameTemplate {
         height: 1080,
         quality: 400,
         oversampling: 3,
+        brightness: 4.0,
         skip_iterations: 20,
         border: 0,
     };
