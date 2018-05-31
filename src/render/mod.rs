@@ -7,7 +7,7 @@ pub mod multithreaded_renderer;
 
 mod progress_bar;
 
-const EPSILON: f64 = 0.0000001;
+pub const EPSILON: f64 = 0.0000001;
 
 pub type Histogram = Vec<HDRPixel>;
 

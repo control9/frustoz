@@ -1,3 +1,4 @@
+use render::EPSILON;
 use render::filter::FilterKernel;
 use std::time::Instant;
 use template::flame_template::FilterConfig;
@@ -25,7 +26,17 @@ pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: 
             filter.push(filter_type.apply(ii) * filter_type.apply(jj));
         }
     }
+    let filter = normalize(filter);
+
     let elapsed = now.elapsed();
     println!("Creating filter took: {:?}, filter width: {}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0), filter_width);
     FilterKernel { width: filter_width, coefficients: filter }
+}
+
+fn normalize(matrix: Vec<f64>) -> Vec<f64> {
+    let sum: f64 = matrix.iter().sum();
+    assert!(sum.abs() >= EPSILON);
+    matrix.iter()
+        .map(|x| x / sum)
+        .collect()
 }
