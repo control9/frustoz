@@ -3,7 +3,6 @@ use render::filter::FilterKernel;
 use std::time::Instant;
 use template::flame_template::FilterConfig;
 
-// ToDo: Normalize matrix!
 pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: u32) -> FilterKernel {
     let now = Instant::now();
     let fw: f64 = 2.0 * oversample as f64 * radius as f64 * filter_type.get_spatial_support();
@@ -17,6 +16,7 @@ pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: 
         zero if zero < 0.00000001 => 1.0,
         fw => filter_type.get_spatial_support() * filter_width as f64 / fw
     };
+
     let mut filter = vec![];
     for j in 0..filter_width {
         for i in 0..filter_width {
@@ -26,17 +26,17 @@ pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: 
             filter.push(filter_type.apply(ii) * filter_type.apply(jj));
         }
     }
-    let filter = normalize(filter);
+    normalize(&mut filter);
 
     let elapsed = now.elapsed();
     println!("Creating filter took: {:?}, filter width: {}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0), filter_width);
     FilterKernel { width: filter_width, coefficients: filter }
 }
 
-fn normalize(matrix: Vec<f64>) -> Vec<f64> {
+fn normalize(matrix: &mut Vec<f64>){
     let sum: f64 = matrix.iter().sum();
     assert!(sum.abs() >= EPSILON);
-    matrix.iter()
-        .map(|x| x / sum)
-        .collect()
+    for x in matrix.iter_mut() {
+        *x = *x / sum;
+    }
 }

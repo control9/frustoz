@@ -1,8 +1,8 @@
 use rayon::prelude::*;
 use render::filter::FilterKernel;
+use render::filter::gamma_filter;
 use render::filter::LogFilter;
 use render::filter::spatial_filter;
-use render::filter::gamma_filter;
 use render::HDRPixel;
 use render::Histogram;
 use render::histogram::canvas::HistogramLayer;
@@ -30,7 +30,7 @@ impl HistogramProcessor {
             oversampling,
             view_width,
             view_height,
-            brightness
+            brightness,
         );
         HistogramProcessor { image_width, image_height, histogram_width, histogram_height, oversampling, spatial_filter, log_filter }
     }
@@ -72,8 +72,13 @@ impl HistogramProcessor {
         result
     }
 
-    fn process_pixels(&self, histogram: Histogram) -> Histogram {
-        let hist = spatial_filter::apply_filter(
+    fn process_pixels(&self, mut histogram: Histogram) -> Histogram {
+        histogram = histogram.par_iter()
+            .map(|pixel| self.log_filter.apply(pixel))
+            .collect();
+
+
+        histogram = spatial_filter::apply_filter(
             &self.spatial_filter,
             &histogram,
             self.image_width,
@@ -81,8 +86,8 @@ impl HistogramProcessor {
             self.histogram_width,
             self.histogram_height,
             self.oversampling);
-        hist.par_iter()
-            .map(|pixel| self.log_filter.apply(pixel))
+
+        histogram.par_iter()
             .map(|pixel| gamma_filter::apply(&pixel))
             .collect()
     }
