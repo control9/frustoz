@@ -17,4 +17,6 @@ pub struct LogFilter {
 pub enum FilterType {
     Gaussian,
     Hermite,
+    Box,
+    Triangle,
 }
