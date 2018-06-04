@@ -1,18 +1,18 @@
-use template::flame_template::FlameTemplate;
+use template::flame::Flame;
 
 mod sierpinsky;
 mod barnsley;
 mod spark;
 pub mod green_palette;
 
-pub fn sierpinsky() -> FlameTemplate {
+pub fn sierpinsky() -> Flame {
     sierpinsky::get_flame_template()
 }
 
-pub fn barnsley() -> FlameTemplate {
+pub fn barnsley() -> Flame {
     barnsley::get_flame_template()
 }
 
-pub fn spark() -> FlameTemplate {
+pub fn spark() -> Flame {
     spark::get_flame_template()
 }

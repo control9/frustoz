@@ -8,23 +8,23 @@ use render::Histogram;
 use render::histogram::canvas::HistogramLayer;
 use render::RGBACounter;
 
-pub struct HistogramProcessor {
+pub struct HistogramProcessor<'a> {
     image_width: u32,
     image_height: u32,
     histogram_width: u32,
     histogram_height: u32,
     oversampling: u32,
-    spatial_filter: FilterKernel,
+    spatial_filter: &'a FilterKernel,
     log_filter: LogFilter,
 }
 
-impl HistogramProcessor {
+impl <'a> HistogramProcessor<'a> {
     pub fn new(quality: u32,
                image_width: u32, image_height: u32,
                histogram_width: u32, histogram_height: u32,
                view_width: f64, view_height: f64,
                oversampling: u32, brightness: f64,
-               spatial_filter: FilterKernel) -> Self {
+               spatial_filter: &'a FilterKernel) -> Self {
         let log_filter = LogFilter::new(
             quality,
             oversampling,

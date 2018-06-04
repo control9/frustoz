@@ -1,13 +1,15 @@
 use example::green_palette;
 use render::filter::FilterType;
 use template::builders::transform;
-use template::flame_template::CameraConfig;
-use template::flame_template::FilterConfig;
-use template::flame_template::FlameTemplate;
-use template::flame_template::RenderConfig;
-use template::flame_template::TransformTemplate;
+use template::flame::CameraConfig;
+use template::flame::Flame;
+use template::flame::RenderConfig;
 use template::palette::Palette;
 use util::math::RealPoint;
+use template::TransformTemplate;
+use template::FilterConfig;
+use template::builders;
+use template::filter_builder;
 
 const B1: [f64; 6] = [
     0.0, 0.0, 0.0,
@@ -39,8 +41,8 @@ fn get_transform_templates() -> Vec<TransformTemplate> {
     ]
 }
 
-pub fn get_flame_template() -> FlameTemplate {
-    let render: RenderConfig = RenderConfig {
+pub fn get_flame_template() -> Flame {
+    let mut render: RenderConfig = RenderConfig {
         width: 1920,
         height: 1080,
         quality: 400,
@@ -55,12 +57,16 @@ pub fn get_flame_template() -> FlameTemplate {
         scale_y: 12.0,
     };
 
-    let filter: FilterConfig = FilterConfig {
+
+    let filter_config: FilterConfig = FilterConfig {
         filter_type: FilterType::Gaussian,
         radius: 0.75,
     };
-    let transforms = get_transform_templates();
+    let filter = filter_builder::filter(&filter_config, render.oversampling);
+    render.border = (filter.width - render.oversampling).max(0);
+
+    let transforms = builders::transform_system(&get_transform_templates());
     let palette: Palette = green_palette::palette();
 
-    FlameTemplate { render, camera, filter, transforms, palette }
+    Flame { render, camera, filter, transforms, palette }
 }

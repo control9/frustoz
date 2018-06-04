@@ -1,20 +1,21 @@
 extern crate hex;
 
-use template::flame_template::CameraConfig;
-use template::flame_template::RenderConfig;
-use template::flame_template::TransformTemplate;
-use transforms::TransformSystem;
-use util::math::TransformMatrix;
-use template::palette::Palette;
 use render::histogram::Camera;
 use render::histogram::canvas::Canvas;
+use render::histogram_processor::HistogramProcessor;
+use template::flame::CameraConfig;
+use template::flame::Flame;
+use template::flame::RenderConfig;
+use template::palette::Palette;
+use template::TransformTemplate;
+use transforms::TransformSystem;
+use util::math::TransformMatrix;
 
 pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale_x, config.scale_y)
 }
 
-// ToDo: Adjust after moving stuff to configs
-pub fn canvas(config: &RenderConfig, ) -> Canvas {
+pub fn canvas(config: &RenderConfig) -> Canvas {
     Canvas::new(config.width * config.oversampling + config.border, config.height * config.oversampling + config.border)
 }
 
@@ -43,6 +44,23 @@ pub fn transform_system(templates: &Vec<TransformTemplate>) -> TransformSystem {
     }
     TransformSystem::new(transforms)
 }
+
+pub fn histogram_processor(flame: &Flame) -> HistogramProcessor {
+    let render = &flame.render;
+
+    let histogram_width = render.width * render.oversampling + render.border;
+    let histogram_height = render.height * render.oversampling + render.border;
+
+    HistogramProcessor::new(
+        render.quality,
+        render.width, render.height,
+        histogram_width, histogram_height,
+        flame.camera.scale_x, flame.camera.scale_y,
+        render.oversampling, render.brightness,
+        &flame.filter,
+    )
+}
+
 
 pub fn palette(size: i32, content: &str) -> Palette {
     let content = content.trim();

@@ -2,6 +2,7 @@ use util::math::TransformMatrix;
 use util::math::RealPoint;
 use util::math::ProjectivePoint;
 
+#[derive(Copy, Clone)]
 pub struct WeightedTransform {
     affine: TransformMatrix,
     weight: f64,
@@ -18,6 +19,7 @@ impl WeightedTransform {
     }
 }
 
+#[derive(Clone)]
 pub struct TransformSystem(Vec<WeightedTransform>);
 
 impl TransformSystem {

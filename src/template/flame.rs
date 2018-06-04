@@ -1,27 +1,25 @@
 use util::math::RealPoint;
 use template::palette::Palette;
-use render::filter::FilterType;
+use render::filter::FilterKernel;
+use transforms::TransformSystem;
 
-pub struct FlameTemplate {
+#[derive(Clone)]
+pub struct Flame {
     pub render: RenderConfig,
     pub camera: CameraConfig,
-    pub filter: FilterConfig,
-    pub transforms: Vec<TransformTemplate>,
+    pub filter: FilterKernel,
+    pub transforms: TransformSystem,
     pub palette: Palette,
 }
 
-pub struct TransformTemplate {
-    pub weight: f64,
-    pub color: f64,
-    pub affine_coefficients: [f64; 6],
-}
-
+#[derive(Copy, Clone)]
 pub struct CameraConfig {
     pub origin: RealPoint,
     pub scale_x: f64,
     pub scale_y: f64,
 }
 
+#[derive(Copy, Clone)]
 pub struct RenderConfig {
     pub width: u32,
     pub height: u32,
@@ -30,9 +28,4 @@ pub struct RenderConfig {
     pub brightness: f64,
     pub skip_iterations: u32,
     pub border: u32,
-}
-
-pub struct FilterConfig {
-    pub filter_type: FilterType,
-    pub radius: f64,
 }

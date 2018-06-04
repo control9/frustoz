@@ -19,7 +19,7 @@ impl <'a> Into<RealPoint> for &'a ProjectivePoint {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct TransformMatrix(
     pub (f64, f64, f64),
     pub (f64, f64, f64),

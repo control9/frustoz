@@ -1,7 +1,7 @@
 use render::EPSILON;
 use render::filter::FilterKernel;
 use std::time::Instant;
-use template::flame_template::FilterConfig;
+use template::FilterConfig;
 
 pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: u32) -> FilterKernel {
     let now = Instant::now();
