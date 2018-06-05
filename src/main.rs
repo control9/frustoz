@@ -2,6 +2,7 @@ extern crate image;
 extern crate rand;
 extern crate rayon;
 extern crate num_cpus;
+extern crate xml;
 
 use template::flame::Flame;
 use std::time::Instant;
@@ -12,6 +13,7 @@ pub mod template;
 pub mod transforms;
 pub mod output;
 pub mod util;
+mod parser;
 
 const PRESERVE_CPUS : u32 = 1;
 

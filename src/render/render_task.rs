@@ -8,6 +8,8 @@ use template::builders;
 use template::flame::Flame;
 use util::math::RealPoint;
 
+const SKIP_ITERATIONS : u32 = 20;
+
 pub struct RenderTask {
     camera: Camera,
     canvas: Canvas,
@@ -33,7 +35,6 @@ impl RenderTask {
     pub fn render(mut self) -> HistogramLayer {
         let mut rng = rand::thread_rng();
         let mut last_reported_iteration = 0;
-        let skip_iterations = self.flame.render.skip_iterations;
         let report_frequency = self.iterations / 100;
 
         let xstart: f64 = rng.gen_range(0.0, 1.0);
@@ -54,7 +55,7 @@ impl RenderTask {
                 last_reported_iteration = iteration;
             }
 
-            if iteration > skip_iterations {
+            if iteration > SKIP_ITERATIONS {
                 let camera_coordinates = self.camera.project(&point);
                 self.canvas.project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
             }
