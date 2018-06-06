@@ -3,7 +3,7 @@ use template::palette::Palette;
 use render::filter::FilterKernel;
 use transforms::TransformSystem;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Flame {
     pub render: RenderConfig,
     pub camera: CameraConfig,
@@ -12,14 +12,14 @@ pub struct Flame {
     pub palette: Palette,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct CameraConfig {
     pub origin: RealPoint,
     pub scale_x: f64,
     pub scale_y: f64,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct RenderConfig {
     pub width: u32,
     pub height: u32,

@@ -3,7 +3,7 @@ pub mod log_filter;
 pub mod filter_type;
 pub mod spatial_filter;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct FilterKernel {
     pub width: u32,
     pub coefficients: Vec<f64>,

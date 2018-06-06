@@ -1,7 +1,7 @@
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct RGB(pub f32, pub f32, pub f32);
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Palette {
     size: i32,
     colors: Vec<RGB>,
