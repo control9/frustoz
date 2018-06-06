@@ -42,7 +42,6 @@ pub fn get_flame_template() -> Flame {
         quality: 800,
         oversampling: 1,
         brightness: 4.0,
-        skip_iterations: 20,
         border: 0,
     };
     let camera: CameraConfig = CameraConfig {

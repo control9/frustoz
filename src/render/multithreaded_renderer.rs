@@ -16,7 +16,6 @@ pub struct Renderer {
 impl Renderer {
     pub fn render(&self, flame: Flame) -> Vec<u8> {
         let now = Instant::now();
-        ThreadPoolBuilder::new().num_threads(self.threads as usize).build_global().expect("Failed to initialize pool");
 
         let processor = builders::histogram_processor(&flame);
 

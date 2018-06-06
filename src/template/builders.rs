@@ -62,11 +62,11 @@ pub fn histogram_processor(flame: &Flame) -> HistogramProcessor {
 }
 
 
-pub fn palette(size: i32, content: &str) -> Palette {
+pub fn palette(size: u32, content: &str) -> Palette {
     let content = content.trim();
 
     let colors = hex::decode(content).expect("Incorrect palette");
-    assert_eq!(3 * size, colors.len() as i32);
+    assert_eq!(3 * size, colors.len() as u32);
     Palette::new(&colors)
 }
 

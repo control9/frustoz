@@ -35,7 +35,6 @@ pub fn get_flame_template() -> Flame {
         quality: 400,
         oversampling: 3,
         brightness: 4.0,
-        skip_iterations: 20,
         border: 0,
     };
     let camera: CameraConfig = CameraConfig {
@@ -44,7 +43,7 @@ pub fn get_flame_template() -> Flame {
         scale_y: 6.95,
     };
     let filter_config: FilterConfig = FilterConfig {
-        filter_type: FilterType::Gaussian,
+        filter_type: FilterType::Mitchell,
         radius: 0.75,
     };
     let filter = filter_builder::filter(&filter_config, render.oversampling);
