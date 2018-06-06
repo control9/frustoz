@@ -25,7 +25,7 @@ pub fn apply_filter(filter: &FilterKernel,
 }
 
 fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram_width: u32, histogram: &Histogram) -> HDRPixel {
-    let &FilterKernel {width: filter_width, coefficients: ref kernel} = filter;
+    let &FilterKernel { width: filter_width, coefficients: ref kernel } = filter;
     let (mut r, mut g, mut b, mut a) = (0.0, 0.0, 0.0, 0.0);
 
     for filter_y in 0..filter_width {
@@ -41,5 +41,9 @@ fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram_width: u32, hi
         }
     }
 
-    HDRPixel(r, g, b, a)
+    HDRPixel(
+        r.min(1.0).max(0.0),
+        g.min(1.0).max(0.0),
+        b.min(1.0).max(0.0),
+        a.min(1.0).max(0.0))
 }

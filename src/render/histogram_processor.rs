@@ -64,9 +64,9 @@ impl <'a> HistogramProcessor<'a> {
             for i in 0..self.image_width {
                 let HDRPixel(r, g, b, _a) = histogram[(i + j * self.image_width) as usize];
 
-                result.push((r * 255.0).min(255.0) as u8);
-                result.push((g * 255.0).min(255.0) as u8);
-                result.push((b * 255.0).min(255.0) as u8);
+                result.push((r * 256.0).min(255.0) as u8);
+                result.push((g * 256.0).min(255.0) as u8);
+                result.push((b * 256.0).min(255.0) as u8);
             }
         }
         result
@@ -77,6 +77,9 @@ impl <'a> HistogramProcessor<'a> {
             .map(|pixel| self.log_filter.apply(pixel))
             .collect();
 
+        histogram = histogram.par_iter()
+            .map(|pixel| gamma_filter::apply(&pixel))
+            .collect();
 
         histogram = spatial_filter::apply_filter(
             &self.spatial_filter,
@@ -87,9 +90,7 @@ impl <'a> HistogramProcessor<'a> {
             self.histogram_height,
             self.oversampling);
 
-        histogram.par_iter()
-            .map(|pixel| gamma_filter::apply(&pixel))
-            .collect()
+        histogram
     }
 }
 

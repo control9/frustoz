@@ -32,7 +32,7 @@ pub fn get_flame_template() -> Flame {
     let mut render: RenderConfig = RenderConfig {
         width: 1920,
         height: 1080,
-        quality: 100,
+        quality: 400,
         oversampling: 3,
         brightness: 4.0,
         border: 0,

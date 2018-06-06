@@ -19,5 +19,5 @@ pub fn apply(&HDRPixel(r, g, b, a): &HDRPixel) -> HDRPixel {
 }
 
 fn apply_gamma(color: f64) -> f64 {
-    color.min(1.0).max(0.0).powf(GAMMA_FACTOR)
+    color.powf(GAMMA_FACTOR).min(1.0).max(0.0)
 }
