@@ -1,5 +1,4 @@
 use rayon::prelude::*;
-use rayon::ThreadPoolBuilder;
 use render::histogram::canvas::HistogramLayer;
 use render::progress_bar;
 use render::render_task::RenderTask;

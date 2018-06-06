@@ -7,7 +7,6 @@ extern crate xml;
 use rayon::ThreadPoolBuilder;
 use std::env;
 use std::time::Instant;
-use template::flame::Flame;
 
 pub mod render;
 pub mod example;

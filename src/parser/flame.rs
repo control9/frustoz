@@ -4,7 +4,6 @@ use render::filter::FilterType;
 use std::collections::HashMap;
 use std::io::Read;
 use super::camera;
-use super::extract_attributes;
 use super::render;
 use template::builders;
 use template::filter_builder;
@@ -13,7 +12,6 @@ use template::flame::Flame;
 use template::palette::Palette;
 use template::TransformTemplate;
 use transforms::TransformSystem;
-use xml::attribute::OwnedAttribute;
 use xml::EventReader;
 use xml::reader::XmlEvent;
 
