@@ -40,12 +40,7 @@ fn radius(x: f64, y: f64) -> f64 {
 }
 
 fn theta(x: f64, y: f64) -> f64 {
-    let t = x / y;
-    if t.is_nan() {
-        0.0
-    } else {
-        t.atan()
-    }
+    x.atan2(y)
 }
 
 
