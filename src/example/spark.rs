@@ -10,6 +10,9 @@ use template::palette::Palette;
 use transforms::Transform;
 use transforms::TransformSystem;
 use util::math::RealPoint;
+use variations::Variation;
+use variations::Variations;
+use variations::VariationType::Linear;
 
 const T1: [f64; 6] = [
     0.9398083605003169, -0.8990128677757641, 1.3909810148054664,
@@ -21,10 +24,15 @@ const T2: [f64; 6] = [
     -0.2510551099892795, 0.8032270759543487, -0.2239140170174654,
 ];
 
+
+fn variations() -> Variations {
+    Variations::new(vec![Variation { variation_type: Linear, weight: 1.0 }])
+}
+
 fn transforms() -> Vec<Transform> {
     vec![
-        transform(1.0, 0.47, T1),
-        transform(1.0, 0.78, T2),
+        transform(1.0, 0.47, T1, variations()),
+        transform(1.0, 0.78, T2, variations()),
     ]
 }
 

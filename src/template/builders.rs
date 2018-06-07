@@ -9,6 +9,7 @@ use template::flame::RenderConfig;
 use template::palette::Palette;
 use transforms::Transform;
 use util::math::TransformMatrix;
+use variations::Variations;
 
 pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale_x, config.scale_y)
@@ -22,13 +23,13 @@ pub fn iterations(config: &RenderConfig) -> u32 {
     config.width * config.height * config.quality
 }
 
-pub fn transform(weight: f64, color: f64, coef: [f64; 6]) -> Transform {
+pub fn transform(weight: f64, color: f64, coef: [f64; 6], variations: Variations) -> Transform {
     let affine: TransformMatrix = TransformMatrix(
         (coef[0], coef[1], coef[2]),
         (coef[3], coef[4], coef[5]),
         (0.0, 0.0, 1.0),
     );
-    Transform { weight, color, affine }
+    Transform { weight, color, affine, variations }
 }
 
 pub fn histogram_processor(flame: &Flame) -> HistogramProcessor {

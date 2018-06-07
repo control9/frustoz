@@ -1,10 +1,12 @@
 use util::math::TransformMatrix;
 use util::math::RealPoint;
 use util::math::ProjectivePoint;
+use variations::Variations;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Transform {
     pub affine: TransformMatrix,
+    pub variations: Variations,
     pub weight: f64,
     pub color: f64,
 }
@@ -47,12 +49,13 @@ impl TransformSystem {
         panic!("Seed is greater than 1 or incorrect Transformation")
     }
 
-    pub fn apply_transform(&self, seed: f64, point: &RealPoint) -> RealPoint {
+    pub fn apply_transform(&self, transform_seed: f64, variation_seed: f64, point: &RealPoint) -> RealPoint {
         let pr: &ProjectivePoint = &point.into();
 
-        let transform: &Transform = self.get_transformation(seed);
-        let result_pr = &(&transform.affine * pr);
-        let result: RealPoint = result_pr.into();
+        let transform: &Transform = self.get_transformation(transform_seed);
+        let affine_result_pr = &(&transform.affine * pr);
+        let affine_result: RealPoint = affine_result_pr.into();
+        let result = transform.variations.get_variation(variation_seed).apply(affine_result);
         result
     }
 }

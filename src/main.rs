@@ -14,6 +14,7 @@ pub mod template;
 pub mod transforms;
 pub mod output;
 pub mod util;
+pub mod variations;
 mod parser;
 
 const PRESERVE_CPUS: u32 = 1;
