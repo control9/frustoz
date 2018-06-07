@@ -14,8 +14,11 @@ pub struct Transform {
 impl Transform {
     pub fn apply(&self, point: &RealPoint, color: f64) -> (RealPoint, f64) {
         let pr: &ProjectivePoint = &point.into();
+
         let result_pr = &(&self.affine * pr);
-        let result: RealPoint = result_pr.into();
+        let affine_result : RealPoint = result_pr.into();
+        let result = self.variations.apply(&affine_result);
+
         let result_color = (color + self.color) / 2.0;
         (result, result_color)
     }
@@ -47,15 +50,5 @@ impl TransformSystem {
             }
         }
         panic!("Seed is greater than 1 or incorrect Transformation")
-    }
-
-    pub fn apply_transform(&self, transform_seed: f64, variation_seed: f64, point: &RealPoint) -> RealPoint {
-        let pr: &ProjectivePoint = &point.into();
-
-        let transform: &Transform = self.get_transformation(transform_seed);
-        let affine_result_pr = &(&transform.affine * pr);
-        let affine_result: RealPoint = affine_result_pr.into();
-        let result = transform.variations.get_variation(variation_seed).apply(affine_result);
-        result
     }
 }

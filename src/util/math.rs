@@ -1,5 +1,28 @@
+use std::ops;
+use std::iter::Sum;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct RealPoint(pub f64, pub f64);
+
+impl <'a> ops::Mul<RealPoint> for f64 {
+    type Output = RealPoint;
+
+    fn mul(self, RealPoint(x, y): RealPoint) -> RealPoint {
+        RealPoint(self * x, self * y)
+    }
+}
+
+impl Sum<RealPoint> for RealPoint {
+    fn sum<I: Iterator<Item=RealPoint>>(iter: I) -> Self {
+        let (mut x, mut y) = (0.0, 0.0);
+        for RealPoint(x2, y2) in iter {
+            x += x2;
+            y += y2;
+        }
+        RealPoint(x, y)
+    }
+}
+
 
 #[derive(Debug, PartialEq)]
 pub struct ProjectivePoint(pub f64, pub f64, pub f64);
@@ -42,7 +65,6 @@ impl ProjectivePoint {
         )
     }
 }
-use std::ops;
 
 impl <'a, 'b> ops::Mul<&'a ProjectivePoint> for &'b TransformMatrix {
     type Output = ProjectivePoint;
