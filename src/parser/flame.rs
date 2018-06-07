@@ -10,7 +10,7 @@ use template::filter_builder;
 use template::FilterConfig;
 use template::flame::Flame;
 use template::palette::Palette;
-use template::TransformTemplate;
+use transforms::Transform;
 use transforms::TransformSystem;
 use xml::EventReader;
 use xml::reader::XmlEvent;
@@ -39,7 +39,7 @@ pub fn parse_flame<_R: Read>(reader: &mut EventReader<_R>, attributes: HashMap<S
 }
 
 fn parse_sub_elements<_R: Read>(reader: &mut EventReader<_R>) -> (TransformSystem, Palette) {
-    let mut transforms: Vec<TransformTemplate> = vec![];
+    let mut transforms: Vec<Transform> = vec![];
     let mut palette = None;
     loop {
         match reader.next() {
@@ -64,5 +64,5 @@ fn parse_sub_elements<_R: Read>(reader: &mut EventReader<_R>) -> (TransformSyste
             _ => continue,
         }
     }
-    (builders::transform_system(&transforms), palette.unwrap_or(builders::palette(2, "000000FFFFFF")))
+    (TransformSystem::new(transforms), palette.unwrap_or(builders::palette(2, "000000FFFFFF")))
 }

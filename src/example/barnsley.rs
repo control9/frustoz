@@ -1,15 +1,15 @@
 use example::green_palette;
 use render::filter::FilterType;
 use template::builders::transform;
+use template::filter_builder;
+use template::FilterConfig;
 use template::flame::CameraConfig;
 use template::flame::Flame;
 use template::flame::RenderConfig;
 use template::palette::Palette;
+use transforms::Transform;
+use transforms::TransformSystem;
 use util::math::RealPoint;
-use template::TransformTemplate;
-use template::FilterConfig;
-use template::builders;
-use template::filter_builder;
 
 const B1: [f64; 6] = [
     0.0, 0.0, 0.0,
@@ -32,7 +32,7 @@ const B4: [f64; 6] = [
 ];
 
 
-fn get_transform_templates() -> Vec<TransformTemplate> {
+fn transforms() -> Vec<Transform> {
     vec![
         transform(1.0, 0.7, B1),
         transform(24.0, 0.8, B2),
@@ -64,7 +64,7 @@ pub fn get_flame_template() -> Flame {
     let filter = filter_builder::filter(&filter_config, render.oversampling);
     render.border = (filter.width - render.oversampling).max(0);
 
-    let transforms = builders::transform_system(&get_transform_templates());
+    let transforms = TransformSystem::new(transforms());
     let palette: Palette = green_palette::palette();
 
     Flame { render, camera, filter, transforms, palette }

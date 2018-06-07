@@ -1,15 +1,15 @@
 use render::filter::FilterType;
 use template::builders::palette;
 use template::builders::transform;
+use template::filter_builder;
+use template::FilterConfig;
 use template::flame::CameraConfig;
 use template::flame::Flame;
 use template::flame::RenderConfig;
 use template::palette::Palette;
+use transforms::Transform;
+use transforms::TransformSystem;
 use util::math::RealPoint;
-use template::TransformTemplate;
-use template::FilterConfig;
-use template::builders;
-use template::filter_builder;
 
 const T1: [f64; 6] = [
     0.9398083605003169, -0.8990128677757641, 1.3909810148054664,
@@ -21,7 +21,7 @@ const T2: [f64; 6] = [
     -0.2510551099892795, 0.8032270759543487, -0.2239140170174654,
 ];
 
-fn get_transform_templates() -> Vec<TransformTemplate> {
+fn transforms() -> Vec<Transform> {
     vec![
         transform(1.0, 0.47, T1),
         transform(1.0, 0.78, T2),
@@ -49,7 +49,7 @@ pub fn get_flame_template() -> Flame {
     let filter = filter_builder::filter(&filter_config, render.oversampling);
     render.border = (filter.width - render.oversampling).max(0);
 
-    let transforms = builders::transform_system(&get_transform_templates());
+    let transforms = TransformSystem::new(transforms());
     let palette: Palette = palette(256, PALETTE);
 
     Flame { render, camera, filter, transforms, palette }
