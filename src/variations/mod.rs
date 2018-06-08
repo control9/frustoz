@@ -7,6 +7,7 @@ mod types;
 pub enum Variation {
     Linear(f64),
     Spiral(f64),
+    Sinusoidal(f64),
 }
 
 fn radius(x: f64, y: f64) -> f64 {

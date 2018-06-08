@@ -1,7 +1,8 @@
-use render::EPSILON;
+
 use render::filter::FilterKernel;
 use std::time::Instant;
 use template::FilterConfig;
+use util::math::EPSILON;
 
 pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: u32) -> FilterKernel {
     let now = Instant::now();
@@ -13,7 +14,7 @@ pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: 
     }
 
     let adjust = match fw {
-        zero if zero < 0.00000001 => 1.0,
+        zero if zero < EPSILON => 1.0,
         fw => filter_type.get_spatial_support() * filter_width as f64 / fw
     };
 

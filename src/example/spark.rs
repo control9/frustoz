@@ -12,7 +12,7 @@ use transforms::TransformSystem;
 use util::math::RealPoint;
 use variations::Variation;
 use variations::Variations;
-use variations::VariationType::Linear;
+use variations::Variation::*;
 
 const T1: [f64; 6] = [
     0.9398083605003169, -0.8990128677757641, 1.3909810148054664,
@@ -26,7 +26,7 @@ const T2: [f64; 6] = [
 
 
 fn variations() -> Variations {
-    Variations::new(vec![Variation { variation_type: Linear, weight: 1.0 }])
+    Variations::new(vec![Linear(1.0)])
 }
 
 fn transforms() -> Vec<Transform> {

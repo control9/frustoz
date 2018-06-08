@@ -11,8 +11,8 @@ use transforms::Transform;
 use transforms::TransformSystem;
 use util::math::RealPoint;
 use variations::Variation;
+use variations::Variation::*;
 use variations::Variations;
-use variations::VariationType::Linear;
 
 const B1: [f64; 6] = [
     0.0, 0.0, 0.0,
@@ -36,9 +36,8 @@ const B4: [f64; 6] = [
 
 
 fn variations() -> Variations {
-    Variations::new(vec![Variation { variation_type: Linear, weight: 1.0 }])
+    Variations::new(vec![Linear(1.0)])
 }
-
 
 fn transforms() -> Vec<Transform> {
     vec![

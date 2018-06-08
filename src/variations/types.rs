@@ -1,21 +1,26 @@
 use super::radius;
 use super::theta;
 use super::Variation;
-use super::VariationType;
+use super::Variation::*;
 use util::math::EPSILON;
 use util::math::RealPoint;
 
 impl Variation {
     pub fn apply(&self, point: &RealPoint) -> RealPoint {
-        match self.variation_type {
-            VariationType::Linear(w) => linear(point, w),
-            VariationType::Spiral(w) => spiral(point, w),
+        match self {
+            Linear(w) => linear(point, *w),
+            Spiral(w) => spiral(point, *w),
+            Sinusoidal(w) => sinusoidal(point, *w),
         }
     }
 }
 
 fn linear(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
     RealPoint(w * x, w * y)
+}
+
+fn sinusoidal(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
+    RealPoint(w * x.sin(), w * y.sin())
 }
 
 fn spiral(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
