@@ -3,9 +3,9 @@ use super::extract;
 use super::extract_all;
 use template::builders;
 use transforms::Transform;
-use variations::Variation;
 use variations::Variations;
-use variations::VariationType::*;
+use variations::Variation;
+use variations::Variation::*;
 
 pub fn extract_transform(attributes: &HashMap<String, String>) -> Transform {
     let weight = extract("weight", 1.0, attributes);
@@ -30,17 +30,9 @@ fn extract_variations(attributes: &HashMap<String, String>) -> Variations {
 
 fn try_extract_variation(name: &str, value: &str) -> Option<Variation> {
     match name.split('#').next().unwrap() {
-        "linear" => Some(linear(value)),
-        "linear3D" => Some(linear(value)),
-        "spiral" => Some(spiral(value)),
+        "linear" => Some(Linear(value.parse().unwrap_or(1.0))),
+        "linear3D" => Some(Linear(value.parse().unwrap_or(1.0))),
+        "spiral" => Some(Spiral(value.parse().unwrap_or(1.0))),
         _ => None,
     }
-}
-
-fn linear(args: &str) -> Variation {
-    Variation { variation_type: Linear, weight: args.parse().unwrap_or(1.0) }
-}
-
-fn spiral(args: &str) -> Variation {
-    Variation { variation_type: Spiral, weight: args.parse().unwrap_or(1.0) }
 }
