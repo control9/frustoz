@@ -1,4 +1,5 @@
 use util::math::RealPoint;
+use util::math::EPSILON;
 
 #[derive(Clone, Debug)]
 pub enum VariationType {
@@ -27,7 +28,7 @@ fn linear(&RealPoint(x, y): &RealPoint) -> RealPoint {
 }
 
 fn spiral(&RealPoint(x, y): &RealPoint) -> RealPoint {
-    let r = radius(x, y);
+    let r = radius(x, y) + EPSILON;
     let t = theta(x, y);
     RealPoint(
         1.0 / r * (t.cos() + r.sin()),

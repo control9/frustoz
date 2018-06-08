@@ -1,6 +1,7 @@
 use std::f64::consts::FRAC_2_PI;
 use std::f64::consts::PI;
 use super::FilterType;
+use util::math::EPSILON;
 
 const GAUSS_SUPPORT: f64 = 1.5;
 const HERMITE_SUPPORT: f64 = 1.0;
@@ -16,7 +17,7 @@ const MITCHELL_C: f64 = 1.0/3.0;
 fn _sinc(x: f64) -> f64 {
     let xt = x * PI;
     match xt {
-        zero if zero < 0.00000001 => 1.0,
+        zero if zero < EPSILON => 1.0,
         _non_zero => xt.sin() / xt
     }
 }

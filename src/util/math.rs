@@ -1,6 +1,8 @@
 use std::ops;
 use std::iter::Sum;
 
+pub const EPSILON: f64 = 0.00000001;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct RealPoint(pub f64, pub f64);
 
