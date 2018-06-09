@@ -10,7 +10,6 @@ use template::palette::Palette;
 use transforms::Transform;
 use transforms::TransformSystem;
 use util::math::RealPoint;
-use variations::Variation;
 use variations::Variations;
 use variations::Variation::*;
 

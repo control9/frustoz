@@ -1,17 +1,24 @@
 use util::math::RealPoint;
-use util::math::EPSILON;
 
 mod types;
 
 #[derive(Clone, Debug)]
 pub enum Variation {
     Linear(f64),
-    Spiral(f64),
     Sinusoidal(f64),
+    Spherical(f64),
+    Swirl(f64),
+    Horseshoe(f64),
+    Polar(f64),
+    Spiral(f64),
 }
 
 fn radius(x: f64, y: f64) -> f64 {
     (x.powi(2) + y.powi(2)).sqrt()
+}
+
+fn rad2(x: f64, y: f64) -> f64 {
+    x.powi(2) + y.powi(2)
 }
 
 fn theta(x: f64, y: f64) -> f64 {

@@ -32,8 +32,12 @@ fn try_extract_variation(name: &str, value: &str) -> Option<Variation> {
     match name.split('#').next().unwrap() {
         "linear" => Some(Linear(value.parse().unwrap_or(1.0))),
         "linear3D" => Some(Linear(value.parse().unwrap_or(1.0))),
-        "spiral" => Some(Spiral(value.parse().unwrap_or(1.0))),
         "sinusoidal" => Some(Sinusoidal(value.parse().unwrap_or(1.0))),
+        "spherical" => Some(Spherical(value.parse().unwrap_or(1.0))),
+        "swirl" => Some(Swirl(value.parse().unwrap_or(1.0))),
+        "horseshoe" => Some(Horseshoe(value.parse().unwrap_or(1.0))),
+        "polar" => Some(Polar(value.parse().unwrap_or(1.0))),
+        "spiral" => Some(Spiral(value.parse().unwrap_or(1.0))),
         _ => None,
     }
 }
