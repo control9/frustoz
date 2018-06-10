@@ -10,6 +10,9 @@ pub enum Variation {
     Swirl(f64),
     Horseshoe(f64),
     Polar(f64),
+    Handkerchief(f64),
+    Heart(f64),
+    Disk(f64),
     Spiral(f64),
 }
 

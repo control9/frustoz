@@ -16,6 +16,9 @@ impl Variation {
             Swirl(w) => swirl(point, *w),
             Horseshoe(w) => horseshoe(point, *w),
             Polar(w) => polar(point, *w),
+            Handkerchief(w) => handkerchief(point, *w),
+            Heart(w) => heart(point, *w),
+            Disk(w) => disc(point, *w),
             Spiral(w) => spiral(point, *w),
         }
     }
@@ -56,6 +59,26 @@ fn polar(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
     let r = radius(x, y);
     let a = theta(x, y);
     RealPoint(w * a / PI, w * (r - 1.0))
+}
+
+fn handkerchief(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
+    let r = radius(x, y);
+    let t = theta(x, y);
+
+    RealPoint(w * r * (t + r).sin(), w * r * (t - r).cos())
+}
+
+fn heart(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
+    let r = radius(x, y);
+    let a = r * theta(x, y);
+
+    RealPoint(w * r * a.sin(), -w * r * a.cos())
+}
+
+fn disc(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
+    let a = theta(x * PI, y * PI) / PI;
+    let r = PI * radius(x, y);
+    RealPoint(w * r.sin() * a, w * r.cos() * a)
 }
 
 fn spiral(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
