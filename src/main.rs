@@ -1,11 +1,16 @@
 extern crate image;
+#[macro_use]
+extern crate log;
 extern crate num_cpus;
 extern crate rand;
 extern crate rayon;
+extern crate simplelog;
 extern crate xml;
 
 use rayon::ThreadPoolBuilder;
+use simplelog::*;
 use std::env;
+use std::fs::File;
 use std::time::Instant;
 
 pub mod render;
@@ -20,6 +25,12 @@ mod parser;
 const PRESERVE_CPUS: u32 = 1;
 
 fn main() {
+    CombinedLogger::init(
+        vec![
+            TermLogger::new(LevelFilter::Warn, Config::default()).unwrap(),
+            WriteLogger::new(LevelFilter::Debug, Config::default(), File::create("frustoz.log").unwrap()),
+        ]
+    ).unwrap();
     let now = Instant::now();
     let threads = (num_cpus::get() as u32 - PRESERVE_CPUS).max(1);
     ThreadPoolBuilder::new().num_threads(threads as usize).build_global().expect("Failed to initialize pool");
@@ -39,7 +50,7 @@ fn main() {
         output::write(&format!("fractal_{}.png", num + 1), raw, image_width, image_height);
     }
     let elapsed = now.elapsed();
-    println!("Time elapsed: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
+    info!("Time elapsed: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
 }
 
 

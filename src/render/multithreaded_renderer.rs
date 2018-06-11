@@ -33,7 +33,7 @@ impl Renderer {
             .collect();
 
         let elapsed = now.elapsed();
-        println!("Creating tasks took: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
+        info!("Creating tasks took: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
 
 
         let histograms: Vec<HistogramLayer> = tasks.into_par_iter()

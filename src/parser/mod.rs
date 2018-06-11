@@ -25,7 +25,7 @@ pub fn parse_file(path: &str) -> Vec<Flame> {
             Ok(XmlEvent::StartElement{name, attributes, .. })  => {
                 if name.local_name.eq_ignore_ascii_case("flame") {
                     let flame = flame::parse_flame(&mut reader, extract_attributes(attributes));
-                    println!("{:?}", flame);
+                    trace!("{:?}", flame);
                     result.push(flame);
                 }
             }

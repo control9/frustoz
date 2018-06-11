@@ -20,7 +20,7 @@ pub fn apply_filter(filter: &FilterKernel,
         .map(|(x, y)| process_point(x, y, filter, histogram_width, histogram))
         .collect();
     let elapsed = now.elapsed();
-    println!("Filtering took: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
+    info!("Filtering took: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
     result
 }
 
