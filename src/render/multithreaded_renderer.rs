@@ -22,7 +22,7 @@ impl Renderer {
         let iterations_per_thread = split(iterations, self.threads);
 
         let (tx, rx) = mpsc::channel();
-        progress_bar::console_progress_bar(rx, iterations, 5);
+        progress_bar::console_progress_bar(rx, iterations);
 
         let thread_configs: Vec<(u32, Sender<u32>, Flame)> = iterations_per_thread.iter()
             .map(|&i| (i, tx.clone(), flame.clone()))

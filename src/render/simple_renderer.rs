@@ -7,7 +7,7 @@ use template::flame::Flame;
 pub fn render(flame: Flame) -> Vec<u8> {
     let iterations = builders::iterations(&flame.render);
     let (tx, rx) = mpsc::channel();
-    progress_bar::console_progress_bar(rx, iterations, 1);
+    progress_bar::console_progress_bar(rx, iterations);
 
     let processor = builders::histogram_processor(&flame);
 

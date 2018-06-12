@@ -6,6 +6,7 @@ extern crate rand;
 extern crate rayon;
 extern crate simplelog;
 extern crate xml;
+extern crate pbr;
 
 use rayon::ThreadPoolBuilder;
 use simplelog::*;
