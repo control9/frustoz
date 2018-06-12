@@ -28,7 +28,7 @@ const PRESERVE_CPUS: u32 = 1;
 fn main() {
     CombinedLogger::init(
         vec![
-            TermLogger::new(LevelFilter::Warn, Config::default()).unwrap(),
+            TermLogger::new(LevelFilter::Error, Config::default()).unwrap(),
             WriteLogger::new(LevelFilter::Debug, Config::default(), File::create("frustoz.log").unwrap()),
         ]
     ).unwrap();

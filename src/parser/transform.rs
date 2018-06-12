@@ -20,12 +20,16 @@ pub fn extract_transform(attributes: &HashMap<String, String>) -> Transform {
 }
 
 fn extract_variations(attributes: &HashMap<String, String>) -> Variations {
-    let result = attributes.iter()
+    let result: Vec<Variation> = attributes.iter()
         .map(|(name, value)| try_extract_variation(name, value))
         .flat_map(|opt_variation| opt_variation.into_iter())
         .collect();
-
-    Variations::new(result)
+    if !result.is_empty() {
+        Variations::new(result)
+    } else {
+        warn!("No transformation type found, assuming linear: {:?}", attributes);
+        Variations::new(vec![Linear(1.0)])
+    }
 }
 
 fn try_extract_variation(name: &str, value: &str) -> Option<Variation> {
