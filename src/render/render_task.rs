@@ -7,6 +7,7 @@ use std::sync::mpsc::Sender;
 use template::builders;
 use template::flame::Flame;
 use util::math::RealPoint;
+use super::Progress;
 
 const SKIP_ITERATIONS : u32 = 20;
 
@@ -15,11 +16,12 @@ pub struct RenderTask {
     canvas: Canvas,
     flame: Flame,
     iterations: u32,
-    progress_reporter: Sender<u32>,
+    id: usize,
+    progress_reporter: Sender<Progress>,
 }
 
 impl RenderTask {
-    pub fn new(flame: Flame, iterations: u32, progress_reporter: Sender<u32>) -> Self {
+    pub fn new(flame: Flame, iterations: u32, id: usize, progress_reporter: Sender<Progress>) -> Self {
         let camera = builders::camera(&flame.camera);
         let canvas = builders::canvas(&flame.render);
 
@@ -28,13 +30,13 @@ impl RenderTask {
             canvas,
             flame,
             iterations,
+            id,
             progress_reporter,
         }
     }
 
     pub fn render(mut self) -> HistogramLayer {
         let mut rng = rand::thread_rng();
-        let mut last_reported_iteration = 0;
         let report_frequency = self.iterations / 100;
 
         let xstart: f64 = rng.gen_range(0.0, 1.0);
@@ -42,17 +44,20 @@ impl RenderTask {
         let mut point = RealPoint(xstart, ystart);
         let mut color: f64 = rng.gen_range(0.0, 1.0);
 
-        for iteration in 1..self.iterations {
+        let mut progress = Progress(0, self.id);
+
+        for iteration in 0..self.iterations {
             let transform_seed: f64 = rng.gen_range(0.0, 1.0);
             let transform = self.flame.transforms.get_transformation(transform_seed);
 
             let (new_point, new_color) = transform.apply(&point, color);
             point = new_point;
             color = new_color;
+            progress.0 += 1;
 
-            if iteration % report_frequency == 0 {
-                self.progress_reporter.send(iteration - last_reported_iteration).unwrap();
-                last_reported_iteration = iteration;
+            if progress.0 % report_frequency == 0 {
+                self.progress_reporter.send(progress).unwrap();
+                progress.0 = 0;
             }
 
             if iteration > SKIP_ITERATIONS {
@@ -60,7 +65,7 @@ impl RenderTask {
                 self.canvas.project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
             }
         }
-        self.progress_reporter.send(self.iterations - last_reported_iteration).unwrap();
+        self.progress_reporter.send(progress).unwrap();
         self.canvas.extract_data()
     }
 }

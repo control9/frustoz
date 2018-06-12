@@ -7,6 +7,7 @@ use std::sync::mpsc::Sender;
 use std::time::Instant;
 use template::builders;
 use template::flame::Flame;
+use super::Progress;
 
 pub struct Renderer {
     pub threads: u32,
@@ -22,14 +23,15 @@ impl Renderer {
         let iterations_per_thread = split(iterations, self.threads);
 
         let (tx, rx) = mpsc::channel();
-        progress_bar::console_progress_bar(rx, iterations);
-
-        let thread_configs: Vec<(u32, Sender<u32>, Flame)> = iterations_per_thread.iter()
+        let thread_configs: Vec<(u32, Sender<Progress>, Flame)> = iterations_per_thread.iter()
             .map(|&i| (i, tx.clone(), flame.clone()))
             .collect();
 
+        progress_bar::multi_progress_bar(rx, iterations, &iterations_per_thread);
+
         let tasks: Vec<RenderTask> = thread_configs.into_par_iter()
-            .map(move |(iters, tx, flame)| RenderTask::new(flame, iters, tx))
+            .enumerate()
+            .map(move |(i, (iters, tx, flame))| RenderTask::new(flame, iters, i,tx))
             .collect();
 
         let elapsed = now.elapsed();
