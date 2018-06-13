@@ -18,7 +18,7 @@ impl Variation {
             Polar(w) => polar(point, *w),
             Handkerchief(w) => handkerchief(point, *w),
             Heart(w) => heart(point, *w),
-            Disk(w) => disc(point, *w),
+            Disc(w) => disc(point, *w),
             Spiral(w) => spiral(point, *w),
         }
     }
@@ -88,4 +88,16 @@ fn spiral(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
         w / r * (t.cos() + r.sin()),
         w / r * (t.sin() - r.cos()),
     )
+}
+
+fn hyperbolic(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
+    let r = radius(x, y) + EPSILON;
+    let t = theta(x, y);
+    RealPoint(w * a.sin() / r, w * a.cos() * r)
+}
+
+fn diamond(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
+    let r = radius(x, y);
+    let t = theta(x, y);
+    RealPoint(w * a.sin() * r.cos(), w * a.cos() * r.sin())
 }

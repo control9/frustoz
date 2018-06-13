@@ -43,8 +43,10 @@ fn try_extract_variation(name: &str, value: &str) -> Option<Variation> {
         "polar" => Some(Polar(value.parse().unwrap_or(1.0))),
         "handkerchief" => Some(Handkerchief(value.parse().unwrap_or(1.0))),
         "heart" => Some(Heart(value.parse().unwrap_or(1.0))),
-        "disk" => Some(Disk(value.parse().unwrap_or(1.0))),
+        "disc" => Some(Disc(value.parse().unwrap_or(1.0))),
         "spiral" => Some(Spiral(value.parse().unwrap_or(1.0))),
+        "hyperbolic" => Some(Hyperbolic(value.parse().unwrap_or(1.0))),
+        "diamond" => Some(Diamond(value.parse().unwrap_or(1.0))),
         _ => None,
     }
 }

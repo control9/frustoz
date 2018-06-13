@@ -12,8 +12,10 @@ pub enum Variation {
     Polar(f64),
     Handkerchief(f64),
     Heart(f64),
-    Disk(f64),
+    Disc(f64),
     Spiral(f64),
+    Hyperbolic(f64),
+    Diamond(f64),
 }
 
 fn radius(x: f64, y: f64) -> f64 {
