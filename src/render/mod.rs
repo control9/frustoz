@@ -10,9 +10,6 @@ mod progress_bar;
 pub type Histogram = Vec<HDRPixel>;
 
 #[derive(Copy, Clone)]
-pub struct RGBACounter(pub f64, pub f64, pub f64, pub u64);
-
-#[derive(Copy, Clone)]
 pub struct HDRPixel(pub f64, pub f64, pub f64, pub f64);
 
 #[derive(Copy, Clone)]

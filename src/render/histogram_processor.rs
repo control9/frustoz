@@ -5,8 +5,6 @@ use render::filter::LogFilter;
 use render::filter::spatial_filter;
 use render::HDRPixel;
 use render::Histogram;
-use render::histogram::canvas::HistogramLayer;
-use render::RGBACounter;
 
 pub struct HistogramProcessor<'a> {
     image_width: u32,
@@ -35,19 +33,19 @@ impl <'a> HistogramProcessor<'a> {
         HistogramProcessor { image_width, image_height, histogram_width, histogram_height, oversampling, spatial_filter, log_filter }
     }
 
-    pub fn process_to_raw(&self, histograms: Vec<HistogramLayer>) -> Vec<u8> {
+    pub fn process_to_raw(&self, histograms: Vec<Histogram>) -> Vec<u8> {
         let histogram: Histogram = HistogramProcessor::combine(histograms);
         self.do_process(histogram)
     }
 
-    fn combine(histograms: Vec<HistogramLayer>) -> Histogram {
+    fn combine(histograms: Vec<Histogram>) -> Histogram {
         let length = histograms.iter()
             .map(|h| h.len())
             .min().unwrap_or(0);
 
         (0..length).into_par_iter()
             .map(|i| {
-                let (mut r, mut b, mut g, mut a) = (0.0, 0.0, 0.0, 0);
+                let (mut r, mut b, mut g, mut a) = (0.0, 0.0, 0.0, 0.0);
                 for hist in &histograms {
                     add_pixel(&mut r, &mut g, &mut b, &mut a, &hist[i]);
                 }
@@ -94,7 +92,7 @@ impl <'a> HistogramProcessor<'a> {
     }
 }
 
-fn add_pixel(r: &mut f64, g: &mut f64, b: &mut f64, a: &mut u64, &RGBACounter(rn, gn, bn, an): &RGBACounter) {
+fn add_pixel(r: &mut f64, g: &mut f64, b: &mut f64, a: &mut f64, &HDRPixel(rn, gn, bn, an): &HDRPixel) {
     *r = *r + rn;
     *g = *g + gn;
     *b = *b + bn;

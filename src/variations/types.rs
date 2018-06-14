@@ -20,6 +20,8 @@ impl Variation {
             Heart(w) => heart(point, *w),
             Disc(w) => disc(point, *w),
             Spiral(w) => spiral(point, *w),
+            Hyperbolic(w) => hyperbolic(point, *w),
+            Diamond(w) => diamond(point, *w),
         }
     }
 }
@@ -92,12 +94,12 @@ fn spiral(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
 
 fn hyperbolic(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
     let r = radius(x, y) + EPSILON;
-    let t = theta(x, y);
+    let a = theta(x, y);
     RealPoint(w * a.sin() / r, w * a.cos() * r)
 }
 
 fn diamond(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
     let r = radius(x, y);
-    let t = theta(x, y);
+    let a = theta(x, y);
     RealPoint(w * a.sin() * r.cos(), w * a.cos() * r.sin())
 }

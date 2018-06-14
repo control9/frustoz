@@ -2,12 +2,12 @@ use rand;
 use rand::Rng;
 use render::histogram::Camera;
 use render::histogram::canvas::Canvas;
-use render::histogram::canvas::HistogramLayer;
 use std::sync::mpsc::Sender;
 use template::builders;
 use template::flame::Flame;
 use util::math::RealPoint;
 use super::Progress;
+use render::Histogram;
 
 const SKIP_ITERATIONS : u32 = 20;
 
@@ -35,7 +35,7 @@ impl RenderTask {
         }
     }
 
-    pub fn render(mut self) -> HistogramLayer {
+    pub fn render(mut self) -> Histogram {
         let mut rng = rand::thread_rng();
         let report_frequency = self.iterations / 100;
 

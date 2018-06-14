@@ -1,5 +1,4 @@
 use rayon::prelude::*;
-use render::histogram::canvas::HistogramLayer;
 use render::progress_bar;
 use render::render_task::RenderTask;
 use std::sync::mpsc;
@@ -8,6 +7,7 @@ use std::time::Instant;
 use template::builders;
 use template::flame::Flame;
 use super::Progress;
+use render::Histogram;
 
 pub struct Renderer {
     pub threads: u32,
@@ -38,7 +38,7 @@ impl Renderer {
         info!("Creating tasks took: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
 
 
-        let histograms: Vec<HistogramLayer> = tasks.into_par_iter()
+        let histograms: Vec<Histogram> = tasks.into_par_iter()
             .map(|t| t.render())
             .collect();
 

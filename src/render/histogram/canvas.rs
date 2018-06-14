@@ -2,19 +2,19 @@ use util::coordinates::CameraCoordinates;
 use util::coordinates::CanvasPixel;
 use template::palette::RGB;
 use std::f64;
-use render::RGBACounter;
+use render::Histogram;
+use render::HDRPixel;
 
-pub type HistogramLayer = Vec<RGBACounter>;
 
 pub struct Canvas {
     width: u32,
     height: u32,
-    pixels: HistogramLayer,
+    pixels: Histogram,
 }
 
 impl Canvas {
     pub fn new(width: u32, height: u32) -> Self {
-        Self { width, height, pixels: vec![RGBACounter(0.0, 0.0, 0.0, 0); (width * height) as usize] }
+        Self { width, height, pixels: vec![HDRPixel(0.0, 0.0, 0.0, 0.0); (width * height) as usize] }
     }
 
     fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
@@ -42,11 +42,11 @@ impl Canvas {
     }
 
     fn update_pixel(&mut self, index: usize, &RGB(r, g, b): &RGB) {
-        let &RGBACounter(rc, gc, bc, a) = &self.pixels[index];
-        self.pixels[index] = RGBACounter(rc + r as f64, gc + g as f64, bc + b as f64, a + 1);
+        let &HDRPixel(rc, gc, bc, a) = &self.pixels[index];
+        self.pixels[index] = HDRPixel(rc + r as f64, gc + g as f64, bc + b as f64, a + 1.0);
     }
 
-    pub fn extract_data(self) -> HistogramLayer {
+    pub fn extract_data(self) -> Histogram {
         self.pixels
     }
 }
