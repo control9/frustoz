@@ -7,6 +7,7 @@ const GAUSS_SUPPORT: f64 = 1.5;
 const HERMITE_SUPPORT: f64 = 1.0;
 const BOX_SUPPORT: f64 = 0.5;
 const TRIANGLE_SUPPORT: f64 = 1.0;
+const BELL_SUPPORT: f64 = 1.5;
 const MITCHELL_SUPPORT: f64 = 2.0;
 
 
@@ -75,6 +76,17 @@ fn triangle(x: f64) -> f64 {
         _ => 0.0
     }
 }
+
+fn bell(x: f64) -> f64 {
+    let t = x.abs();
+
+    match t {
+        _ if t < 0.5 => 0.75 - t*t,
+        _ if t < 1.5 => 0.5 * (t - 1.5) * (t - 1.5),
+        _ => 0.0
+    }
+}
+
 impl FilterType {
     pub fn apply(&self, x: f64) -> f64 {
         match self {
@@ -82,6 +94,7 @@ impl FilterType {
             &FilterType::Hermite => hermite(x),
             &FilterType::Box => boxed(x),
             &FilterType::Triangle => triangle(x),
+            &FilterType::Bell => bell(x),
             &FilterType::Mitchell => mitchell(x),
         }
     }
@@ -92,6 +105,7 @@ impl FilterType {
             &FilterType::Hermite => HERMITE_SUPPORT,
             &FilterType::Box => BOX_SUPPORT,
             &FilterType::Triangle => TRIANGLE_SUPPORT,
+            &FilterType::Bell => BELL_SUPPORT,
             &FilterType::Mitchell => MITCHELL_SUPPORT,
         }
     }

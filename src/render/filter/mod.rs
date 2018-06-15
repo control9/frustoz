@@ -20,5 +20,6 @@ pub enum FilterType {
     Hermite,
     Box,
     Triangle,
+    Bell,
     Mitchell,
 }
