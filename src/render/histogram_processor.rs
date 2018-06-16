@@ -9,8 +9,6 @@ use render::Histogram;
 pub struct HistogramProcessor<'a> {
     image_width: u32,
     image_height: u32,
-    histogram_width: u32,
-    histogram_height: u32,
     oversampling: u32,
     spatial_filter: &'a FilterKernel,
     log_filter: LogFilter,
@@ -19,7 +17,6 @@ pub struct HistogramProcessor<'a> {
 impl <'a> HistogramProcessor<'a> {
     pub fn new(quality: u32,
                image_width: u32, image_height: u32,
-               histogram_width: u32, histogram_height: u32,
                view_width: f64, view_height: f64,
                oversampling: u32, brightness: f64,
                spatial_filter: &'a FilterKernel) -> Self {
@@ -30,7 +27,7 @@ impl <'a> HistogramProcessor<'a> {
             view_height,
             brightness,
         );
-        HistogramProcessor { image_width, image_height, histogram_width, histogram_height, oversampling, spatial_filter, log_filter }
+        HistogramProcessor { image_width, image_height, oversampling, spatial_filter, log_filter }
     }
 
     pub fn process_to_raw(&self, histograms: Vec<Histogram>) -> Vec<u8> {
@@ -39,18 +36,18 @@ impl <'a> HistogramProcessor<'a> {
     }
 
     fn combine(histograms: Vec<Histogram>) -> Histogram {
-        let length = histograms.iter()
-            .map(|h| h.len())
-            .min().unwrap_or(0);
+        let (width, height) = (histograms[0].width, histograms[0].height);
+        let length = (width * height) as usize;
 
-        (0..length).into_par_iter()
+        let data = (0..length).into_par_iter()
             .map(|i| {
                 let (mut r, mut b, mut g, mut a) = (0.0, 0.0, 0.0, 0.0);
                 for hist in &histograms {
-                    add_pixel(&mut r, &mut g, &mut b, &mut a, &hist[i]);
+                    add_pixel(&mut r, &mut g, &mut b, &mut a, &hist.data[i]);
                 }
                 HDRPixel(r, g, b, a as f64)
-            }).collect()
+            }).collect();
+        Histogram{data, width, height}
     }
 
     fn do_process(&self, histogram: Histogram) -> Vec<u8> {
@@ -60,7 +57,7 @@ impl <'a> HistogramProcessor<'a> {
 
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let HDRPixel(r, g, b, _a) = histogram[(i + j * self.image_width) as usize];
+                let HDRPixel(r, g, b, _a) = histogram.data[(i + j * self.image_width) as usize];
 
                 result.push((r * 256.0).min(255.0) as u8);
                 result.push((g * 256.0).min(255.0) as u8);
@@ -71,11 +68,11 @@ impl <'a> HistogramProcessor<'a> {
     }
 
     fn process_pixels(&self, mut histogram: Histogram) -> Histogram {
-        histogram = histogram.par_iter()
+        histogram.data = histogram.data.par_iter()
             .map(|pixel| self.log_filter.apply(pixel))
             .collect();
 
-        histogram = histogram.par_iter()
+        histogram.data = histogram.data.par_iter()
             .map(|pixel| gamma_filter::apply(&pixel))
             .collect();
 
@@ -84,8 +81,6 @@ impl <'a> HistogramProcessor<'a> {
             &histogram,
             self.image_width,
             self.image_height,
-            self.histogram_width,
-            self.histogram_height,
             self.oversampling);
 
         histogram

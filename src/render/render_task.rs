@@ -1,7 +1,6 @@
 use rand;
 use rand::Rng;
 use render::histogram::Camera;
-use render::histogram::canvas::Canvas;
 use std::sync::mpsc::Sender;
 use template::builders;
 use template::flame::Flame;
@@ -13,7 +12,7 @@ const SKIP_ITERATIONS : u32 = 20;
 
 pub struct RenderTask {
     camera: Camera,
-    canvas: Canvas,
+    canvas: Histogram,
     flame: Flame,
     iterations: u32,
     id: usize,
@@ -23,7 +22,7 @@ pub struct RenderTask {
 impl RenderTask {
     pub fn new(flame: Flame, iterations: u32, id: usize, progress_reporter: Sender<Progress>) -> Self {
         let camera = builders::camera(&flame.camera);
-        let canvas = builders::canvas(&flame.render);
+        let canvas = builders::histogram(&flame.render, flame.filter.width);
 
         RenderTask {
             camera,
@@ -66,7 +65,7 @@ impl RenderTask {
             }
         }
         self.progress_reporter.send(progress).unwrap();
-        self.canvas.extract_data()
+        self.canvas
     }
 }
 

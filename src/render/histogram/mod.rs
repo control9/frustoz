@@ -1,7 +1,7 @@
 use util::math::RealPoint;
 
 pub mod camera;
-pub mod canvas;
+pub mod histogram;
 
 pub struct Camera {
     origin: RealPoint,

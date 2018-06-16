@@ -1,7 +1,6 @@
 extern crate hex;
 
 use render::histogram::Camera;
-use render::histogram::canvas::Canvas;
 use render::histogram_processor::HistogramProcessor;
 use template::flame::CameraConfig;
 use template::flame::Flame;
@@ -10,13 +9,14 @@ use template::palette::Palette;
 use transforms::Transform;
 use util::math::TransformMatrix;
 use variations::Variations;
+use render::Histogram;
 
 pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale_x, config.scale_y)
 }
 
-pub fn canvas(config: &RenderConfig) -> Canvas {
-    Canvas::new(config.width * config.oversampling + config.border, config.height * config.oversampling + config.border)
+pub fn histogram(config: &RenderConfig, filter_width: u32) -> Histogram {
+    Histogram::new(config.width, config.height, config.oversampling, filter_width)
 }
 
 pub fn iterations(config: &RenderConfig) -> u32 {
@@ -35,13 +35,9 @@ pub fn transform(weight: f64, color: f64, coef: [f64; 6], variations: Variations
 pub fn histogram_processor(flame: &Flame) -> HistogramProcessor {
     let render = &flame.render;
 
-    let histogram_width = render.width * render.oversampling + render.border;
-    let histogram_height = render.height * render.oversampling + render.border;
-
     HistogramProcessor::new(
         render.quality,
         render.width, render.height,
-        histogram_width, histogram_height,
         flame.camera.scale_x, flame.camera.scale_y,
         render.oversampling, render.brightness,
         &flame.filter,

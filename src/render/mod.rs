@@ -7,7 +7,11 @@ pub mod multithreaded_renderer;
 
 mod progress_bar;
 
-pub type Histogram = Vec<HDRPixel>;
+pub struct Histogram {
+    data: Vec<HDRPixel>,
+    width: u32,
+    height: u32,
+}
 
 #[derive(Copy, Clone)]
 pub struct HDRPixel(pub f64, pub f64, pub f64, pub f64);
