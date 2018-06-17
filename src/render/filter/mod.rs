@@ -21,5 +21,6 @@ pub enum FilterType {
     Box,
     Triangle,
     Bell,
+    BSpline,
     Mitchell,
 }

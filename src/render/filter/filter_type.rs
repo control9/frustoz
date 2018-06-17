@@ -8,6 +8,7 @@ const HERMITE_SUPPORT: f64 = 1.0;
 const BOX_SUPPORT: f64 = 0.5;
 const TRIANGLE_SUPPORT: f64 = 1.0;
 const BELL_SUPPORT: f64 = 1.5;
+const B_SPLINE_SUPPORT: f64 = 2.0;
 const MITCHELL_SUPPORT: f64 = 2.0;
 
 
@@ -87,6 +88,22 @@ fn bell(x: f64) -> f64 {
     }
 }
 
+fn b_spline(x: f64) -> f64 {
+    let mut t = x.abs();
+
+    match t {
+        _ if t < 1.0 => {
+            let tt = t * t;
+            (0.5 * tt * t) - tt + (2.0/3.0)
+        }
+        _ if t < 2.0 => {
+            t = 2.0 - t;
+            (1.0 / 6.0) * t * t * t
+        }
+        _ => 0.0
+    }
+}
+
 impl FilterType {
     pub fn apply(&self, x: f64) -> f64 {
         match self {
@@ -95,6 +112,7 @@ impl FilterType {
             &FilterType::Box => boxed(x),
             &FilterType::Triangle => triangle(x),
             &FilterType::Bell => bell(x),
+            &FilterType::BSpline => b_spline(x),
             &FilterType::Mitchell => mitchell(x),
         }
     }
@@ -106,6 +124,7 @@ impl FilterType {
             &FilterType::Box => BOX_SUPPORT,
             &FilterType::Triangle => TRIANGLE_SUPPORT,
             &FilterType::Bell => BELL_SUPPORT,
+            &FilterType::BSpline => B_SPLINE_SUPPORT,
             &FilterType::Mitchell => MITCHELL_SUPPORT,
         }
     }
