@@ -49,7 +49,7 @@ impl RenderTask {
             let transform_seed: f64 = rng.gen_range(0.0, 1.0);
             let transform = self.flame.transforms.get_transformation(transform_seed);
 
-            let (new_point, new_color) = transform.apply(&point, color);
+            let (new_point, new_color) = transform.apply(&point, color, &mut rng);
             point = new_point;
             color = new_color;
             progress.0 += 1;

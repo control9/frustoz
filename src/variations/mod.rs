@@ -1,4 +1,5 @@
 use util::math::RealPoint;
+use rand::ThreadRng;
 
 mod types;
 
@@ -16,6 +17,7 @@ pub enum Variation {
     Spiral(f64),
     Hyperbolic(f64),
     Diamond(f64),
+    Julia(f64)
 }
 
 fn radius(x: f64, y: f64) -> f64 {
@@ -41,9 +43,9 @@ impl Variations {
         Variations { variations}
     }
 
-    pub fn apply(&self, point: &RealPoint) -> RealPoint {
+    pub fn apply(&self, point: &RealPoint, rng: &mut ThreadRng) -> RealPoint {
         self.variations.iter()
-            .map(|var| var.apply(point))
+            .map(|var| var.apply(point, rng))
             .sum()
     }
 }

@@ -47,6 +47,7 @@ fn try_extract_variation(name: &str, value: &str) -> Option<Variation> {
         "spiral" => Some(Spiral(value.parse().unwrap_or(1.0))),
         "hyperbolic" => Some(Hyperbolic(value.parse().unwrap_or(1.0))),
         "diamond" => Some(Diamond(value.parse().unwrap_or(1.0))),
+        "julia" => Some(Julia(value.parse().unwrap_or(1.0))),
         _ => None,
     }
 }
