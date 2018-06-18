@@ -2,7 +2,7 @@ use util::math::TransformMatrix;
 use util::math::RealPoint;
 use util::math::ProjectivePoint;
 use variations::Variations;
-use rand::ThreadRng;
+use rand::prelude::*;
 
 #[derive(Clone, Debug)]
 pub struct Transform {
@@ -13,7 +13,7 @@ pub struct Transform {
 }
 
 impl Transform {
-    pub fn apply(&self, point: &RealPoint, color: f64, rng: &mut ThreadRng) -> (RealPoint, f64) {
+    pub fn apply<R: Rng + ?Sized>(&self, point: &RealPoint, color: f64, rng: &mut R) -> (RealPoint, f64) {
         let pr: &ProjectivePoint = &point.into();
 
         let result_pr = &(&self.affine * pr);

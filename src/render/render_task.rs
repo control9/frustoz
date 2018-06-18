@@ -1,5 +1,4 @@
-use rand;
-use rand::Rng;
+use rand::prelude::*;
 use render::histogram::Camera;
 use std::sync::mpsc::Sender;
 use template::builders;
@@ -35,7 +34,7 @@ impl RenderTask {
     }
 
     pub fn render(mut self) -> Histogram {
-        let mut rng = rand::thread_rng();
+        let mut rng = thread_rng();
         let report_frequency = self.iterations / 100;
 
         let xstart: f64 = rng.gen_range(0.0, 1.0);

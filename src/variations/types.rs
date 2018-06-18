@@ -6,11 +6,10 @@ use super::Variation;
 use super::Variation::*;
 use util::math::EPSILON;
 use util::math::RealPoint;
-use rand::ThreadRng;
-use rand::Rng;
+use rand::prelude::*;
 
 impl Variation {
-    pub fn apply(&self, point: &RealPoint, _rng: &mut ThreadRng) -> RealPoint {
+    pub fn apply<R: Rng + ?Sized>(&self, point: &RealPoint, rng: &mut R) -> RealPoint {
         match self {
             Linear(w) => linear(point, *w),
             Sinusoidal(w) => sinusoidal(point, *w),
@@ -24,7 +23,7 @@ impl Variation {
             Spiral(w) => spiral(point, *w),
             Hyperbolic(w) => hyperbolic(point, *w),
             Diamond(w) => diamond(point, *w),
-            Julia(w) => julia(point, *w, _rng.gen())
+            Julia(w) => julia(point, *w, rng.gen())
         }
     }
 }

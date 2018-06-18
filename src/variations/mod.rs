@@ -1,5 +1,5 @@
 use util::math::RealPoint;
-use rand::ThreadRng;
+use rand::prelude::*;
 
 mod types;
 
@@ -43,7 +43,7 @@ impl Variations {
         Variations { variations}
     }
 
-    pub fn apply(&self, point: &RealPoint, rng: &mut ThreadRng) -> RealPoint {
+    pub fn apply<R: Rng + ?Sized>(&self, point: &RealPoint, rng: &mut R) -> RealPoint {
         self.variations.iter()
             .map(|var| var.apply(point, rng))
             .sum()
