@@ -10,13 +10,14 @@ const TRIANGLE_SUPPORT: f64 = 1.0;
 const BELL_SUPPORT: f64 = 1.5;
 const B_SPLINE_SUPPORT: f64 = 2.0;
 const MITCHELL_SUPPORT: f64 = 2.0;
+const BLACKMAN_SUPPORT: f64 = 1.0;
 
 
 const MITCHELL_B: f64 = 1.0/3.0;
 const MITCHELL_C: f64 = 1.0/3.0;
 
 
-fn _sinc(x: f64) -> f64 {
+fn sinc(x: f64) -> f64 {
     let xt = x * PI;
     match xt {
         zero if zero < EPSILON => 1.0,
@@ -104,6 +105,10 @@ fn b_spline(x: f64) -> f64 {
     }
 }
 
+fn blackman(x: f64) -> f64 {
+    0.42 + 0.5 * (x * PI).cos() + 0.08 * (PI * 2.0 * x).sin()
+}
+
 impl FilterType {
     pub fn apply(&self, x: f64) -> f64 {
         match self {
@@ -114,6 +119,7 @@ impl FilterType {
             &FilterType::Bell => bell(x),
             &FilterType::BSpline => b_spline(x),
             &FilterType::Mitchell => mitchell(x),
+            &FilterType::Blackman => sinc(x) * blackman(x),
         }
     }
 
@@ -126,6 +132,7 @@ impl FilterType {
             &FilterType::Bell => BELL_SUPPORT,
             &FilterType::BSpline => B_SPLINE_SUPPORT,
             &FilterType::Mitchell => MITCHELL_SUPPORT,
+            &FilterType::Blackman => BLACKMAN_SUPPORT,
         }
     }
 }

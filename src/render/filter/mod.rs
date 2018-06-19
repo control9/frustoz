@@ -23,4 +23,5 @@ pub enum FilterType {
     Bell,
     BSpline,
     Mitchell,
+    Blackman,
 }
