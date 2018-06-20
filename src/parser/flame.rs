@@ -4,6 +4,7 @@ use render::filter::FilterType;
 use std::collections::HashMap;
 use std::io::Read;
 use super::camera;
+use super::extract;
 use super::render;
 use template::builders;
 use template::filter_builder;
@@ -19,9 +20,25 @@ pub fn parse_flame<_R: Read>(reader: &mut EventReader<_R>, attributes: HashMap<S
     let mut render = render::extract_render_config(&attributes);
     let camera = camera::extract_camera_config(&attributes, render.width as f64, render.height as f64);
 
+    let filter_radius = extract("filter", 0.75, &attributes);
+    let filter_type_name = attributes.get("filter_kernel").map(|x| x.to_uppercase());
+
+    let filter_type = match filter_type_name.as_ref().map(String::as_str) {
+        Some("HERMITE") => FilterType::Hermite,
+        Some("BOX") => FilterType::Box,
+        Some("TRIANGLE") => FilterType::Triangle,
+        Some("BELL") => FilterType::Bell,
+        Some("B_SPLINE") => FilterType::BSpline,
+        Some("MITCHELL") => FilterType::Mitchell,
+        Some("MITCHELL_SINEPOW") => FilterType::Mitchell,
+        Some("BLACKMAN") => FilterType::Blackman,
+        Some("GAUSSIAN") => FilterType::Gaussian,
+        _ => FilterType::Gaussian,
+    };
+
     let filter_config: FilterConfig = FilterConfig {
-        filter_type: FilterType::Gaussian,
-        radius: 0.75,
+        filter_type: filter_type,
+        radius: filter_radius,
     };
 
     let filter = filter_builder::filter(&filter_config, render.oversampling);
