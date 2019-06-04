@@ -1,7 +1,5 @@
-use util::math::TransformMatrix;
-use util::math::RealPoint;
-use util::math::ProjectivePoint;
-use variations::Variations;
+use super::util::math::{TransformMatrix, RealPoint, ProjectivePoint};
+use super::variations::Variations;
 use rand::prelude::*;
 
 #[derive(Clone, Debug)]

@@ -1,9 +1,9 @@
-use util::coordinates::CameraCoordinates;
-use util::coordinates::CanvasPixel;
-use template::palette::RGB;
+use crate::util::coordinates::CameraCoordinates;
+use crate::util::coordinates::CanvasPixel;
+use crate::template::palette::RGB;
 use std::f64;
-use render::Histogram;
-use render::HDRPixel;
+use super::super::Histogram;
+use super::super::HDRPixel;
 
 
 impl Histogram {

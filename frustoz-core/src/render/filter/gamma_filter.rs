@@ -1,5 +1,5 @@
-use render::HDRPixel;
-use util::math::EPSILON;
+use crate::render::HDRPixel;
+use crate::util::math::EPSILON;
 
 const GAMMA_FACTOR: f64 = 1.0 / 4.0;
 

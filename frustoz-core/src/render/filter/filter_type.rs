@@ -1,7 +1,7 @@
 use std::f64::consts::FRAC_2_PI;
 use std::f64::consts::PI;
 use super::FilterType;
-use util::math::EPSILON;
+use crate::util::math::EPSILON;
 
 const GAUSS_SUPPORT: f64 = 1.5;
 const HERMITE_SUPPORT: f64 = 1.0;

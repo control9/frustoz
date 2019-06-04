@@ -1,13 +1,13 @@
-use render::progress_bar;
-use render::render_task::RenderTask;
+//use super::progress_bar;
+use super::render_task::RenderTask;
 use std::sync::mpsc;
-use template::builders;
-use template::flame::Flame;
+use crate::template::builders;
+use crate::template::flame::Flame;
 
 pub fn render(flame: Flame) -> Vec<u8> {
     let iterations = builders::iterations(&flame.render);
     let (tx, rx) = mpsc::channel();
-    progress_bar::single_progress_bar(rx, iterations);
+//    progress_bar::single_progress_bar(rx, iterations);
 
     let processor = builders::histogram_processor(&flame);
 

@@ -5,8 +5,6 @@ pub mod simple_renderer;
 pub mod histogram_processor;
 pub mod multithreaded_renderer;
 
-mod progress_bar;
-
 pub struct Histogram {
     data: Vec<HDRPixel>,
     width: u32,

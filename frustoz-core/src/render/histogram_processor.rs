@@ -1,10 +1,10 @@
 use rayon::prelude::*;
-use render::filter::FilterKernel;
-use render::filter::gamma_filter;
-use render::filter::LogFilter;
-use render::filter::spatial_filter;
-use render::HDRPixel;
-use render::Histogram;
+use super::filter::FilterKernel;
+use super::filter::gamma_filter;
+use super::filter::LogFilter;
+use super::filter::spatial_filter;
+use super::HDRPixel;
+use super::Histogram;
 
 pub struct HistogramProcessor<'a> {
     image_width: u32,

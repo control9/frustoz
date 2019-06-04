@@ -1,4 +1,4 @@
-use render::HDRPixel;
+use crate::render::HDRPixel;
 use super::LogFilter;
 
 

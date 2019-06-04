@@ -4,8 +4,8 @@ use super::radius;
 use super::theta;
 use super::Variation;
 use super::Variation::*;
-use util::math::EPSILON;
-use util::math::RealPoint;
+use crate::util::math::EPSILON;
+use crate::util::math::RealPoint;
 use rand::prelude::*;
 
 impl Variation {

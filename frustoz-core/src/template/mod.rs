@@ -1,4 +1,4 @@
-use render::filter::FilterType;
+use crate::render::filter::FilterType;
 
 pub mod flame;
 pub mod builders;

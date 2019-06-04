@@ -1,15 +1,15 @@
 extern crate hex;
 
-use render::histogram::Camera;
-use render::histogram_processor::HistogramProcessor;
-use template::flame::CameraConfig;
-use template::flame::Flame;
-use template::flame::RenderConfig;
-use template::palette::Palette;
-use transforms::Transform;
-use util::math::TransformMatrix;
-use variations::Variations;
-use render::Histogram;
+use crate::render::histogram::Camera;
+use crate::render::histogram_processor::HistogramProcessor;
+use crate::template::flame::CameraConfig;
+use crate::template::flame::Flame;
+use crate::template::flame::RenderConfig;
+use crate::template::palette::Palette;
+use crate::transforms::Transform;
+use crate::util::math::TransformMatrix;
+use crate::variations::Variations;
+use crate::render::Histogram;
 
 pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale_x, config.scale_y)

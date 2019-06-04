@@ -1,8 +1,7 @@
-
-use render::filter::FilterKernel;
+use crate::render::filter::FilterKernel;
+use crate::template::FilterConfig;
+use crate::util::math::EPSILON;
 use std::time::Instant;
-use template::FilterConfig;
-use util::math::EPSILON;
 
 pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: u32) -> FilterKernel {
     let now = Instant::now();

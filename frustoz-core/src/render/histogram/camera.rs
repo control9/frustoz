@@ -1,5 +1,5 @@
-use util::math::RealPoint;
-use util::coordinates::CameraCoordinates;
+use crate::util::math::RealPoint;
+use crate::util::coordinates::CameraCoordinates;
 use super::Camera;
 
 

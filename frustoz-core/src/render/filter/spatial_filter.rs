@@ -1,6 +1,6 @@
 use rayon::prelude::*;
-use render::HDRPixel;
-use render::Histogram;
+use crate::render::HDRPixel;
+use crate::render::Histogram;
 use std::time::Instant;
 use super::FilterKernel;
 

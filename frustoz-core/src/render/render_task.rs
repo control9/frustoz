@@ -1,11 +1,11 @@
 use rand::prelude::*;
-use render::histogram::Camera;
-use std::sync::mpsc::Sender;
-use template::builders;
-use template::flame::Flame;
-use util::math::RealPoint;
+use super::histogram::Camera;
 use super::Progress;
-use render::Histogram;
+use super::Histogram;
+use std::sync::mpsc::Sender;
+use crate::template::builders;
+use crate::template::flame::Flame;
+use crate::util::math::RealPoint;
 
 const SKIP_ITERATIONS : u32 = 20;
 

@@ -1,13 +1,13 @@
 use rayon::prelude::*;
-use render::progress_bar;
-use render::render_task::RenderTask;
+//use super::progress_bar;
+use super::Histogram;
+use super::render_task::RenderTask;
 use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use std::time::Instant;
-use template::builders;
-use template::flame::Flame;
+use crate::template::builders;
+use crate::template::flame::Flame;
 use super::Progress;
-use render::Histogram;
 
 pub struct Renderer {
     pub threads: u32,
@@ -27,7 +27,7 @@ impl Renderer {
             .map(|&i| (i, tx.clone(), flame.clone()))
             .collect();
 
-        progress_bar::multi_progress_bar(rx, iterations, &iterations_per_thread);
+//        progress_bar::multi_progress_bar(rx, iterations, &iterations_per_thread);
 
         let tasks: Vec<RenderTask> = thread_configs.into_par_iter()
             .enumerate()

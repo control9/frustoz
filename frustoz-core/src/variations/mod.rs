@@ -1,4 +1,4 @@
-use util::math::RealPoint;
+use crate::util::math::RealPoint;
 use rand::prelude::*;
 
 mod types;

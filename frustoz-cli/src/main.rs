@@ -8,19 +8,21 @@ extern crate simplelog;
 extern crate xml;
 extern crate pbr;
 
+extern crate frustoz_core;
+pub use frustoz_core::render;
+pub use frustoz_core::template;
+pub use frustoz_core::util;
+pub use frustoz_core::variations;
+pub use frustoz_core::transforms;
+
 use rayon::ThreadPoolBuilder;
 use simplelog::*;
 use std::env;
 use std::fs::File;
 use std::time::Instant;
 
-pub mod render;
-pub mod example;
-pub mod template;
-pub mod transforms;
-pub mod output;
-pub mod util;
-pub mod variations;
+mod example;
+mod output;
 mod parser;
 
 const PRESERVE_CPUS: u32 = 1;
