@@ -9,7 +9,8 @@ use render::HDRPixel;
 impl Histogram {
 
     pub fn new(image_width: u32, image_height: u32, oversampling: u32, filter_width: u32) -> Self {
-        let border = (filter_width - oversampling).max(0);
+        let border = if oversampling > filter_width { 0 }
+            else { filter_width - oversampling };
         let width = image_width * oversampling + border;
         let height = image_height * oversampling + border;
 
@@ -53,9 +54,9 @@ fn valid_coordinates(&CameraCoordinates(x, y): &CameraCoordinates) -> bool {
 
 #[cfg(test)]
 mod canvas_test {
-    use super::Canvas;
     use super::CameraCoordinates;
     use super::CanvasPixel;
+    use super::Histogram;
     use std::f64;
 
     #[test]
