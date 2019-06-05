@@ -8,13 +8,15 @@ use std::time::Instant;
 use crate::template::builders;
 use crate::template::flame::Flame;
 use super::Progress;
+use super::ProgressReporter;
+use super::NoOpReporter;
 
 pub struct Renderer {
     pub threads: u32,
 }
 
 impl Renderer {
-    pub fn render(&self, flame: Flame) -> Vec<u8> {
+    pub fn render<T: ProgressReporter + Clone + Send>(&self, flame: Flame) -> Vec<u8> {
         let now = Instant::now();
 
         let processor = builders::histogram_processor(&flame);
@@ -22,16 +24,16 @@ impl Renderer {
         let iterations = builders::iterations(&flame.render);
         let iterations_per_thread = split(iterations, self.threads);
 
-        let (tx, rx) = mpsc::channel();
-        let thread_configs: Vec<(u32, Sender<Progress>, Flame)> = iterations_per_thread.iter()
-            .map(|&i| (i, tx.clone(), flame.clone()))
+        let reporter = T::new(&iterations_per_thread);
+        let thread_configs: Vec<(u32, T, Flame)> = iterations_per_thread.iter()
+            .map(|&i| (i, reporter.clone(), flame.clone()))
             .collect();
 
 //        progress_bar::multi_progress_bar(rx, iterations, &iterations_per_thread);
 
-        let tasks: Vec<RenderTask> = thread_configs.into_par_iter()
+        let tasks: Vec<RenderTask<T>> = thread_configs.into_par_iter()
             .enumerate()
-            .map(move |(i, (iters, tx, flame))| RenderTask::new(flame, iters, i,tx))
+            .map(move |(i, (iters, rep, flame))| RenderTask::new(flame, iters, i, rep))
             .collect();
 
         let elapsed = now.elapsed();

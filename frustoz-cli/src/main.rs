@@ -20,10 +20,12 @@ use simplelog::*;
 use std::env;
 use std::fs::File;
 use std::time::Instant;
+use progress_bar::MultiProgressBar;
 
 mod example;
 mod output;
 mod parser;
+mod progress_bar;
 
 const PRESERVE_CPUS: u32 = 1;
 
@@ -49,7 +51,7 @@ fn main() {
     for (num, template) in templates.into_iter().enumerate() {
         let (image_width, image_height) = (template.render.width, template.render.height);
 
-        let raw = renderer.render(template);
+        let raw = renderer.render::<MultiProgressBar>(template);
         output::write(&format!("fractal_{}.png", num + 1), raw, image_width, image_height);
     }
     let elapsed = now.elapsed();

@@ -17,4 +17,19 @@ pub struct HDRPixel(pub f64, pub f64, pub f64, pub f64);
 #[derive(Copy, Clone)]
 pub struct Progress(pub u32, pub usize);
 
+pub trait ProgressReporter {
+    fn new(iterations_per_thread: &Vec<u32>) -> Self;
+    fn report(&mut self, progress: Progress);
+}
 
+struct NoOpReporter {}
+
+impl ProgressReporter for NoOpReporter {
+    fn new(iterations_per_thread: &Vec<u32>) -> Self{
+        NoOpReporter{}
+    }
+
+    fn report(&mut self, progress: Progress) {
+        info!{"Progress"}
+    }
+}

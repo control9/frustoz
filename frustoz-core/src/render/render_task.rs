@@ -2,24 +2,24 @@ use rand::prelude::*;
 use super::histogram::Camera;
 use super::Progress;
 use super::Histogram;
-use std::sync::mpsc::Sender;
+use super::ProgressReporter;
 use crate::template::builders;
 use crate::template::flame::Flame;
 use crate::util::math::RealPoint;
 
 const SKIP_ITERATIONS : u32 = 20;
 
-pub struct RenderTask {
+pub struct RenderTask<T: ProgressReporter + Sized> {
     camera: Camera,
     canvas: Histogram,
     flame: Flame,
     iterations: u32,
     id: usize,
-    progress_reporter: Sender<Progress>,
+    progress_reporter: T,
 }
 
-impl RenderTask {
-    pub fn new(flame: Flame, iterations: u32, id: usize, progress_reporter: Sender<Progress>) -> Self {
+impl <T: ProgressReporter + Sized> RenderTask<T> {
+    pub fn new(flame: Flame, iterations: u32, id: usize, progress_reporter: T) -> Self {
         let camera = builders::camera(&flame.camera);
         let canvas = builders::histogram(&flame.render, flame.filter.width);
 
@@ -54,7 +54,7 @@ impl RenderTask {
             progress.0 += 1;
 
             if progress.0 % report_frequency == 0 {
-                self.progress_reporter.send(progress).unwrap();
+                self.progress_reporter.report(progress);
                 progress.0 = 0;
             }
 
@@ -63,7 +63,7 @@ impl RenderTask {
                 self.canvas.project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
             }
         }
-        self.progress_reporter.send(progress).unwrap();
+        self.progress_reporter.report(progress);
         self.canvas
     }
 }
