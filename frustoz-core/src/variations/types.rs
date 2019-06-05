@@ -1,11 +1,7 @@
 use std::f64::consts::PI;
-use super::rad2;
-use super::radius;
-use super::theta;
 use super::Variation;
 use super::Variation::*;
-use crate::util::math::EPSILON;
-use crate::util::math::RealPoint;
+use crate::util::math::{rad2, radius, theta, RealPoint, EPSILON};
 use rand::prelude::*;
 
 impl Variation {

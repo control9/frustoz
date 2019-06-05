@@ -1,0 +1,15 @@
+[package]
+name = "frustoz-core"
+version = "0.0.1"
+authors = ["Aleksei Sukontsev <aleksei.sukontsev@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+hex = "0.3.2"
+log = { version = "0.4", features = ["release_max_level_info"] }
+rayon = "1.0"
+
+rand = "0.5.1"

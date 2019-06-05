@@ -3,6 +3,18 @@ use std::iter::Sum;
 
 pub const EPSILON: f64 = 0.00000001;
 
+pub fn radius(x: f64, y: f64) -> f64 {
+    (x.powi(2) + y.powi(2)).sqrt()
+}
+
+pub fn rad2(x: f64, y: f64) -> f64 {
+    x.powi(2) + y.powi(2)
+}
+
+pub fn theta(x: f64, y: f64) -> f64 {
+    x.atan2(y)
+}
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct RealPoint(pub f64, pub f64);
 
