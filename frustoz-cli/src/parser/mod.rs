@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use xml::attribute::OwnedAttribute;
-use template::flame::Flame;
+use model::flame::Flame;
 use std::fs::File;
 use std::io::BufReader;
 use std::str::FromStr;

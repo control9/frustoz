@@ -1,12 +1,12 @@
 use render::filter::FilterType;
-use template::builders::palette;
-use template::builders::transform;
-use template::filter_builder;
-use template::FilterConfig;
-use template::flame::CameraConfig;
-use template::flame::Flame;
-use template::flame::RenderConfig;
-use template::palette::Palette;
+use model::builders::palette;
+use model::builders::transform;
+use model::filter_builder;
+use model::FilterConfig;
+use model::flame::CameraConfig;
+use model::flame::Flame;
+use model::flame::RenderConfig;
+use model::palette::Palette;
 use transforms::Transform;
 use transforms::TransformSystem;
 use util::math::RealPoint;
@@ -35,7 +35,7 @@ fn transforms() -> Vec<Transform> {
     ]
 }
 
-pub fn get_flame_template() -> Flame {
+pub fn get_flame_model() -> Flame {
     let mut render: RenderConfig = RenderConfig {
         width: 1920,
         height: 1080,

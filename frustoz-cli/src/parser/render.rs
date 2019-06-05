@@ -1,7 +1,7 @@
 use super::extract;
 use super::extract_all;
 use std::collections::HashMap;
-use template::flame::RenderConfig;
+use model::flame::RenderConfig;
 
 const DEFAULT_SIZE: &str = "1920 1080";
 

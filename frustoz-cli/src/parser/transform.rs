@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use super::extract;
 use super::extract_all;
-use template::builders;
+use model::builders;
 use transforms::Transform;
 use variations::Variation;
 use variations::Variation::*;

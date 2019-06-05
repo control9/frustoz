@@ -6,11 +6,11 @@ use std::io::Read;
 use super::camera;
 use super::extract;
 use super::render;
-use crate::template::builders;
-use crate::template::filter_builder;
-use crate::template::FilterConfig;
-use crate::template::flame::Flame;
-use crate::template::palette::Palette;
+use crate::model::builders;
+use crate::model::filter_builder;
+use crate::model::FilterConfig;
+use crate::model::flame::Flame;
+use crate::model::palette::Palette;
 use crate::transforms::Transform;
 use crate::transforms::TransformSystem;
 use xml::EventReader;
@@ -37,7 +37,7 @@ pub fn parse_flame<_R: Read>(reader: &mut EventReader<_R>, attributes: HashMap<S
     };
 
     let filter_config: FilterConfig = FilterConfig {
-        filter_type: filter_type,
+        filter_type,
         radius: filter_radius,
     };
 

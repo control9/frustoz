@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use super::extract;
 use super::extract_all;
-use template::flame::CameraConfig;
+use model::flame::CameraConfig;
 use util::math::RealPoint;
 
 pub fn extract_camera_config(attributes: &HashMap<String, String>, image_width: f64, image_height: f64) -> CameraConfig {

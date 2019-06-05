@@ -10,7 +10,7 @@ extern crate pbr;
 
 extern crate frustoz_core;
 pub use frustoz_core::render;
-pub use frustoz_core::template;
+pub use frustoz_core::model;
 pub use frustoz_core::util;
 pub use frustoz_core::variations;
 pub use frustoz_core::transforms;
@@ -43,15 +43,15 @@ fn main() {
     let renderer = render::multithreaded_renderer::Renderer { threads };
 
     let args: Vec<String> = env::args().collect();
-    let templates = match args.len() {
+    let models = match args.len() {
         1 => vec![example::spark()],
         _ => parser::parse_file(&args[1]),
     };
 
-    for (num, template) in templates.into_iter().enumerate() {
-        let (image_width, image_height) = (template.render.width, template.render.height);
+    for (num, model) in models.into_iter().enumerate() {
+        let (image_width, image_height) = (model.render.width, model.render.height);
 
-        let raw = renderer.render::<MultiProgressBar>(template);
+        let raw = renderer.render::<MultiProgressBar>(model);
         output::write(&format!("fractal_{}.png", num + 1), raw, image_width, image_height);
     }
     let elapsed = now.elapsed();

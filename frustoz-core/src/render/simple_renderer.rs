@@ -1,14 +1,12 @@
 use super::ProgressReporter;
 use super::render_task::RenderTask;
 use std::sync::mpsc;
-use crate::template::builders;
-use crate::template::flame::Flame;
+use crate::model::builders;
+use crate::model::flame::Flame;
 
 pub fn render<T: ProgressReporter>(flame: Flame) -> Vec<u8> {
     let iterations = builders::iterations(&flame.render);
     let progress_reporter = T::new(&vec![iterations]);
-//    let (tx, rx) = mpsc::channel();
-//    progress_bar::single_progress_bar(rx, iterations);
 
     let processor = builders::histogram_processor(&flame);
 

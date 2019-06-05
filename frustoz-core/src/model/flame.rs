@@ -1,5 +1,5 @@
 use crate::util::math::RealPoint;
-use crate::template::palette::Palette;
+use crate::model::palette::Palette;
 use crate::render::filter::FilterKernel;
 use crate::transforms::TransformSystem;
 

@@ -1,6 +1,6 @@
 use crate::util::coordinates::CameraCoordinates;
 use crate::util::coordinates::CanvasPixel;
-use crate::template::palette::RGB;
+use crate::model::palette::RGB;
 use std::f64;
 use super::super::Histogram;
 use super::super::HDRPixel;

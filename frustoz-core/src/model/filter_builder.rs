@@ -1,5 +1,5 @@
 use crate::render::filter::FilterKernel;
-use crate::template::FilterConfig;
+use crate::model::FilterConfig;
 use crate::util::math::EPSILON;
 use std::time::Instant;
 

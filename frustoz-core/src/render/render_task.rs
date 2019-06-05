@@ -3,8 +3,8 @@ use super::histogram::Camera;
 use super::Progress;
 use super::Histogram;
 use super::ProgressReporter;
-use crate::template::builders;
-use crate::template::flame::Flame;
+use crate::model::builders;
+use crate::model::flame::Flame;
 use crate::util::math::RealPoint;
 
 const SKIP_ITERATIONS : u32 = 20;

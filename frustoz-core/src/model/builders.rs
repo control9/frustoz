@@ -2,10 +2,10 @@ extern crate hex;
 
 use crate::render::histogram::Camera;
 use crate::render::histogram_processor::HistogramProcessor;
-use crate::template::flame::CameraConfig;
-use crate::template::flame::Flame;
-use crate::template::flame::RenderConfig;
-use crate::template::palette::Palette;
+use crate::model::flame::CameraConfig;
+use crate::model::flame::Flame;
+use crate::model::flame::RenderConfig;
+use crate::model::palette::Palette;
 use crate::transforms::Transform;
 use crate::util::math::TransformMatrix;
 use crate::variations::Variations;
@@ -56,7 +56,7 @@ pub fn palette(size: u32, content: &str) -> Palette {
 
 #[cfg(test)]
 mod palette_builder_test {
-    use template::palette::RGB;
+    use model::palette::RGB;
 
     #[test]
     pub fn should_decode_palette() {
