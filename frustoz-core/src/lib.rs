@@ -6,3 +6,4 @@ pub mod model;
 pub mod util;
 pub mod variations;
 pub mod transforms;
+pub mod example;

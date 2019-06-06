@@ -97,7 +97,7 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "frustoz"
+name = "frustoz-cli"
 version = "0.0.1"
 dependencies = [
  "frustoz-core 0.0.1",

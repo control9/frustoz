@@ -1,17 +1,17 @@
-use render::filter::FilterType;
-use model::builders::palette;
-use model::builders::transform;
-use model::filter_builder;
-use model::FilterConfig;
-use model::flame::CameraConfig;
-use model::flame::Flame;
-use model::flame::RenderConfig;
-use model::palette::Palette;
-use transforms::Transform;
-use transforms::TransformSystem;
-use util::math::RealPoint;
-use variations::Variations;
-use variations::Variation::*;
+use crate::render::filter::FilterType;
+use crate::model::builders::palette;
+use crate::model::builders::transform;
+use crate::model::filter_builder;
+use crate::model::FilterConfig;
+use crate::model::flame::CameraConfig;
+use crate::model::flame::Flame;
+use crate::model::flame::RenderConfig;
+use crate::model::palette::Palette;
+use crate::transforms::Transform;
+use crate::transforms::TransformSystem;
+use crate::util::math::RealPoint;
+use crate::variations::Variations;
+use crate::variations::Variation::*;
 
 const T1: [f64; 6] = [
     0.9398083605003169, -0.8990128677757641, 1.3909810148054664,
@@ -37,10 +37,10 @@ fn transforms() -> Vec<Transform> {
 
 pub fn get_flame_model() -> Flame {
     let mut render: RenderConfig = RenderConfig {
-        width: 1920,
-        height: 1080,
-        quality: 400,
-        oversampling: 3,
+        width: 1024,
+        height: 768,
+        quality: 100,
+        oversampling: 2,
         brightness: 4.0,
         border: 0,
     };

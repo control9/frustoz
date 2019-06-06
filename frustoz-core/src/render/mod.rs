@@ -22,7 +22,7 @@ pub trait ProgressReporter {
     fn report(&mut self, progress: Progress);
 }
 
-struct NoOpReporter {}
+pub struct NoOpReporter {}
 
 impl ProgressReporter for NoOpReporter {
     fn new(iterations_per_thread: &Vec<u32>) -> Self{

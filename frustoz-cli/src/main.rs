@@ -14,6 +14,7 @@ pub use frustoz_core::model;
 pub use frustoz_core::util;
 pub use frustoz_core::variations;
 pub use frustoz_core::transforms;
+use frustoz_core::example;
 
 use rayon::ThreadPoolBuilder;
 use simplelog::*;
@@ -22,7 +23,6 @@ use std::fs::File;
 use std::time::Instant;
 use progress_bar::MultiProgressBar;
 
-mod example;
 mod output;
 mod parser;
 mod progress_bar;

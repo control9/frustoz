@@ -1,4 +1,4 @@
-use model::palette::Palette;
+use crate::model::palette::Palette;
 
 pub fn palette() -> Palette {
     let mut data = [0u8 ;256 * 3];

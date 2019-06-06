@@ -1,17 +1,17 @@
-use example::green_palette;
-use render::filter::FilterType;
-use model::builders::transform;
-use model::filter_builder;
-use model::FilterConfig;
-use model::flame::CameraConfig;
-use model::flame::Flame;
-use model::flame::RenderConfig;
-use model::palette::Palette;
-use transforms::Transform;
-use transforms::TransformSystem;
-use util::math::RealPoint;
-use variations::Variation::*;
-use variations::Variations;
+use crate::example::green_palette;
+use crate::render::filter::FilterType;
+use crate::model::builders::transform;
+use crate::model::filter_builder;
+use crate::model::FilterConfig;
+use crate::model::flame::CameraConfig;
+use crate::model::flame::Flame;
+use crate::model::flame::RenderConfig;
+use crate::model::palette::Palette;
+use crate::transforms::Transform;
+use crate::transforms::TransformSystem;
+use crate::util::math::RealPoint;
+use crate::variations::Variation::*;
+use crate::variations::Variations;
 
 const S1: [f64; 6] = [
     0.5, 0.0, 0.0,

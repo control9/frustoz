@@ -1,4 +1,4 @@
-use model::flame::Flame;
+use crate::model::flame::Flame;
 
 mod sierpinsky;
 mod barnsley;
