@@ -22,6 +22,7 @@ pub trait ProgressReporter {
     fn report(&mut self, progress: Progress);
 }
 
+#[derive(Copy, Clone)]
 pub struct NoOpReporter {}
 
 impl ProgressReporter for NoOpReporter {
@@ -30,6 +31,5 @@ impl ProgressReporter for NoOpReporter {
     }
 
     fn report(&mut self, progress: Progress) {
-        info!{"Progress"}
     }
 }

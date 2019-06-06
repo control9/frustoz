@@ -228,11 +228,16 @@ dependencies = [
 name = "frustoz-ui"
 version = "0.1.0"
 dependencies = [
+ "cairo-rs 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frustoz-core 0.0.1",
+ "gdk 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gdk-pixbuf 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gio 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glib 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gtk 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num_cpus 1.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rayon 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "relm 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "relm-derive 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "simplelog 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
