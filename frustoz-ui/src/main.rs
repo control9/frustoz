@@ -22,13 +22,32 @@ use gio::prelude::*;
 use gtk::prelude::GtkApplicationExt;
 use gdk_pixbuf::{Colorspace, Pixbuf};
 use simplelog::*;
+use std::sync::{Arc, Mutex};
 
-use frustoz_core::model::flame::Flame;
-use frustoz_core::render;
-
-mod ui;
 
 pub const PRESERVE_CPUS: u32 = 1;
+
+macro_rules! clone {
+    (@param _) => ( _ );
+    (@param $x:ident) => ( $x );
+    ($($n:ident),+ => move || $body:expr) => (
+        {
+            $( let $n = $n.clone(); )+
+            move || $body
+        }
+    );
+    ($($n:ident),+ => move |$($p:tt),+| $body:expr) => (
+        {
+            $( let $n = $n.clone(); )+
+            move |$(clone!(@param $p),)+| $body
+        }
+    );
+}
+
+mod ui;
+mod drawing_area;
+mod render;
+mod example;
 
 fn main() {
     let threads = (num_cpus::get() as u32 - PRESERVE_CPUS).max(1);
