@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use cairo;
 use gdk::prelude::*;
 use gdk_pixbuf::Pixbuf;
-use gtk::{WidgetExt, WindowPosition, ComboBoxText};
+use gtk::{ApplicationWindow, ApplicationWindowExt, BoxExt, ComboBoxText, SpinButton, WidgetExt, WindowPosition};
 use gtk::prelude::*;
 
 use frustoz_core::model::flame::Flame;
@@ -29,19 +29,19 @@ pub struct Components {
 
 pub fn build_ui(application: &gtk::Application) {
     let state: State = Arc::new(Mutex::new(init_state()));
-    let window = gtk::ApplicationWindow::new(application);
+    let glade_src = include_str!("ui.glade");
+    let builder = gtk::Builder::new_from_string(glade_src);
 
-    window.set_title("First GTK+ Program");
-    window.set_border_width(10);
+    let window: gtk::ApplicationWindow = builder.get_object("window").unwrap();
+    window.set_application(application);
     window.set_position(WindowPosition::Center);
-    window.set_default_size(350, 70);
-
-    let bx = gtk::FlowBox::new();
-    window.add(&bx);
 
     let drawing = create(&state);
+    let window_box: gtk::Box = builder.get_object("window_box").unwrap();
 
-    let example_selector = gtk::ComboBoxText::new();
+    window_box.pack_start(&drawing, true, false, 1);
+
+    let example_selector: ComboBoxText = builder.get_object("example_selector").unwrap();
     example_selector.append_text(SPARK_STR);
     example_selector.append_text(SIERPINSKY_STR);
     example_selector.append_text(BARNSLEY_STR);
@@ -49,10 +49,24 @@ pub fn build_ui(application: &gtk::Application) {
     example_selector.connect_changed(clone!( state => move |x| {
         on_select(x, &state);
     }));
-    bx.add(&example_selector);
-    bx.add(&drawing);
 
-    state.lock().unwrap().components = Some(Components{drawing, example_selector});
+    let scale_x: SpinButton = builder.get_object("scale_x").unwrap();
+    scale_x.connect_activate(clone!(state => move |spin_button| {
+        let text = spin_button.get_text().expect("Couldn't get text from spin_button");
+        println!("spin_button_input: \"{}\"", text);
+        match text.parse::<f64>() {
+            Ok(value) => {
+                {
+                    let st = &mut state.lock().unwrap();
+                    st.flame.as_mut().map(|mut f| f.camera.scale_x = value);
+                }
+                render::render(Arc::clone(&state));
+            }
+            _ => {}
+        };
+    }));
+
+    state.lock().unwrap().components = Some(Components { drawing, example_selector });
     window.show_all();
 }
 

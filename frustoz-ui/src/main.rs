@@ -50,10 +50,16 @@ mod render;
 mod example;
 
 fn main() {
+    CombinedLogger::init(
+        vec![
+            TermLogger::new(LevelFilter::Info, Config::default()).unwrap(),
+        ]
+    ).unwrap();
+
     let threads = (num_cpus::get() as u32 - PRESERVE_CPUS).max(1);
     ThreadPoolBuilder::new().num_threads(threads as usize).build_global().expect("Failed to initialize pool");
 
-    let application = gtk::Application::new("com.github.gtk-rs.examples.basic",
+    let application = gtk::Application::new("name.control9.frustoz",
                                             Default::default())
         .expect("Initialization failed...");
     application.connect_activate(|app| {

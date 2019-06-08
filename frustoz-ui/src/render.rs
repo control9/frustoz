@@ -30,12 +30,14 @@ pub fn render(state: State) {
 
         let state = &mut state.lock().unwrap();
         state.raw = buf;
+        info!("Completed render");
         state.components.as_ref().map(|c| c.drawing.queue_draw());
         Continue(false)
     }));
 }
 
 fn render_flame(flame: Flame) -> Vec<u8> {
+    info!("Started render");
     let flame = override_flame_with_preview(&flame);
 
     let threads = (num_cpus::get() as u32 - crate::PRESERVE_CPUS).max(1);
