@@ -8,6 +8,7 @@ use gtk::{ApplicationWindow, ApplicationWindowExt, Builder, BoxExt, ComboBoxText
 use gtk::prelude::*;
 
 use frustoz_core::model::flame::Flame;
+use frustoz_io as io;
 
 use crate::drawing_area::create;
 use crate::example;
@@ -28,9 +29,8 @@ pub struct Components {
     pub open_file_dialog:  gtk::FileChooserNative,
 }
 
-enum UIUpdate {
+enum FlameUpdate {
     ScaleX(f64),
-    Flame(Flame),
 }
 
 pub fn build_ui(application: &gtk::Application) {
@@ -65,14 +65,15 @@ pub fn build_ui(application: &gtk::Application) {
         };
     }));
 
-//    let open_file_dialog : gtk::FileChooserDialog = builder.get_object("open_file_dialog").unwrap();
     let open_file_dialog : gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Save, None, None);
-    open_file_dialog.connect_response(move |dialog, _response| {
+    open_file_dialog.connect_response(clone!(state =>move |dialog, _response| {
         let path = dialog.get_filename().unwrap();
         let name = path.to_str().unwrap();
         println!("Trying to read file \"{}\"", name);
+        let flame = io::parser::parse_file(name).into_iter().next();
+        flame.map(|f| set_flame(&state, f));
         dialog.hide();
-    });
+    }));
 
     let menu_open: gtk::MenuItem = builder.get_object("menu_open").unwrap();
     menu_open.connect_activate(clone!(state => move |_| {
@@ -110,4 +111,28 @@ fn select_flame(example_selector: &ComboBoxText, state: &&Arc<Mutex<UIState>>) {
     let id = example_selector.get_active_text().map(|i| i.to_string());
     st.flame = id.as_ref().map(|x| &**x) // Converting Option<String> to Option<&str> never fails to amuse me
         .and_then(example::get_example);
+}
+
+fn set_flame(state: &State, flame: Flame) {
+    {
+        let st = &mut state.lock().unwrap();
+        st.flame = Some(flame);
+    }
+    render::render(Arc::clone(&state));
+}
+
+fn update_flame(state: &State, update: FlameUpdate) {
+    {
+        let st = &mut state.lock().unwrap();
+        st.flame = st.flame.as_ref().map(|mut f| apply_update(f.clone(), update));
+    }
+    render::render(Arc::clone(&state));
+}
+
+fn apply_update(mut flame: Flame, update: FlameUpdate) -> Flame{
+    use FlameUpdate::*;
+    match update {
+        ScaleX(x) => flame.camera.scale_x = x,
+    };
+    return flame;
 }

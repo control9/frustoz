@@ -1,4 +1,5 @@
 extern crate frustoz_core;
+extern crate frustoz_io;
 extern crate gdk;
 extern crate gio;
 extern crate gdk_pixbuf;
@@ -10,6 +11,7 @@ extern crate cairo;
 
 extern crate num_cpus;
 extern crate rayon;
+
 
 use std::fs::File;
 use std::env;
