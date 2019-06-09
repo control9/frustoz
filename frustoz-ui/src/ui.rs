@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use cairo;
 use gdk::prelude::*;
 use gdk_pixbuf::Pixbuf;
-use gtk::{ApplicationWindow, ApplicationWindowExt, Builder, BoxExt, ComboBoxText, DialogExt,FileChooserExt, GtkMenuItemExt, SpinButton, WidgetExt, WindowPosition};
+use gtk::{ApplicationWindow, ApplicationWindowExt, BoxExt, Builder, ComboBoxText, DialogExt, FileChooserExt, GtkMenuItemExt, SpinButton, WidgetExt, WindowPosition};
 use gtk::prelude::*;
 
 use frustoz_core::model::flame::Flame;
@@ -19,14 +19,17 @@ pub struct UIState {
     pub flame: Option<Flame>,
     pub raw: Option<Pixbuf>,
     pub components: Option<Components>,
+    pub refresh: bool,
 }
 
 pub type State = Arc<Mutex<UIState>>;
 
+#[derive(Clone)]
 pub struct Components {
     pub drawing: gtk::DrawingArea,
     pub example_selector: gtk::ComboBoxText,
-    pub open_file_dialog:  gtk::FileChooserNative,
+    pub open_file_dialog: gtk::FileChooserNative,
+    pub scale_x: SpinButton,
 }
 
 enum FlameUpdate {
@@ -50,16 +53,13 @@ pub fn build_ui(application: &gtk::Application) {
     let example_selector = init_example_selector(&builder, &state);
 
     let scale_x: SpinButton = builder.get_object("scale_x").unwrap();
-    scale_x.connect_activate(clone!(state => move |spin_button| {
-        let text = spin_button.get_text().expect("Couldn't get text from spin_button");
-        println!("spin_button_input: \"{}\"", text);
-        match text.parse::<f64>() {
-            Ok(value) => update_flame(&state, FlameUpdate::ScaleX(value)),
-            _ => {},
-        };
+    scale_x.connect_value_changed(clone!(state => move |spin_button| {
+        let value = spin_button.get_value();
+        println!("spin_button_input: \"{}\"", value);
+        update_flame(&state, FlameUpdate::ScaleX(value));
     }));
 
-    let open_file_dialog : gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Save, None, None);
+    let open_file_dialog: gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Save, None, None);
     open_file_dialog.connect_response(clone!(state =>move |dialog, _response| {
         let path = dialog.get_filename().unwrap();
         let name = path.to_str().unwrap();
@@ -76,7 +76,7 @@ pub fn build_ui(application: &gtk::Application) {
         st.components.as_ref().map(|c| c.open_file_dialog.show());
     }));
 
-    state.lock().unwrap().components = Some(Components { drawing, example_selector, open_file_dialog});
+    state.lock().unwrap().components = Some(Components { drawing, example_selector, open_file_dialog, scale_x });
     window.show_all();
 }
 
@@ -92,7 +92,7 @@ fn init_example_selector(builder: &Builder, state: &State) -> ComboBoxText {
 }
 
 fn init_state() -> UIState {
-    UIState { flame: None, raw: None, components: None }
+    UIState { flame: None, raw: None, components: None, refresh: false }
 }
 
 fn on_select(example_selector: &ComboBoxText, state: &State) {
@@ -100,7 +100,7 @@ fn on_select(example_selector: &ComboBoxText, state: &State) {
     flame.map(|f| set_flame(state, f));
 }
 
-fn select_flame(example_selector: &ComboBoxText)  -> Option<Flame> {
+fn select_flame(example_selector: &ComboBoxText) -> Option<Flame> {
     let id = example_selector.get_active_text().map(|i| i.to_string());
     id.as_ref().map(|x| &**x) // Converting Option<String> to Option<&str> never fails to amuse me
         .and_then(example::get_example)
@@ -109,20 +109,35 @@ fn select_flame(example_selector: &ComboBoxText)  -> Option<Flame> {
 fn set_flame(state: &State, flame: Flame) {
     {
         let st = &mut state.lock().unwrap();
+        st.refresh = true;
         st.flame = Some(flame);
     }
     render::render(&Arc::clone(&state));
+    rebind_state(&Arc::clone(&state));
+    {
+        let st = &mut state.lock().unwrap();
+        st.refresh = false;
+    }
+}
+
+fn rebind_state(state: &State) {
+    let (flame, components) = {
+        let st = &mut state.lock().unwrap();
+        (st.flame.as_ref().unwrap().clone(), st.components.as_ref().unwrap().clone())
+    };
+    components.scale_x.set_value(flame.camera.scale_x);
 }
 
 fn update_flame(state: &State, update: FlameUpdate) {
     {
         let st = &mut state.lock().unwrap();
+        if st.refresh { return; }
         st.flame = st.flame.as_ref().map(|mut f| apply_update(f.clone(), update));
     }
     render::render(state);
 }
 
-fn apply_update(mut flame: Flame, update: FlameUpdate) -> Flame{
+fn apply_update(mut flame: Flame, update: FlameUpdate) -> Flame {
     use FlameUpdate::*;
     match update {
         ScaleX(x) => flame.camera.scale_x = x,
