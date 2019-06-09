@@ -25,7 +25,7 @@ pub type State = Arc<Mutex<UIState>>;
 pub struct Components {
     pub drawing: gtk::DrawingArea,
     pub example_selector: gtk::ComboBoxText,
-    pub open_file_dialog:  gtk::FileChooserDialog,
+    pub open_file_dialog:  gtk::FileChooserNative,
 }
 
 enum UIUpdate {
@@ -65,8 +65,9 @@ pub fn build_ui(application: &gtk::Application) {
         };
     }));
 
-    let open_file_dialog : gtk::FileChooserDialog = builder.get_object("open_file_dialog").unwrap();
-    open_file_dialog.connect_file_activated(move |dialog| {
+//    let open_file_dialog : gtk::FileChooserDialog = builder.get_object("open_file_dialog").unwrap();
+    let open_file_dialog : gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Save, None, None);
+    open_file_dialog.connect_response(move |dialog, _response| {
         let path = dialog.get_filename().unwrap();
         let name = path.to_str().unwrap();
         println!("Trying to read file \"{}\"", name);
@@ -77,7 +78,7 @@ pub fn build_ui(application: &gtk::Application) {
     menu_open.connect_activate(clone!(state => move |_| {
         let st : &mut UIState = &mut state.lock().unwrap();
         println!("Opening file");
-        st.components.as_ref().map(|c| c.open_file_dialog.show_all());
+        st.components.as_ref().map(|c| c.open_file_dialog.show());
     }));
 
     state.lock().unwrap().components = Some(Components { drawing, example_selector, open_file_dialog});
