@@ -11,7 +11,7 @@ use frustoz_core::render;
 use crate::ui::State;
 use crate::ui::UIState;
 
-pub fn render(state: State) {
+pub fn render(state: &State) {
     let (tx, rx) = MainContext::channel::<Option<Vec<u8>>>(glib::PRIORITY_DEFAULT);
 
     let flame = state.lock().unwrap().flame.as_ref().map(|f| f.clone());

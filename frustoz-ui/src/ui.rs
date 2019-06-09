@@ -54,14 +54,8 @@ pub fn build_ui(application: &gtk::Application) {
         let text = spin_button.get_text().expect("Couldn't get text from spin_button");
         println!("spin_button_input: \"{}\"", text);
         match text.parse::<f64>() {
-            Ok(value) => {
-                {
-                    let st = &mut state.lock().unwrap();
-                    st.flame.as_mut().map(|mut f| f.camera.scale_x = value);
-                }
-                render::render(Arc::clone(&state));
-            }
-            _ => {}
+            Ok(value) => update_flame(&state, FlameUpdate::ScaleX(value)),
+            _ => {},
         };
     }));
 
@@ -102,15 +96,14 @@ fn init_state() -> UIState {
 }
 
 fn on_select(example_selector: &ComboBoxText, state: &State) {
-    select_flame(example_selector, &state);
-    render::render(Arc::clone(&state));
+    let flame = select_flame(example_selector);
+    flame.map(|f| set_flame(state, f));
 }
 
-fn select_flame(example_selector: &ComboBoxText, state: &&Arc<Mutex<UIState>>) {
-    let st = &mut state.lock().unwrap();
+fn select_flame(example_selector: &ComboBoxText)  -> Option<Flame> {
     let id = example_selector.get_active_text().map(|i| i.to_string());
-    st.flame = id.as_ref().map(|x| &**x) // Converting Option<String> to Option<&str> never fails to amuse me
-        .and_then(example::get_example);
+    id.as_ref().map(|x| &**x) // Converting Option<String> to Option<&str> never fails to amuse me
+        .and_then(example::get_example)
 }
 
 fn set_flame(state: &State, flame: Flame) {
@@ -118,7 +111,7 @@ fn set_flame(state: &State, flame: Flame) {
         let st = &mut state.lock().unwrap();
         st.flame = Some(flame);
     }
-    render::render(Arc::clone(&state));
+    render::render(&Arc::clone(&state));
 }
 
 fn update_flame(state: &State, update: FlameUpdate) {
@@ -126,7 +119,7 @@ fn update_flame(state: &State, update: FlameUpdate) {
         let st = &mut state.lock().unwrap();
         st.flame = st.flame.as_ref().map(|mut f| apply_update(f.clone(), update));
     }
-    render::render(Arc::clone(&state));
+    render::render(state);
 }
 
 fn apply_update(mut flame: Flame, update: FlameUpdate) -> Flame{
