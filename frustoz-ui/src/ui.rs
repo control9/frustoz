@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use cairo;
 use gdk::prelude::*;
 use gdk_pixbuf::Pixbuf;
-use gtk::{ApplicationWindow, ApplicationWindowExt, BoxExt, ComboBoxText, SpinButton, WidgetExt, WindowPosition};
+use gtk::{ApplicationWindow, ApplicationWindowExt, Builder, BoxExt, ComboBoxText, DialogExt,FileChooserExt, GtkMenuItemExt, SpinButton, WidgetExt, WindowPosition};
 use gtk::prelude::*;
 
 use frustoz_core::model::flame::Flame;
@@ -25,12 +25,18 @@ pub type State = Arc<Mutex<UIState>>;
 pub struct Components {
     pub drawing: gtk::DrawingArea,
     pub example_selector: gtk::ComboBoxText,
+    pub open_file_dialog:  gtk::FileChooserDialog,
+}
+
+enum UIUpdate {
+    ScaleX(f64),
+    Flame(Flame),
 }
 
 pub fn build_ui(application: &gtk::Application) {
     let state: State = Arc::new(Mutex::new(init_state()));
     let glade_src = include_str!("ui.glade");
-    let builder = gtk::Builder::new_from_string(glade_src);
+    let builder = Builder::new_from_string(glade_src);
 
     let window: gtk::ApplicationWindow = builder.get_object("window").unwrap();
     window.set_application(application);
@@ -41,14 +47,7 @@ pub fn build_ui(application: &gtk::Application) {
 
     window_box.pack_start(&drawing, true, false, 1);
 
-    let example_selector: ComboBoxText = builder.get_object("example_selector").unwrap();
-    example_selector.append_text(SPARK_STR);
-    example_selector.append_text(SIERPINSKY_STR);
-    example_selector.append_text(BARNSLEY_STR);
-
-    example_selector.connect_changed(clone!( state => move |x| {
-        on_select(x, &state);
-    }));
+    let example_selector = init_example_selector(&builder, &state);
 
     let scale_x: SpinButton = builder.get_object("scale_x").unwrap();
     scale_x.connect_activate(clone!(state => move |spin_button| {
@@ -66,8 +65,34 @@ pub fn build_ui(application: &gtk::Application) {
         };
     }));
 
-    state.lock().unwrap().components = Some(Components { drawing, example_selector });
+    let open_file_dialog : gtk::FileChooserDialog = builder.get_object("open_file_dialog").unwrap();
+    open_file_dialog.connect_file_activated(move |dialog| {
+        let path = dialog.get_filename().unwrap();
+        let name = path.to_str().unwrap();
+        println!("Trying to read file \"{}\"", name);
+        dialog.hide();
+    });
+
+    let menu_open: gtk::MenuItem = builder.get_object("menu_open").unwrap();
+    menu_open.connect_activate(clone!(state => move |_| {
+        let st : &mut UIState = &mut state.lock().unwrap();
+        println!("Opening file");
+        st.components.as_ref().map(|c| c.open_file_dialog.show_all());
+    }));
+
+    state.lock().unwrap().components = Some(Components { drawing, example_selector, open_file_dialog});
     window.show_all();
+}
+
+fn init_example_selector(builder: &Builder, state: &State) -> ComboBoxText {
+    let example_selector: ComboBoxText = builder.get_object("example_selector").unwrap();
+    example_selector.append_text(SPARK_STR);
+    example_selector.append_text(SIERPINSKY_STR);
+    example_selector.append_text(BARNSLEY_STR);
+    example_selector.connect_changed(clone!( state => move |x| {
+        on_select(x, &state);
+    }));
+    example_selector
 }
 
 fn init_state() -> UIState {
