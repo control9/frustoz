@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use model::builders;
-use model::palette::Palette;
+use frustoz_core::model::builders;
+use frustoz_core::model::palette::Palette;
 use super::extract;
 
 pub fn extract_palette(attributes: &HashMap<String, String>, palette_body: String) -> Palette {

@@ -1,30 +1,29 @@
-extern crate image;
 #[macro_use]
 extern crate log;
 extern crate num_cpus;
-extern crate rand;
 extern crate rayon;
 extern crate simplelog;
-extern crate xml;
 extern crate pbr;
 
 extern crate frustoz_core;
+extern crate frustoz_io;
+
 pub use frustoz_core::render;
-pub use frustoz_core::model;
-pub use frustoz_core::util;
-pub use frustoz_core::variations;
-pub use frustoz_core::transforms;
+use frustoz_core::model;
+use frustoz_core::util;
+use frustoz_core::variations;
+use frustoz_core::transforms;
 use frustoz_core::example;
+use frustoz_io::parser;
+use frustoz_io::output;
 
 use rayon::ThreadPoolBuilder;
 use simplelog::*;
-use std::env;
 use std::fs::File;
 use std::time::Instant;
+use std::env;
 use progress_bar::MultiProgressBar;
 
-mod output;
-mod parser;
 mod progress_bar;
 
 const PRESERVE_CPUS: u32 = 1;
@@ -32,7 +31,7 @@ const PRESERVE_CPUS: u32 = 1;
 fn main() {
     CombinedLogger::init(
         vec![
-            TermLogger::new(LevelFilter::Error, Config::default()).unwrap(),
+            TermLogger::new(LevelFilter::Debug, Config::default()).unwrap(),
             WriteLogger::new(LevelFilter::Debug, Config::default(), File::create("frustoz.log").unwrap()),
         ]
     ).unwrap();

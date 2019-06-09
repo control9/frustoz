@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use super::extract;
 use super::extract_all;
-use model::flame::CameraConfig;
-use util::math::RealPoint;
+use frustoz_core::model::flame::CameraConfig;
+use frustoz_core::util::math::RealPoint;
 
 pub fn extract_camera_config(attributes: &HashMap<String, String>, image_width: f64, image_height: f64) -> CameraConfig {
     let pixels_per_unit = extract("scale", 100.0, attributes);

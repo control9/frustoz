@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use super::extract;
 use super::extract_all;
-use model::builders;
-use transforms::Transform;
-use variations::Variation;
-use variations::Variation::*;
-use variations::Variations;
+use frustoz_core::model::builders;
+use frustoz_core::transforms::Transform;
+use frustoz_core::variations::Variation;
+use frustoz_core::variations::Variation::*;
+use frustoz_core::variations::Variations;
 
 pub fn extract_transform(attributes: &HashMap<String, String>) -> Transform {
     let weight = extract("weight", 1.0, attributes);
