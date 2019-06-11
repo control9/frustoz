@@ -54,7 +54,7 @@ pub fn build_ui(application: &gtk::Application) {
         update_flame(&state, FlameUpdate::ScaleX(value));
     }));
 
-    let open_file_dialog: gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Save, None, None);
+    let open_file_dialog: gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Open, None, None);
     open_file_dialog.connect_response(clone!(state =>move |dialog, _response| {
         let path = dialog.get_filename().unwrap();
         let name = path.to_str().unwrap();
