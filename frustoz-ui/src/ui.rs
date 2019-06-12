@@ -11,8 +11,6 @@ use frustoz_core::model::flame::Flame;
 use frustoz_io as io;
 
 use crate::drawing_area::create;
-use crate::example;
-use crate::example::*;
 use crate::render;
 
 pub struct UIState {
@@ -27,7 +25,6 @@ pub type State = Arc<Mutex<UIState>>;
 #[derive(Clone)]
 pub struct Components {
     pub drawing: gtk::DrawingArea,
-    pub example_selector: gtk::ComboBoxText,
     pub open_file_dialog: gtk::FileChooserNative,
     pub scale_x: SpinButton,
 }
@@ -50,8 +47,6 @@ pub fn build_ui(application: &gtk::Application) {
 
     window_box.pack_start(&drawing, true, false, 1);
 
-    let example_selector = init_example_selector(&builder, &state);
-
     let scale_x: SpinButton = builder.get_object("scale_x").unwrap();
     scale_x.connect_value_changed(clone!(state => move |spin_button| {
         let value = spin_button.get_value();
@@ -59,7 +54,7 @@ pub fn build_ui(application: &gtk::Application) {
         update_flame(&state, FlameUpdate::ScaleX(value));
     }));
 
-    let open_file_dialog: gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Save, None, None);
+    let open_file_dialog: gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Open, None, None);
     open_file_dialog.connect_response(clone!(state =>move |dialog, _response| {
         let path = dialog.get_filename().unwrap();
         let name = path.to_str().unwrap();
@@ -76,34 +71,12 @@ pub fn build_ui(application: &gtk::Application) {
         st.components.as_ref().map(|c| c.open_file_dialog.show());
     }));
 
-    state.lock().unwrap().components = Some(Components { drawing, example_selector, open_file_dialog, scale_x });
+    state.lock().unwrap().components = Some(Components { drawing, open_file_dialog, scale_x });
     window.show_all();
-}
-
-fn init_example_selector(builder: &Builder, state: &State) -> ComboBoxText {
-    let example_selector: ComboBoxText = builder.get_object("example_selector").unwrap();
-    example_selector.append_text(SPARK_STR);
-    example_selector.append_text(SIERPINSKY_STR);
-    example_selector.append_text(BARNSLEY_STR);
-    example_selector.connect_changed(clone!( state => move |x| {
-        on_select(x, &state);
-    }));
-    example_selector
 }
 
 fn init_state() -> UIState {
     UIState { flame: None, raw: None, components: None, refresh: false }
-}
-
-fn on_select(example_selector: &ComboBoxText, state: &State) {
-    let flame = select_flame(example_selector);
-    flame.map(|f| set_flame(state, f));
-}
-
-fn select_flame(example_selector: &ComboBoxText) -> Option<Flame> {
-    let id = example_selector.get_active_text().map(|i| i.to_string());
-    id.as_ref().map(|x| &**x) // Converting Option<String> to Option<&str> never fails to amuse me
-        .and_then(example::get_example)
 }
 
 fn set_flame(state: &State, flame: Flame) {

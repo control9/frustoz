@@ -49,7 +49,6 @@ macro_rules! clone {
 mod ui;
 mod drawing_area;
 mod render;
-mod example;
 
 fn main() {
     CombinedLogger::init(
