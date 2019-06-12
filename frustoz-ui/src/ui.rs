@@ -55,65 +55,67 @@ pub fn build_ui(application: &gtk::Application) {
     }));
 
     let open_file_dialog: gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(&window), gtk::FileChooserAction::Open, None, None);
-    open_file_dialog.connect_response(clone!(state =>move |dialog, _response| {
-        let path = dialog.get_filename().unwrap();
-        let name = path.to_str().unwrap();
-        println!("Trying to read file \"{}\"", name);
-        let flame = io::parser::parse_file(name).into_iter().next();
-        flame.map(|f| set_flame(&state, f));
-        dialog.hide();
-    }));
+    open_file_dialog.connect_response(clone!(state => move |dialog, _response| {
+        let path = dialog.get_filename();
+        let name = path.as_ref().and_then(|x| x.to_str());
+        name.map(| name | {
+            println!("Trying to read file \"{}\"", name);
+            let flame = io::parser::parse_file(name).into_iter().next();
+            flame.map(|f| set_flame(&state, f));
+        });
+    dialog.hide();
+}));
 
-    let menu_open: gtk::MenuItem = builder.get_object("menu_open").unwrap();
-    menu_open.connect_activate(clone!(state => move |_| {
-        let st : &mut UIState = &mut state.lock().unwrap();
-        println!("Opening file");
-        st.components.as_ref().map(|c| c.open_file_dialog.show());
-    }));
+let menu_open: gtk::MenuItem = builder.get_object("menu_open").unwrap();
+menu_open.connect_activate(clone ! (state => move | _ | {
+let st: & mut UIState = & mut state.lock().unwrap();
+println! ("Opening file");
+st.components.as_ref().map( | c | c.open_file_dialog.show());
+}));
 
-    state.lock().unwrap().components = Some(Components { drawing, open_file_dialog, scale_x });
-    window.show_all();
+state.lock().unwrap().components = Some(Components { drawing, open_file_dialog, scale_x });
+window.show_all();
 }
 
 fn init_state() -> UIState {
-    UIState { flame: None, raw: None, components: None, refresh: false }
+UIState { flame: None, raw: None, components: None, refresh: false }
 }
 
-fn set_flame(state: &State, flame: Flame) {
-    {
-        let st = &mut state.lock().unwrap();
-        st.refresh = true;
-        st.flame = Some(flame);
-    }
-    render::render(&Arc::clone(&state));
-    rebind_state(&Arc::clone(&state));
-    {
-        let st = &mut state.lock().unwrap();
-        st.refresh = false;
-    }
+fn set_flame(state: & State, flame: Flame) {
+{
+let st = & mut state.lock().unwrap();
+st.refresh = true;
+st.flame = Some(flame);
+}
+render::render( & Arc::clone( &state));
+rebind_state( & Arc::clone( & state));
+{
+let st = & mut state.lock().unwrap();
+st.refresh = false;
+}
 }
 
-fn rebind_state(state: &State) {
-    let (flame, components) = {
-        let st = &mut state.lock().unwrap();
-        (st.flame.as_ref().unwrap().clone(), st.components.as_ref().unwrap().clone())
-    };
-    components.scale_x.set_value(flame.camera.scale_x);
+fn rebind_state(state: & State) {
+let (flame, components) = {
+let st = & mut state.lock().unwrap();
+(st.flame.as_ref().unwrap().clone(), st.components.as_ref().unwrap().clone())
+};
+components.scale_x.set_value(flame.camera.scale_x);
 }
 
-fn update_flame(state: &State, update: FlameUpdate) {
-    {
-        let st = &mut state.lock().unwrap();
-        if st.refresh { return; }
-        st.flame = st.flame.as_ref().map(|mut f| apply_update(f.clone(), update));
-    }
-    render::render(state);
+fn update_flame(state: & State, update: FlameUpdate) {
+{
+let st = & mut state.lock().unwrap();
+if st.refresh { return; }
+st.flame = st.flame.as_ref().map( | mut f | apply_update(f.clone(), update));
+}
+render::render(state);
 }
 
-fn apply_update(mut flame: Flame, update: FlameUpdate) -> Flame {
-    use FlameUpdate::*;
-    match update {
-        ScaleX(x) => flame.camera.scale_x = x,
-    };
-    return flame;
+fn apply_update( mut flame: Flame, update: FlameUpdate) -> Flame {
+use FlameUpdate::*;
+match update {
+ScaleX(x) => flame.camera.scale_x = x,
+};
+return flame;
 }
