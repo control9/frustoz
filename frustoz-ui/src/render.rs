@@ -8,8 +8,7 @@ use num_cpus;
 use frustoz_core::model::flame::Flame;
 use frustoz_core::render;
 
-use crate::ui::State;
-use crate::ui::UIState;
+use crate::ui::state::State;
 
 pub fn render(state: &State) {
     let (tx, rx) = MainContext::channel::<Option<Vec<u8>>>(glib::PRIORITY_DEFAULT);
