@@ -17,7 +17,8 @@ pub enum Variation {
     Spiral(f64),
     Hyperbolic(f64),
     Diamond(f64),
-    Julia(f64)
+    Julia(f64),
+    JuliaN(f64, f64, f64),
 }
 
 #[derive(Clone, Debug)]
@@ -30,7 +31,7 @@ impl Variations {
         Variations { variations}
     }
 
-    pub fn apply<R: Rng + ?Sized>(&self, point: &RealPoint, rng: &mut R) -> RealPoint {
+    pub fn apply<R: Rng + Sized>(&self, point: &RealPoint, rng: &mut R) -> RealPoint {
         self.variations.iter()
             .map(|var| var.apply(point, rng))
             .sum()

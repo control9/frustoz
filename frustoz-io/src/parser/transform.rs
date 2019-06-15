@@ -21,7 +21,7 @@ pub fn extract_transform(attributes: &HashMap<String, String>) -> Transform {
 
 fn extract_variations(attributes: &HashMap<String, String>) -> Variations {
     let result: Vec<Variation> = attributes.iter()
-        .map(|(name, value)| try_extract_variation(name, value))
+        .map(|(name, value)| try_extract_variation(name, value, attributes))
         .flat_map(|opt_variation| opt_variation.into_iter())
         .collect();
     if !result.is_empty() {
@@ -32,7 +32,7 @@ fn extract_variations(attributes: &HashMap<String, String>) -> Variations {
     }
 }
 
-fn try_extract_variation(name: &str, value: &str) -> Option<Variation> {
+fn try_extract_variation(name: &str, value: &str, others: &HashMap<String, String>) -> Option<Variation> {
     match name.split('#').next().unwrap() {
         "linear" => Some(Linear(value.parse().unwrap_or(1.0))),
         "linear3D" => Some(Linear(value.parse().unwrap_or(1.0))),
@@ -48,6 +48,15 @@ fn try_extract_variation(name: &str, value: &str) -> Option<Variation> {
         "hyperbolic" => Some(Hyperbolic(value.parse().unwrap_or(1.0))),
         "diamond" => Some(Diamond(value.parse().unwrap_or(1.0))),
         "julia" => Some(Julia(value.parse().unwrap_or(1.0))),
+        "julian" => Some(extract_julian(value, others)),
         _ => None,
     }
+}
+
+fn extract_julian(value: &str, others: &HashMap<String, String>) -> Variation {
+    let weight = value.parse().unwrap_or(1.0);
+    let julian_power = extract("julian_power", 1.0, others);
+    let julian_dist = extract("julian_dist", 1.0, others);
+    info!("weight: {}, power: {}, dist: {}", weight, julian_power, julian_dist);
+    JuliaN(weight, julian_power, julian_dist)
 }

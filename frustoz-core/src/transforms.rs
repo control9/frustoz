@@ -11,7 +11,7 @@ pub struct Transform {
 }
 
 impl Transform {
-    pub fn apply<R: Rng + ?Sized>(&self, point: &RealPoint, color: f64, rng: &mut R) -> (RealPoint, f64) {
+    pub fn apply<R: Rng + Sized>(&self, point: &RealPoint, color: f64, rng: &mut R) -> (RealPoint, f64) {
         let pr: &ProjectivePoint = &point.into();
 
         let result_pr = &(&self.affine * pr);
