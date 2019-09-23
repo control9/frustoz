@@ -3,6 +3,10 @@ use gtk::{DrawingArea, WidgetExt, Inhibit};
 use gdk::ContextExt;
 use super::state::State;
 use std::sync::{Arc, Mutex};
+use crate::ui::bus::Bus;
+use gdk_pixbuf::Pixbuf;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 
 pub fn create( state: &State) -> DrawingArea {

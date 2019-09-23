@@ -26,7 +26,6 @@ use gdk_pixbuf::{Colorspace, Pixbuf};
 use simplelog::*;
 use std::sync::{Arc, Mutex};
 
-
 pub const PRESERVE_CPUS: u32 = 1;
 
 macro_rules! clone {
@@ -49,6 +48,7 @@ macro_rules! clone {
 mod ui;
 mod render;
 
+
 fn main() {
     CombinedLogger::init(
         vec![
@@ -59,11 +59,10 @@ fn main() {
     let threads = (num_cpus::get() as u32 - PRESERVE_CPUS).max(1);
     ThreadPoolBuilder::new().num_threads(threads as usize).build_global().expect("Failed to initialize pool");
 
-    let application = gtk::Application::new("name.control9.frustoz",
-                                            Default::default())
-        .expect("Initialization failed...");
+    let application = gtk::Application::new("name.control9.frustoz",Default::default())
+        .expect("Initialization failed.");
     application.connect_activate(|app| {
-        ui::build_ui(app);
+        ui::build_ui_bus(app);
     });
     application.run(&env::args().collect::<Vec<_>>());
 }
