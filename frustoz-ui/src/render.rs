@@ -11,7 +11,6 @@ use crate::ui::bus::process;
 use crate::ui::bus::Update::Redraw;
 
 pub fn render(bus: &Bus, flame: &Option<Flame>) {
-
     let (tx, rx) = MainContext::channel::<Option<Vec<u8>>>(glib::PRIORITY_DEFAULT);
 
     spawn(clone!( flame =>
@@ -26,7 +25,6 @@ pub fn render(bus: &Bus, flame: &Option<Flame>) {
         }
         Continue(false)
     }));
-
 }
 
 fn render_flame(flame: &Flame) -> Vec<u8> {

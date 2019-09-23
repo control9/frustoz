@@ -25,7 +25,6 @@ pub fn create() -> Preview {
     }
 }
 
-
 fn draw(draw: &gtk::DrawingArea, c: &cairo::Context, buf: &Option<Pixbuf>) {
     draw.set_size_request(1024, 768);
     buf.as_ref().map(|buf| {

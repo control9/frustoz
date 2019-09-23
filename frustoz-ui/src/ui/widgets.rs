@@ -1,5 +1,4 @@
-use gtk::{ApplicationWindow, Builder, WindowPosition};
-use gtk::GtkWindowExt;
+use gtk::{ApplicationWindow, Builder};
 use gtk::prelude::*;
 
 use frustoz_core::model::flame::Flame;
@@ -33,7 +32,6 @@ pub fn create(builder: Builder, window: &ApplicationWindow, preview: &Preview) -
         scale_x,
     }
 }
-
 
 impl Widgets {
     pub fn bind(&self, flame: &Flame, bus: &Bus) {

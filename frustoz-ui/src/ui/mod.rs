@@ -2,12 +2,7 @@ use gtk::{Builder, WindowPosition};
 use gtk::GtkWindowExt;
 use gtk::prelude::*;
 
-
-use crate::ui::bus::Bus;
-use crate::ui::bus::process;
-use crate::ui::bus::Update::Bind;
-use crate::ui::bus::Update::FlameUpdate;
-use crate::ui::bus::Update::Open;
+use bus::Bus;
 
 pub mod bus;
 
@@ -15,7 +10,6 @@ mod preview;
 mod widgets;
 
 pub fn build_ui(application: &gtk::Application) {
-
     let glade_src = include_str!("ui.glade");
     let builder = Builder::new_from_string(glade_src);
 
@@ -25,7 +19,7 @@ pub fn build_ui(application: &gtk::Application) {
 
     let preview = preview::create();
     let widgets = widgets::create(builder, &window, &preview);
-    let mut bus: Bus = bus::create_bus(&widgets, preview);
+    let bus: Bus = bus::create_bus(&widgets, preview);
     widgets.connect(&bus);
 
     window.show_all();

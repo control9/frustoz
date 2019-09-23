@@ -3,13 +3,14 @@ use std::rc::Rc;
 
 use gdk_pixbuf::{Colorspace, Pixbuf};
 use glib::Bytes;
-use gtk::{Continue, SpinButtonExt, WidgetExt};
+use gtk::{Continue, WidgetExt};
 use gtk::NativeDialogExt;
 
 use frustoz_core::model::flame::Flame;
 
 use crate::render::render;
 use crate::ui::preview::Preview;
+
 use super::widgets::Widgets;
 
 pub struct BusImpl {
@@ -72,8 +73,6 @@ pub fn process(bus_ref: &Bus, event: Update) {
                 let raw_bytes = Bytes::from(&raw);
                 Pixbuf::new_from_bytes(&raw_bytes, Colorspace::Rgb, false, 8, 1024, 768, 3 * 1024)
             };
-
-
             let buf = itself.preview.pix_buf.clone();
             let mut buffer = (*buf).borrow_mut();
             *buffer = Some(pixbuf);
@@ -81,7 +80,6 @@ pub fn process(bus_ref: &Bus, event: Update) {
         }
     }
 }
-
 
 pub fn create_bus(widgets: &Widgets, preview: Preview) -> Bus {
     let bus_impl = BusImpl {
