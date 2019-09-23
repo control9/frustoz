@@ -1,4 +1,3 @@
-use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -8,10 +7,8 @@ use gtk::{Continue, SpinButtonExt, WidgetExt};
 use gtk::NativeDialogExt;
 
 use frustoz_core::model::flame::Flame;
-use Update::Bind;
-use Update::Open;
 
-use crate::render::render_bus;
+use crate::render::render;
 use crate::ui::preview::Preview;
 
 pub struct BusImpl {
@@ -38,7 +35,7 @@ pub enum Update {
 pub type Bus = Rc<RefCell<BusImpl>>;
 
 pub fn process(bus_ref: &Bus, event: Update) {
-    let mut bus = (*bus_ref).clone();
+    let bus = (*bus_ref).clone();
     let mut itself = (*bus).borrow_mut();
     match event {
         Update::Bind(f) => {
@@ -76,7 +73,7 @@ pub fn process(bus_ref: &Bus, event: Update) {
             if !itself.binding {
                 let f = itself.flame.clone();
                 gtk::idle_add(clone!(bus => move || {
-                    render_bus(&bus, &f);
+                    render(&bus, &f);
                     Continue(false)
                 }));
             }

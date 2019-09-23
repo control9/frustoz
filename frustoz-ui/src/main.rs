@@ -1,30 +1,23 @@
+extern crate cairo;
 extern crate frustoz_core;
 extern crate frustoz_io;
 extern crate gdk;
-extern crate gio;
 extern crate gdk_pixbuf;
+extern crate gio;
 extern crate glib;
 extern crate gtk;
 #[macro_use]
 extern crate log;
-extern crate cairo;
-
 extern crate num_cpus;
 extern crate rayon;
 
 
-use std::fs::File;
 use std::env;
 
+use gio::ApplicationExt;
+use gio::ApplicationExtManual;
 use rayon::ThreadPoolBuilder;
-
-use gdk::prelude::*;
-use gtk::prelude::*;
-use gio::prelude::*;
-use gtk::prelude::GtkApplicationExt;
-use gdk_pixbuf::{Colorspace, Pixbuf};
 use simplelog::*;
-use std::sync::{Arc, Mutex};
 
 pub const PRESERVE_CPUS: u32 = 1;
 
@@ -62,7 +55,7 @@ fn main() {
     let application = gtk::Application::new("name.control9.frustoz",Default::default())
         .expect("Initialization failed.");
     application.connect_activate(|app| {
-        ui::build_ui_bus(app);
+        ui::build_ui(app);
     });
     application.run(&env::args().collect::<Vec<_>>());
 }
