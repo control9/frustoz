@@ -1,6 +1,7 @@
 use super::util::math::{TransformMatrix, RealPoint, ProjectivePoint};
 use super::variations::Variations;
 use rand::prelude::*;
+use std::fmt::{Debug, Formatter, Error};
 
 #[derive(Clone, Debug)]
 pub struct Transform {
@@ -23,7 +24,7 @@ impl Transform {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct TransformSystem {
     transforms: Vec<Transform>,
     total_weight: f64,
@@ -49,5 +50,11 @@ impl TransformSystem {
             }
         }
         panic!("Seed is greater than 1 or incorrect Transformation")
+    }
+}
+
+impl Debug for TransformSystem {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "Transform system size [{}]", self.transforms.len())
     }
 }
