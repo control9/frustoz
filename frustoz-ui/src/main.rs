@@ -38,7 +38,6 @@ macro_rules! clone {
 }
 
 mod ui;
-mod render;
 
 
 fn main() {
