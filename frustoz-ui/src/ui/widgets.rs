@@ -1,25 +1,25 @@
-use gtk::{ApplicationWindow, Builder, NativeDialogExt};
+use gtk::{ApplicationWindow, Builder};
 use gtk::prelude::*;
 
 use frustoz_core::model::flame::Flame;
 use frustoz_io as io;
 
 use super::bus::Bus;
-use super::bus::Subscriber;
 use super::bus::process;
-use super::bus::Update;
 use super::bus::Update::*;
 use super::preview::Preview;
 
 #[derive(Clone)]
 pub struct Widgets {
-    bus: Bus,
     menu_open: gtk::MenuItem,
     pub open_file_dialog: gtk::FileChooserNative,
     pub scale_x: gtk::SpinButton,
 }
 
-pub fn create(builder: Builder, window: &ApplicationWindow, bus: Bus) -> Widgets {
+pub fn create(builder: Builder, window: &ApplicationWindow, preview: &Preview) -> Widgets {
+    let window_box: gtk::Box = builder.get_object("window_box").unwrap();
+    window_box.pack_start(&preview.draw, true, false, 1);
+
     let menu_open: gtk::MenuItem = builder.get_object("menu_open").unwrap();
     let open_file_dialog: gtk::FileChooserNative = gtk::FileChooserNative::new(Some("Open"), Some(window), gtk::FileChooserAction::Open, None, None);
     let scale_x: gtk::SpinButton = builder.get_object("scale_x").unwrap();
@@ -27,7 +27,6 @@ pub fn create(builder: Builder, window: &ApplicationWindow, bus: Bus) -> Widgets
     window.show_all();
 
     Widgets {
-        bus,
         menu_open,
         open_file_dialog,
         scale_x,
@@ -35,28 +34,23 @@ pub fn create(builder: Builder, window: &ApplicationWindow, bus: Bus) -> Widgets
 }
 
 impl Widgets {
-    fn bind(&self, flame: &Flame) {
+    pub fn bind(&self, flame: &Flame, bus: &Bus) {
         let f = flame.clone();
         let itself = self.clone();
-        let bus = itself.bus.clone();
-
         gtk::idle_add(move || {
             itself.scale_x.set_value(f.camera.scale_x);
             Continue(false)
         });
 
-        gtk::idle_add(clone!(bus => move || {
-                    process(&bus, PostBind()); // ToDo: error handling
-                    Continue(false)
+        gtk::timeout_add(100, clone!(bus => move|| {
+                process(&bus, Render(true));
+                Continue(false)
         }));
-    }
-
-    fn open(&self) {
-        self.open_file_dialog.show();
     }
 
     pub fn connect(&self, bus: &Bus) {
         self.scale_x.connect_value_changed(clone!(bus => move |spin_button| {
+            println!("Changed");
             let value = spin_button.get_value();
             process(&bus, FlameUpdate(value));
         }));
@@ -67,19 +61,7 @@ impl Widgets {
             name.map(| name | {
                 println!("Trying to read file \"{}\"", name);
                 let flame = io::parser::parse_file(name).into_iter().next();
-                let f = flame.unwrap();
-
-                gtk::idle_add(clone!(bus, f => move || {
-                    process(&bus, PreBind(&f));
-                    Continue(false)
-                }));
-
-
-                gtk::idle_add(clone!(bus, f => move || {
-                    process(&bus, Bind(&f));
-                    Continue(false)
-                }));
-
+                process(&bus, Bind(flame.unwrap())); // ToDo: error handling
             });
             dialog.hide();
         }));
@@ -88,28 +70,5 @@ impl Widgets {
             println! ("Opening file");
             process(&bus, Open());
         }));
-    }
-}
-
-impl Subscriber for Widgets {
-
-    fn accepts(&self, e: &Update) -> bool{
-        match e {
-            Bind(_) => true,
-            Open() => true,
-            _ => false
-        }
-    }
-
-    fn process(&mut self, e: &Update) {
-        match e {
-            Bind(flame) => {
-                self.bind(flame);
-            }
-            Open() => {
-                self.open();
-            }
-            _ => {}
-        }
     }
 }

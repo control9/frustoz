@@ -1,19 +1,10 @@
-use std::fmt::{Debug, Formatter, Error};
-
-#[derive(PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct RGB(pub f32, pub f32, pub f32);
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Palette {
     size: i32,
     colors: Vec<RGB>,
-}
-
-impl Debug for Palette {
-
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "Palette size [{}]", self.size)
-    }
 }
 
 impl Palette {
