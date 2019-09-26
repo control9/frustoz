@@ -7,6 +7,7 @@ use bus::subscribe;
 use bus::Bus;
 use crate::ui::render::RenderClient;
 use crate::ui::model::Model;
+use crate::ui::widgets::Widgets;
 
 pub mod bus;
 
@@ -25,8 +26,7 @@ pub fn build_ui(application: &gtk::Application) {
 
     let preview = preview::Preview::new(&builder);
     let bus: Bus = bus::new();
-    let widgets = widgets::create(builder, &window,  bus.clone());
-    widgets.connect(&bus);
+    let widgets = Widgets::new(&builder, &window,  &bus);
 
     let render_client = RenderClient::new(&bus);
     let model = Model::new(&bus);
@@ -35,7 +35,6 @@ pub fn build_ui(application: &gtk::Application) {
     subscribe(&bus, Box::new(render_client));
     subscribe(&bus, Box::new(preview));
     subscribe(&bus, Box::new(model));
-
 
     window.show_all();
 }

@@ -47,9 +47,28 @@
       </object>
     </child>
   </object>
+  <object class="GtkAdjustment" id="origin_x_adj">
+    <property name="lower">-999</property>
+    <property name="upper">999</property>
+    <property name="step_increment">0.0099999997764825821</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="origin_y_adj">
+    <property name="lower">-999</property>
+    <property name="upper">999</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkAdjustment" id="scale_x_adj">
     <property name="lower">-999</property>
     <property name="upper">999</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="scale_y_adj">
+    <property name="lower">-999</property>
+    <property name="upper">999</property>
+    <property name="step_increment">0.0099999997764825821</property>
     <property name="page_increment">1</property>
   </object>
   <object class="GtkApplicationWindow" id="window">
@@ -185,10 +204,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="max_width_chars">8</property>
-                        <property name="text" translatable="yes">0,000000000</property>
-                        <property name="completion">entrycompletion1</property>
+                        <property name="text" translatable="yes">0,000000</property>
                         <property name="adjustment">scale_x_adj</property>
-                        <property name="digits">9</property>
+                        <property name="climb_rate">0.0099999997764825821</property>
+                        <property name="digits">5</property>
                         <property name="numeric">True</property>
                       </object>
                       <packing>
@@ -200,8 +219,9 @@
                       <object class="GtkSpinButton" id="scale_y">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="max_width_chars">7</property>
+                        <property name="max_width_chars">8</property>
                         <property name="text" translatable="yes">0,000000</property>
+                        <property name="adjustment">scale_y_adj</property>
                         <property name="climb_rate">0.01</property>
                         <property name="digits">6</property>
                         <property name="numeric">True</property>
@@ -215,8 +235,9 @@
                       <object class="GtkSpinButton" id="origin_x">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="max_width_chars">7</property>
+                        <property name="max_width_chars">8</property>
                         <property name="text" translatable="yes">0,000000</property>
+                        <property name="adjustment">origin_x_adj</property>
                         <property name="climb_rate">0.01</property>
                         <property name="digits">6</property>
                         <property name="numeric">True</property>
@@ -232,6 +253,7 @@
                         <property name="can_focus">True</property>
                         <property name="max_width_chars">7</property>
                         <property name="text" translatable="yes">0,000000</property>
+                        <property name="adjustment">origin_y_adj</property>
                         <property name="climb_rate">0.01</property>
                         <property name="digits">6</property>
                         <property name="numeric">True</property>
@@ -401,6 +423,30 @@
                       <object class="GtkGrid">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <placeholder/>
                         </child>

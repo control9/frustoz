@@ -6,9 +6,9 @@ use num_cpus;
 use frustoz_core::model::flame::Flame;
 use frustoz_core::render;
 
-use crate::ui::bus::{Bus, Subscriber, Update};
+use crate::ui::bus::{Bus, Subscriber, Event};
 use crate::ui::bus::process;
-use crate::ui::bus::Update::Redraw;
+use crate::ui::bus::Event::Redraw;
 
 #[derive(Clone)]
 pub struct RenderClient {
@@ -37,20 +37,19 @@ impl RenderClient {
     pub fn new(bus : &Bus) -> Self {
         RenderClient{ bus: bus.clone() }
     }
-
 }
 
 impl Subscriber for RenderClient {
-    fn accepts(&self, e: &Update) -> bool {
+    fn accepts(&self, e: &Event) -> bool {
         match e {
-            Update::DoRender(_)  => true,
+            Event::DoRender(_)  => true,
             _ => false
         }
     }
 
-    fn process(&mut self, e: &Update) {
+    fn process(&mut self, e: &Event) {
         match e {
-            Update::DoRender(flame)  => self.render(flame),
+            Event::DoRender(flame)  => self.render(flame),
             _ => {}
         }
     }

@@ -5,7 +5,7 @@ use gdk::ContextExt;
 use gdk_pixbuf::{Colorspace, Pixbuf};
 use glib::Bytes;
 use gtk::{DrawingArea, Inhibit, WidgetExt, BoxExt, Builder, false_};
-use crate::ui::bus::{Subscriber, Update};
+use crate::ui::bus::{Subscriber, Event};
 
 pub struct Preview {
     pub draw: DrawingArea,
@@ -52,16 +52,16 @@ fn draw(draw: &gtk::DrawingArea, c: &cairo::Context, buf: &Option<Pixbuf>) {
 }
 
 impl Subscriber for Preview {
-    fn accepts(&self, e: &Update) -> bool {
+    fn accepts(&self, e: &Event) -> bool {
         match e {
-            Update::Redraw(_) => true,
+            Event::Redraw(_) => true,
             _ => false
         }
     }
 
-    fn process(&mut self, e: &Update) {
+    fn process(&mut self, e: &Event) {
         match e {
-            Update::Redraw(raw) => self.redraw(raw),
+            Event::Redraw(raw) => self.redraw(raw),
             _ => {}
         }
     }

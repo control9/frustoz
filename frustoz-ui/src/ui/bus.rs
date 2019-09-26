@@ -12,25 +12,33 @@ pub struct BusImpl {
 }
 
 #[derive(Debug)]
-pub enum Update<'a> {
+pub enum Event<'a> {
     Open(),
 
     PreBind(&'a Flame),
     Bind(&'a Flame),
     PostBind(),
 
-    FlameUpdate(f64),
+    Edit(FlameUpdate),
 
     SuggestRender(),
     DoRender(&'a Flame),
     Redraw(Vec<u8>),
 }
 
+#[derive(Debug)]
+pub enum FlameUpdate {
+    ScaleX(f64),
+    ScaleY(f64),
+    OriginX(f64),
+    OriginY(f64),
+}
+
 pub type Bus = Rc<RefCell<BusImpl>>;
 
-pub fn process(bus: &Bus, event: Update) {
+pub fn process(bus: &Bus, event: Event) {
     match &event {
-        Update::Redraw(raw) => println!("Processing Redraw with size {}", raw.len() ),
+        Event::Redraw(raw) => println!("Processing Redraw with size {}", raw.len() ),
         e => println!("Processing {:?}", e)
     }
     let mut itself = (bus).borrow_mut();
@@ -44,8 +52,8 @@ pub fn subscribe(bus: &Bus, sub: Box<dyn Subscriber>) {
 }
 
 pub trait Subscriber  {
-    fn accepts(&self, e: &Update) -> bool;
-    fn process(&mut self, e: &Update);
+    fn accepts(&self, e: &Event) -> bool;
+    fn process(&mut self, e: &Event);
 }
 
 pub fn new() -> Bus {
