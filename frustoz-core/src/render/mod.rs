@@ -15,10 +15,10 @@ pub struct Histogram {
 pub struct HDRPixel(pub f64, pub f64, pub f64, pub f64);
 
 #[derive(Copy, Clone)]
-pub struct Progress(pub u32, pub usize);
+pub struct Progress(pub u64, pub usize);
 
 pub trait ProgressReporter {
-    fn new(iterations_per_thread: &Vec<u32>) -> Self;
+    fn new(iterations_per_thread: &Vec<u64>) -> Self;
     fn report(&mut self, progress: Progress);
 }
 
@@ -26,10 +26,10 @@ pub trait ProgressReporter {
 pub struct NoOpReporter {}
 
 impl ProgressReporter for NoOpReporter {
-    fn new(iterations_per_thread: &Vec<u32>) -> Self{
+    fn new(_: &Vec<u64>) -> Self{
         NoOpReporter{}
     }
 
-    fn report(&mut self, progress: Progress) {
+    fn report(&mut self, _: Progress) {
     }
 }

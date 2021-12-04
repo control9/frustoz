@@ -2,7 +2,6 @@ use std::f64::consts::PI;
 use super::Variation;
 use super::Variation::*;
 use crate::util::math::{rad2, radius, theta, RealPoint, EPSILON};
-use rand::prelude::*;
 use rand::Rng;
 
 impl Variation {
@@ -21,7 +20,7 @@ impl Variation {
             Hyperbolic(w) => hyperbolic(point, *w),
             Diamond(w) => diamond(point, *w),
             Julia(w) => julia(point, *w, rng.gen()),
-            JuliaN(w, power, dist) => juliaN(point, *w, *power, *dist, rng),
+            JuliaN(w, power, dist) => julia_n(point, *w, *power, *dist, rng),
         }
     }
 }
@@ -114,11 +113,11 @@ fn julia(&RealPoint(x, y): &RealPoint, w: f64, random_bit: bool) -> RealPoint {
     RealPoint(r * a.cos(), r * a.sin())
 }
 
-fn juliaN<R: Rng + Sized>(&RealPoint(x, y): &RealPoint, w: f64, power: f64, dist: f64, rng: &mut R) -> RealPoint {
-    let rN = power.abs();
+fn julia_n<R: Rng + Sized>(&RealPoint(x, y): &RealPoint, w: f64, power: f64, dist: f64, rng: &mut R) -> RealPoint {
+    let r_n = power.abs();
     let cn = dist / power / 2.0;
 
-    let a = (theta(x, y) + 2.0 * PI * rng.gen_range(0.0, rN) /power);
+    let a = theta(x, y) + 2.0 * PI * rng.gen_range(0.0, r_n) /power;
 
     let r = w * (x*x+y*y).powf(cn);
     RealPoint(r * a.cos(), r * a.sin())

@@ -36,14 +36,17 @@ impl Histogram {
         }
     }
 
+    // #[inline(never)]
     fn update(&mut self, CanvasPixel(x, y): CanvasPixel, color: &RGB) {
         let pixel_index: usize = (y * self.width + x) as usize;
         self.update_pixel(pixel_index, color);
     }
 
+    // #[inline(never)]
     fn update_pixel(&mut self, index: usize, &RGB(r, g, b): &RGB) {
         let &HDRPixel(rc, gc, bc, a) = &self.data[index];
         self.data[index] = HDRPixel(rc + r as f64, gc + g as f64, bc + b as f64, a + 1.0);
+
     }
 
 }

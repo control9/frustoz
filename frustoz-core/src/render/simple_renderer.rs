@@ -1,6 +1,5 @@
 use super::ProgressReporter;
 use super::render_task::RenderTask;
-use std::sync::mpsc;
 use crate::model::builders;
 use crate::model::flame::Flame;
 

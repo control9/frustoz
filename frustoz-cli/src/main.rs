@@ -9,10 +9,6 @@ extern crate frustoz_core;
 extern crate frustoz_io;
 
 pub use frustoz_core::render;
-use frustoz_core::model;
-use frustoz_core::util;
-use frustoz_core::variations;
-use frustoz_core::transforms;
 use frustoz_core::example;
 use frustoz_io::parser;
 use frustoz_io::output;
@@ -31,7 +27,7 @@ const PRESERVE_CPUS: u32 = 1;
 fn main() {
     CombinedLogger::init(
         vec![
-            TermLogger::new(LevelFilter::Debug, Config::default()).unwrap(),
+            TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Stdout, ColorChoice::Auto),
             WriteLogger::new(LevelFilter::Debug, Config::default(), File::create("frustoz.log").unwrap()),
         ]
     ).unwrap();

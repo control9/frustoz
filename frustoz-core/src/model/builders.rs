@@ -19,8 +19,8 @@ pub fn histogram(config: &RenderConfig, filter_width: u32) -> Histogram {
     Histogram::new(config.width, config.height, config.oversampling, filter_width)
 }
 
-pub fn iterations(config: &RenderConfig) -> u32 {
-    config.width * config.height * config.quality
+pub fn iterations(config: &RenderConfig) -> u64 {
+    config.width as u64 * config.height as u64 * config.quality as u64
 }
 
 pub fn transform(weight: f64, color: f64, coef: [f64; 6], variations: Variations) -> Transform {

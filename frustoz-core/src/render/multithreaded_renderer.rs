@@ -1,16 +1,10 @@
 use rayon::prelude::*;
-//use super::progress_bar;
 use super::Histogram;
 use super::render_task::RenderTask;
-use std::sync::mpsc;
-use std::sync::mpsc::Sender;
 use std::time::Instant;
 use crate::model::builders;
 use crate::model::flame::Flame;
-use super::Progress;
 use super::ProgressReporter;
-use super::NoOpReporter;
-
 pub struct Renderer {
     pub threads: u32,
 }
@@ -25,7 +19,7 @@ impl Renderer {
         let iterations_per_thread = split(iterations, self.threads);
 
         let reporter = T::new(&iterations_per_thread);
-        let thread_configs: Vec<(u32, T, Flame)> = iterations_per_thread.iter()
+        let thread_configs: Vec<(u64, T, Flame)> = iterations_per_thread.iter()
             .map(|&i| (i, reporter.clone(), flame.clone()))
             .collect();
 
@@ -49,12 +43,12 @@ impl Renderer {
     }
 }
 
-fn split(iterations: u32, parts: u32) -> Vec<u32> {
+fn split(iterations: u64, parts: u32) -> Vec<u64> {
     if parts == 1 {
         return vec![iterations];
     }
-    let mut result = vec![iterations / parts; parts as usize - 1];
-    let sum: u32 = result.iter().sum();
+    let mut result = vec![iterations / parts as u64; parts as usize - 1];
+    let sum: u64 = result.iter().sum();
     result.push(iterations - sum);
     result
 }

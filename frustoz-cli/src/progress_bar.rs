@@ -1,7 +1,7 @@
 use pbr::{MultiBar, Pipe};
 use pbr::ProgressBar;
 use std::sync::mpsc;
-use std::sync::mpsc::{Receiver, Sender};
+use std::sync::mpsc::{Sender};
 use std::thread;
 use crate::render::Progress;
 use crate::render::ProgressReporter;
@@ -13,7 +13,7 @@ pub struct SingleProgressBar {
 }
 
 impl ProgressReporter for SingleProgressBar {
-    fn new(iterations_per_thread: &Vec<u32>) -> Self {
+    fn new(iterations_per_thread: &Vec<u64>) -> Self {
         let iterations = iterations_per_thread.iter().map(|&x| x as u64).sum();
         SingleProgressBar{
             remaining: iterations,
@@ -38,9 +38,9 @@ pub struct MultiProgressBar {
 }
 
 impl ProgressReporter for MultiProgressBar {
-    fn new(iterations_per_thread: &Vec<u32>) -> Self {
+    fn new(iterations_per_thread: &Vec<u64>) -> Self {
         let iterations: u64 = iterations_per_thread.iter().map(|&x| x as u64).sum();
-        let mut mb = MultiBar::new();
+        let mb = MultiBar::new();
         mb.println("Rendering per thread:");
 
         let mut bars: Vec<ProgressBar<Pipe>> = iterations_per_thread.iter().enumerate()
@@ -59,7 +59,7 @@ impl ProgressReporter for MultiProgressBar {
 
         let mut remaining_per_thread = iterations_per_thread.clone();
         thread::spawn(move || {
-            let mut remaining = iterations as u32;
+            let mut remaining = iterations;
             while remaining > 0 {
                 let Progress(increment, i) = rx.recv().unwrap();
                 bars[i].add(increment as u64);
@@ -74,6 +74,6 @@ impl ProgressReporter for MultiProgressBar {
     }
 
     fn report(&mut self, progress: Progress) {
-        self.tx.send(progress);
+        self.tx.send(progress).unwrap();
     }
 }

@@ -7,19 +7,21 @@ use crate::model::builders;
 use crate::model::flame::Flame;
 use crate::util::math::RealPoint;
 
-const SKIP_ITERATIONS : u32 = 20;
+const SKIP_ITERATIONS : u64 = 20;
+const REPORT_FREQUENCY_PERCENT : u64 = 10;
+
 
 pub struct RenderTask<T: ProgressReporter + Sized> {
     camera: Camera,
     canvas: Histogram,
     flame: Flame,
-    iterations: u32,
+    iterations: u64,
     id: usize,
     progress_reporter: T,
 }
 
 impl <T: ProgressReporter + Sized> RenderTask<T> {
-    pub fn new(flame: Flame, iterations: u32, id: usize, progress_reporter: T) -> Self {
+    pub fn new(flame: Flame, iterations: u64, id: usize, progress_reporter: T) -> Self {
         let camera = builders::camera(&flame.camera);
         let canvas = builders::histogram(&flame.render, flame.filter.width);
 
@@ -35,7 +37,7 @@ impl <T: ProgressReporter + Sized> RenderTask<T> {
 
     pub fn render(mut self) -> Histogram {
         let mut rng = thread_rng();
-        let report_frequency = self.iterations / 100;
+        let report_frequency = self.iterations / 100 * REPORT_FREQUENCY_PERCENT;
 
         let xstart: f64 = rng.gen_range(0.0, 1.0);
         let ystart: f64 = rng.gen_range(0.0, 1.0);
