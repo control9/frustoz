@@ -8,7 +8,7 @@ use crate::model::flame::Flame;
 use crate::util::math::RealPoint;
 
 const SKIP_ITERATIONS : u64 = 20;
-const REPORT_FREQUENCY_PERCENT : u64 = 10;
+const REPORT_FREQUENCY_PERCENT : u64 = 1;
 
 
 pub struct RenderTask<T: ProgressReporter + Sized> {

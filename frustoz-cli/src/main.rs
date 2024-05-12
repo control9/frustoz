@@ -4,9 +4,11 @@ extern crate num_cpus;
 extern crate rayon;
 extern crate simplelog;
 extern crate pbr;
+extern crate indicatif;
 
 extern crate frustoz_core;
 extern crate frustoz_io;
+extern crate indicatif_log_bridge;
 
 pub use frustoz_core::render;
 use frustoz_core::example;
@@ -18,19 +20,27 @@ use simplelog::*;
 use std::fs::File;
 use std::time::Instant;
 use std::env;
+use std::sync::OnceLock;
+use indicatif::MultiProgress;
+use indicatif_log_bridge::LogWrapper;
 use progress_bar::MultiProgressBar;
 
 mod progress_bar;
 
 const PRESERVE_CPUS: u32 = 1;
+static  MB: OnceLock<MultiProgress> = OnceLock::new();
 
 fn main() {
-    CombinedLogger::init(
+    let logger = CombinedLogger::new(
         vec![
-            TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Stdout, ColorChoice::Auto),
+            TermLogger::new(LevelFilter::Trace, Config::default(), TerminalMode::Stdout, ColorChoice::Auto),
             WriteLogger::new(LevelFilter::Debug, Config::default(), File::create("frustoz.log").unwrap()),
         ]
-    ).unwrap();
+    );
+
+    LogWrapper::new(MB.get_or_init(|| MultiProgress::new()).clone(), logger)
+        .try_init()
+        .unwrap();
     let now = Instant::now();
     let threads = (num_cpus::get() as u32 - PRESERVE_CPUS).max(1);
     ThreadPoolBuilder::new().num_threads(threads as usize).build_global().expect("Failed to initialize pool");

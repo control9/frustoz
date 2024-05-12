@@ -1,11 +1,11 @@
 [package]
 name = "frustoz-io"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Aleksei Sukontsev <aleksei.sukontsev@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-log = { version = "0.4", features = ["release_max_level_info"] }
-xml-rs = "0.8.0"
-image = "0.19.0"
-frustoz-core = { version = "0.1.0", path = "../frustoz-core"}
+log = { version = "0.4.21", features = ["release_max_level_info"] }
+xml-rs = "0.8.20"
+image = "0.25.1"
+frustoz-core = { version = "0.1.1", path = "../frustoz-core"}

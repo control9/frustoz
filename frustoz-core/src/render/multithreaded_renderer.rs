@@ -1,6 +1,14 @@
 use rayon::prelude::*;
 use super::Histogram;
+
+
+// Easier switching between implementations for performance comparison
+#[allow(unused_imports)]
 use super::render_task::RenderTask;
+#[allow(unused_imports)]
+use super::split_render_task::SplitRenderTask;
+
+
 use std::time::Instant;
 use crate::model::builders;
 use crate::model::flame::Flame;
@@ -8,6 +16,8 @@ use super::ProgressReporter;
 pub struct Renderer {
     pub threads: u32,
 }
+
+type Task<T> = SplitRenderTask<T>;
 
 impl Renderer {
     pub fn render<T: ProgressReporter + Clone + Send>(&self, flame: Flame) -> Vec<u8> {
@@ -25,9 +35,9 @@ impl Renderer {
 
 //        progress_bar::multi_progress_bar(rx, iterations, &iterations_per_thread);
 
-        let tasks: Vec<RenderTask<T>> = thread_configs.into_par_iter()
+        let tasks: Vec<Task<T>> = thread_configs.into_par_iter()
             .enumerate()
-            .map(move |(i, (iters, rep, flame))| RenderTask::new(flame, iters, i, rep))
+            .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep))
             .collect();
 
         let elapsed = now.elapsed();

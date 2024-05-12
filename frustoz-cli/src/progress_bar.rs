@@ -1,21 +1,23 @@
-use pbr::{MultiBar, Pipe};
-use pbr::ProgressBar;
+
+
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
+
 use std::sync::mpsc;
 use std::sync::mpsc::{Sender};
 use std::thread;
 use crate::render::Progress;
 use crate::render::ProgressReporter;
-use std::io::Stdout;
+
 
 pub struct SingleProgressBar {
     remaining: u64,
-    pb: ProgressBar<Stdout>,
+    pb: ProgressBar,
 }
 
 impl ProgressReporter for SingleProgressBar {
     fn new(iterations_per_thread: &Vec<u64>) -> Self {
         let iterations = iterations_per_thread.iter().map(|&x| x as u64).sum();
-        SingleProgressBar{
+        SingleProgressBar {
             remaining: iterations,
             pb: ProgressBar::new(iterations)
         }
@@ -24,10 +26,10 @@ impl ProgressReporter for SingleProgressBar {
     fn report(&mut self, progress: Progress) {
         let mut increment = progress.0 as u64;
         increment = increment.min(self.remaining);
-        self.pb.add(increment);
+        self.pb.inc(increment);
         self.remaining -= increment;
         if self.remaining == 0 {
-            self.pb.finish_println("Rendering completed");
+            self.pb.finish_with_message("Rendering completed");
         }
     }
 }
@@ -37,23 +39,27 @@ pub struct MultiProgressBar {
     tx: Sender<Progress>,
 }
 
+
 impl ProgressReporter for MultiProgressBar {
     fn new(iterations_per_thread: &Vec<u64>) -> Self {
-        let iterations: u64 = iterations_per_thread.iter().map(|&x| x as u64).sum();
-        let mb = MultiBar::new();
-        mb.println("Rendering per thread:");
 
-        let mut bars: Vec<ProgressBar<Pipe>> = iterations_per_thread.iter().enumerate()
-            .map(|(i, size)| {
-                let mut p = mb.create_bar(*size as u64);
-                p.message(&format!("Thread {}: ", i + 1));
-                p.format("[=> ]");
+        let sty = ProgressStyle::with_template(
+            "[{elapsed_precise}] [{bar:40.cyan/blue}] {pos:>7}/{len:7} {msg}",
+        )
+            .unwrap()
+            .progress_chars("#>-");
+        let iterations: u64 = iterations_per_thread.iter().map(|&x| x as u64).sum();
+        let mb = crate::MB.get_or_init(|| MultiProgress::new()).clone();
+        mb.clear().unwrap();
+        mb.println("Rendering per thread:").unwrap();
+
+        let bars: Vec<ProgressBar> = iterations_per_thread.iter().enumerate()
+            .map(|(i, &size)| {
+                let p = mb.add(ProgressBar::new(size));
+                p.set_style(sty.clone());
+                p.set_message(format!("Thread {}: ", i + 1));
                 p
             }).collect();
-
-        thread::spawn(move || {
-            mb.listen();
-        });
 
         let (tx, rx) = mpsc::channel();
 
@@ -62,17 +68,17 @@ impl ProgressReporter for MultiProgressBar {
             let mut remaining = iterations;
             while remaining > 0 {
                 let Progress(increment, i) = rx.recv().unwrap();
-                bars[i].add(increment as u64);
+                bars[i].inc(increment as u64);
                 remaining_per_thread[i] -= increment.min(remaining_per_thread[i]);
                 if remaining_per_thread[i] == 0 {
-                    bars[i].finish_print(&format!("Thread {} FINISHED", i + 1));
+                    bars[i].finish_with_message(format!("Thread {} FINISHED", i + 1));
                 }
                 remaining -= increment.min(remaining);
             }
         });
         Self{tx}
-    }
 
+    }
     fn report(&mut self, progress: Progress) {
         self.tx.send(progress).unwrap();
     }
