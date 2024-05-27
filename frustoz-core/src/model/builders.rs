@@ -40,7 +40,7 @@ pub fn histogram_processor(flame: &Flame) -> HistogramProcessor {
         render.width, render.height,
         flame.camera.scale_x, flame.camera.scale_y,
         render.oversampling, render.brightness,
-        &flame.filter,
+        flame.filter.clone(),
     )
 }
 

@@ -26,7 +26,7 @@ pub struct SplitRenderTask<T: ProgressReporter + Sized> {
 struct State {
     point: RealPoint,
     color: f64,
-    rng: ThreadRng
+    rng: ThreadRng,
 }
 
 impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
@@ -52,20 +52,20 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
             .map(|_| rng.clone())
             .map(|mut rng|
                 State {
-                    point: RealPoint(rng.gen_range(0.0, 1.0), rng.gen_range(0.0, 1.0)),
-                    color: rng.gen_range(0.0, 1.0),
+                    point: RealPoint(rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0)),
+                    color: rng.gen_range(0.0..1.0),
                     rng: rng.clone(),
                 })
             .collect::<Vec<State>>();
-        let mut state : [State; SPLIT_FACTOR] = stt.try_into().expect("AAA");
+        let mut state: [State; SPLIT_FACTOR] = stt.try_into().expect("AAA");
 
         for iteration in (0..self.iterations).step_by(SPLIT_FACTOR)
         {
             for i in 0..SPLIT_FACTOR {
-                let State{point, color, ref mut rng} = &mut state[i];
-                let trs =  rng.gen_range(0.0, 1.0);
+                let State { point, color, ref mut rng } = &mut state[i];
+                let trs = rng.gen_range(0.0..1.0);
                 let tr = self.flame.transforms.get_transformation(trs);
-                let (new_p, new_c)  = tr.apply(point, *color, rng);
+                let (new_p, new_c) = tr.apply(point, *color, rng);
                 state[i].point = new_p;
                 state[i].color = new_c;
             }
@@ -89,5 +89,5 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
         self.progress_reporter.report(progress);
         self.canvas
     }
-        }
+}
 

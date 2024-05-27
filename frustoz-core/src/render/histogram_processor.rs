@@ -6,20 +6,21 @@ use super::filter::spatial_filter;
 use super::HDRPixel;
 use super::Histogram;
 
-pub struct HistogramProcessor<'a> {
+#[derive(Clone)]
+pub struct HistogramProcessor {
     image_width: u32,
     image_height: u32,
     oversampling: u32,
-    spatial_filter: &'a FilterKernel,
+    spatial_filter: FilterKernel,
     log_filter: LogFilter,
 }
 
-impl <'a> HistogramProcessor<'a> {
+impl HistogramProcessor {
     pub fn new(quality: u32,
                image_width: u32, image_height: u32,
                view_width: f64, view_height: f64,
                oversampling: u32, brightness: f64,
-               spatial_filter: &'a FilterKernel) -> Self {
+               spatial_filter: FilterKernel) -> Self {
         let log_filter = LogFilter::new(
             quality,
             oversampling,

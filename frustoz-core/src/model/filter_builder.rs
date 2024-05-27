@@ -1,7 +1,7 @@
 use crate::render::filter::FilterKernel;
 use crate::model::FilterConfig;
 use crate::util::math::EPSILON;
-use std::time::Instant;
+use web_time::Instant;
 
 pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: u32) -> FilterKernel {
     let now = Instant::now();
@@ -29,7 +29,7 @@ pub fn filter(&FilterConfig { filter_type, radius }: &FilterConfig, oversample: 
     normalize(&mut filter);
 
     let elapsed = now.elapsed();
-    println!("Creating filter took: {:?}, filter width: {}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0), filter_width);
+    info!("Creating filter took: {:?}, filter width: {}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0), filter_width);
     FilterKernel { width: filter_width, coefficients: filter }
 }
 

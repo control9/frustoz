@@ -1,4 +1,3 @@
-use rayon::prelude::*;
 use super::Histogram;
 
 
@@ -8,8 +7,13 @@ use super::render_task::RenderTask;
 #[allow(unused_imports)]
 use super::split_render_task::SplitRenderTask;
 
-
 use web_time::Instant;
+use futures::future::join_all;
+use futures::StreamExt;
+use tokio_with_wasm::tokio;
+use tokio::task::spawn_blocking;
+use tokio_with_wasm::tokio::{join, spawn};
+use tokio_with_wasm::tokio::task::JoinHandle;
 use crate::model::builders;
 use crate::model::flame::Flame;
 use super::ProgressReporter;
@@ -20,7 +24,7 @@ pub struct Renderer {
 type Task<T> = SplitRenderTask<T>;
 
 impl Renderer {
-    pub fn render<T: ProgressReporter + Clone + Send>(&self, flame: Flame) -> Vec<u8> {
+    pub async fn render<T: ProgressReporter + Clone + Send + 'static>(&self, flame: Flame) -> Vec<u8> {
         let now = Instant::now();
 
         let processor = builders::histogram_processor(&flame);
@@ -35,7 +39,7 @@ impl Renderer {
 
 //        progress_bar::multi_progress_bar(rx, iterations, &iterations_per_thread);
 
-        let tasks: Vec<Task<T>> = thread_configs.into_par_iter()
+        let tasks: Vec<Task<T>> = thread_configs.into_iter()
             .enumerate()
             .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep))
             .collect();
@@ -43,11 +47,15 @@ impl Renderer {
         let elapsed = now.elapsed();
         info!("Creating tasks took: {:?}", (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0));
 
-        let histograms: Vec<Histogram> = tasks.into_par_iter()
-            .map(|t| t.render())
+
+        let handlers: Vec<JoinHandle<Histogram>> = tasks.into_iter()
+            .map(|t| spawn_blocking(move || {t.render()}))
             .collect();
 
-
+        let hists = join_all(handlers).await;
+        let histograms: Vec<Histogram> = hists.into_iter()
+            .filter_map(|r| r.ok())
+            .collect();
         processor.process_to_raw(histograms)
     }
 }

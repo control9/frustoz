@@ -17,6 +17,7 @@ impl Debug for FilterKernel {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct LogFilter {
     k1: f64,
     k2: f64,

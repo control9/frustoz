@@ -1,7 +1,6 @@
-use rayon::prelude::*;
 use crate::render::HDRPixel;
 use crate::render::Histogram;
-use std::time::Instant;
+use web_time::Instant;
 use super::FilterKernel;
 
 pub fn apply_filter(filter: &FilterKernel,
@@ -11,7 +10,7 @@ pub fn apply_filter(filter: &FilterKernel,
                     oversample: u32) -> Histogram {
     let now = Instant::now();
     let data = (0..(image_height * image_width))
-        .into_par_iter()
+        .into_iter()
         .map(|i| (i % image_width, i / image_width))
         .map(|(x, y)| (x * oversample, y * oversample))
         .map(|(x, y)| process_point(x, y, filter, histogram))

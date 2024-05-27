@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use xml::attribute::OwnedAttribute;
 use frustoz_core::model::flame::Flame;
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufReader, Read};
 use std::str::FromStr;
 use xml::EventReader;
 use xml::reader::XmlEvent;
@@ -15,9 +15,11 @@ mod palette;
 
 pub fn parse_file(path: &str) -> Vec<Flame> {
     let file = File::open(path).unwrap();
-    let file = BufReader::new(file);
+    let mut file = BufReader::new(file);
+    let mut r = Vec::new();
+    file.read(&mut r);
 
-    let mut reader = EventReader::new(file);
+    let mut reader = EventReader::new(&r[..]);
     let mut result = vec![];
 
     loop {

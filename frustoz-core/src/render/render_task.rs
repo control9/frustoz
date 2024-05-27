@@ -39,15 +39,15 @@ impl <T: ProgressReporter + Sized> RenderTask<T> {
         let mut rng = thread_rng();
         let report_frequency = self.iterations / 100 * REPORT_FREQUENCY_PERCENT;
 
-        let xstart: f64 = rng.gen_range(0.0, 1.0);
-        let ystart: f64 = rng.gen_range(0.0, 1.0);
+        let xstart: f64 = rng.gen_range(0.0..1.0);
+        let ystart: f64 = rng.gen_range(0.0..1.0);
         let mut point = RealPoint(xstart, ystart);
-        let mut color: f64 = rng.gen_range(0.0, 1.0);
+        let mut color: f64 = rng.gen_range(0.0..1.0);
 
         let mut progress = Progress(0, self.id);
 
         for iteration in 0..self.iterations {
-            let transform_seed: f64 = rng.gen_range(0.0, 1.0);
+            let transform_seed: f64 = rng.gen_range(0.0..1.0);
             let transform = self.flame.transforms.get_transformation(transform_seed);
 
             let (new_point, new_color) = transform.apply(&point, color, &mut rng);

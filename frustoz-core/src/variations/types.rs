@@ -117,7 +117,7 @@ fn julia_n<R: Rng + Sized>(&RealPoint(x, y): &RealPoint, w: f64, power: f64, dis
     let r_n = power.abs();
     let cn = dist / power / 2.0;
 
-    let a = theta(x, y) + 2.0 * PI * rng.gen_range(0.0, r_n) /power;
+    let a = theta(x, y) + 2.0 * PI * rng.gen_range(0.0..r_n) /power;
 
     let r = w * (x*x+y*y).powf(cn);
     RealPoint(r * a.cos(), r * a.sin())

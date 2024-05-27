@@ -1,11 +1,15 @@
 pub mod filter;
 pub mod histogram;
-pub mod render_task;
+mod render_task;
 pub mod split_render_task;
 pub mod simple_renderer;
 pub mod histogram_processor;
 pub mod multithreaded_renderer;
+pub mod tokio_multithreaded_renderer;
+pub mod progressive_renderer;
+mod progressive_render_task;
 
+#[derive(Clone)]
 pub struct Histogram {
     data: Vec<HDRPixel>,
     width: u32,
@@ -33,4 +37,14 @@ impl ProgressReporter for NoOpReporter {
 
     fn report(&mut self, _: Progress) {
     }
+}
+
+fn split(iterations: u64, parts: u32) -> Vec<u64> {
+    if parts == 1 {
+        return vec![iterations];
+    }
+    let mut result = vec![iterations / parts as u64; parts as usize - 1];
+    let sum: u64 = result.iter().sum();
+    result.push(iterations - sum);
+    result
 }
