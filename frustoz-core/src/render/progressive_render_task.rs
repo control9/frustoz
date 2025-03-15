@@ -1,14 +1,12 @@
-use futures::future::err;
-use rand::{Rng, thread_rng};
-use tokio_with_wasm::tokio::sync::mpsc::{Receiver, Sender};
-use tokio_with_wasm::tokio::sync::mpsc::error::TryRecvError;
-use web_time::Duration;
 use crate::model::builders;
 use crate::model::flame::Flame;
 use crate::render::histogram::Camera;
-use crate::render::{Histogram};
-use crate::render::progressive_renderer::{TaskCommand, SingleThreadSnapshot};
+use crate::render::progressive_renderer::{SingleThreadSnapshot, TaskCommand};
+use crate::render::Histogram;
 use crate::util::math::RealPoint;
+use rand::{thread_rng, Rng};
+use tokio_with_wasm::tokio::sync::mpsc::error::TryRecvError;
+use tokio_with_wasm::tokio::sync::mpsc::{Receiver, Sender};
 
 pub struct ProgressiveRenderTask {
     camera: Camera,
@@ -19,13 +17,18 @@ pub struct ProgressiveRenderTask {
     tx: Sender<SingleThreadSnapshot>,
 }
 
-const SKIP_ITERATIONS : u64 = 20;
+const SKIP_ITERATIONS: u64 = 20;
 
 impl ProgressiveRenderTask {
-    pub(crate) fn new(flame: Flame, rx: Receiver<TaskCommand>, id: usize, tx: Sender<SingleThreadSnapshot>) -> Self {
+    pub(crate) fn new(
+        flame: Flame,
+        rx: Receiver<TaskCommand>,
+        id: usize,
+        tx: Sender<SingleThreadSnapshot>,
+    ) -> Self {
         let camera = builders::camera(&flame.camera);
         let canvas = builders::histogram(&flame.render, flame.filter.width);
-        ProgressiveRenderTask{
+        ProgressiveRenderTask {
             camera,
             canvas,
             flame,
@@ -56,18 +59,22 @@ impl ProgressiveRenderTask {
 
             if iteration > SKIP_ITERATIONS {
                 let camera_coordinates = self.camera.project(&point);
-                self.canvas.project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
+                self.canvas
+                    .project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
             }
 
             match self.rx.try_recv() {
                 Ok(TaskCommand::FrameExpected) => {
                     let canv = self.canvas.clone();
-                    let snapshot = SingleThreadSnapshot{histogram: canv, steps: iteration};
+                    let snapshot = SingleThreadSnapshot {
+                        histogram: canv,
+                        steps: iteration,
+                    };
                     self.tx.blocking_send(snapshot).unwrap();
                 }
                 Ok(TaskCommand::Completed) => {
-                  complete = true;
-                },
+                    complete = true;
+                }
                 Err(TryRecvError::Disconnected) => {
                     error!("Sender for TaskCommand disconnected before sending Completed");
                     complete = true;
@@ -77,4 +84,3 @@ impl ProgressiveRenderTask {
         }
     }
 }
-

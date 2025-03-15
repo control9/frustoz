@@ -8,4 +8,3 @@ pub struct Camera {
     scale_x: f64,
     scale_y: f64,
 }
-

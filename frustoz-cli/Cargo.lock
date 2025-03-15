@@ -345,6 +345,7 @@ dependencies = [
  "pbr",
  "rayon",
  "simplelog",
+ "tokio",
 ]
 
 [[package]]

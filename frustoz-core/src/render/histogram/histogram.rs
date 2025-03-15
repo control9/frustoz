@@ -1,20 +1,25 @@
+use super::super::HDRPixel;
+use super::super::Histogram;
+use crate::model::palette::RGB;
 use crate::util::coordinates::CameraCoordinates;
 use crate::util::coordinates::CanvasPixel;
-use crate::model::palette::RGB;
 use std::f64;
-use super::super::Histogram;
-use super::super::HDRPixel;
-
 
 impl Histogram {
-
     pub fn new(image_width: u32, image_height: u32, oversampling: u32, filter_width: u32) -> Self {
-        let border = if oversampling > filter_width { 0 }
-            else { filter_width - oversampling };
+        let border = if oversampling > filter_width {
+            0
+        } else {
+            filter_width - oversampling
+        };
         let width = image_width * oversampling + border;
         let height = image_height * oversampling + border;
 
-        Self { width, height, data: vec![HDRPixel(0.0, 0.0, 0.0, 0.0); (width * height) as usize] }
+        Self {
+            width,
+            height,
+            data: vec![HDRPixel(0.0, 0.0, 0.0, 0.0); (width * height) as usize],
+        }
     }
 
     fn project(&self, coordinates: &CameraCoordinates) -> Option<CanvasPixel> {
@@ -32,7 +37,7 @@ impl Histogram {
         let pixel = self.project(coordinates);
         match pixel {
             Some(p) => self.update(p, color),
-            None => ()
+            None => (),
         }
     }
 
@@ -46,9 +51,7 @@ impl Histogram {
     fn update_pixel(&mut self, index: usize, &RGB(r, g, b): &RGB) {
         let &HDRPixel(rc, gc, bc, a) = &self.data[index];
         self.data[index] = HDRPixel(rc + r as f64, gc + g as f64, bc + b as f64, a + 1.0);
-
     }
-
 }
 
 fn valid_coordinates(&CameraCoordinates(x, y): &CameraCoordinates) -> bool {
@@ -75,17 +78,29 @@ mod canvas_test {
 
     #[test]
     pub fn should_map_left_upper_corner() {
-        should_project_coordinates(CanvasPixel(0, 0), CanvasSize(8, 5), CameraCoordinates(0.0, 0.0));
+        should_project_coordinates(
+            CanvasPixel(0, 0),
+            CanvasSize(8, 5),
+            CameraCoordinates(0.0, 0.0),
+        );
     }
 
     #[test]
     pub fn should_map_different_coordinates_correctly() {
-        should_project_coordinates(CanvasPixel(3, 3), CanvasSize(8, 5), CameraCoordinates(0.49, 0.79));
+        should_project_coordinates(
+            CanvasPixel(3, 3),
+            CanvasSize(8, 5),
+            CameraCoordinates(0.49, 0.79),
+        );
     }
 
     #[test]
     pub fn should_map_point_near_right_down_corner() {
-        should_project_coordinates(CanvasPixel(7, 4), CanvasSize(8, 5), CameraCoordinates(0.99, 0.99));
+        should_project_coordinates(
+            CanvasPixel(7, 4),
+            CanvasSize(8, 5),
+            CameraCoordinates(0.99, 0.99),
+        );
     }
 
     #[test]
@@ -108,14 +123,21 @@ mod canvas_test {
 
     struct CanvasSize(u32, u32);
 
-    fn should_project_coordinates(expected: CanvasPixel, CanvasSize(width, height): CanvasSize, coordinates: CameraCoordinates) {
+    fn should_project_coordinates(
+        expected: CanvasPixel,
+        CanvasSize(width, height): CanvasSize,
+        coordinates: CameraCoordinates,
+    ) {
         let canvas = &Histogram::new(width, height, 1, 0);
         let actual = canvas.project(&coordinates);
 
         assert_eq!(Some(expected), actual);
     }
 
-    fn should_not_project_coordinates(CanvasSize(width, height): CanvasSize, coordinates: CameraCoordinates) {
+    fn should_not_project_coordinates(
+        CanvasSize(width, height): CanvasSize,
+        coordinates: CameraCoordinates,
+    ) {
         let canvas = &Histogram::new(width, height, 1, 0);
         let actual = canvas.project(&coordinates);
         assert!(actual.is_none());

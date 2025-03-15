@@ -28,11 +28,12 @@ pub struct Variations {
 
 impl Variations {
     pub fn new(variations: Vec<Variation>) -> Self {
-        Variations { variations}
+        Variations { variations }
     }
 
     pub fn apply<R: Rng + Sized>(&self, point: &RealPoint, rng: &mut R) -> RealPoint {
-        self.variations.iter()
+        self.variations
+            .iter()
             .map(|var| var.apply(point, rng))
             .sum()
     }

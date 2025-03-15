@@ -1,8 +1,8 @@
-use std::f64::consts::PI;
 use super::Variation;
 use super::Variation::*;
 use crate::util::math::{rad2, radius, theta, RealPoint, EPSILON};
 use rand::Rng;
+use std::f64::consts::PI;
 
 impl Variation {
     pub fn apply<R: Rng + Sized>(&self, point: &RealPoint, rng: &mut R) -> RealPoint {
@@ -42,18 +42,12 @@ fn swirl(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
     let r2 = rad2(x, y);
     let c1 = r2.sin();
     let c2 = r2.cos();
-    RealPoint(
-        w * (c1 * x - c2 * y),
-        w * (c2 * x - c1 * y),
-    )
+    RealPoint(w * (c1 * x - c2 * y), w * (c2 * x - c1 * y))
 }
 
 fn horseshoe(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
     let inv_r = 1.0 / (radius(x, y) + EPSILON);
-    RealPoint(
-        w * (x - y) * (x + y) * inv_r,
-        w * 2.0 * x * y * inv_r,
-    )
+    RealPoint(w * (x - y) * (x + y) * inv_r, w * 2.0 * x * y * inv_r)
 }
 
 fn polar(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
@@ -85,10 +79,7 @@ fn disc(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
 fn spiral(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
     let r = radius(x, y) + EPSILON;
     let t = theta(x, y);
-    RealPoint(
-        w / r * (t.cos() + r.sin()),
-        w / r * (t.sin() - r.cos()),
-    )
+    RealPoint(w / r * (t.cos() + r.sin()), w / r * (t.sin() - r.cos()))
 }
 
 fn hyperbolic(&RealPoint(x, y): &RealPoint, w: f64) -> RealPoint {
@@ -113,12 +104,18 @@ fn julia(&RealPoint(x, y): &RealPoint, w: f64, random_bit: bool) -> RealPoint {
     RealPoint(r * a.cos(), r * a.sin())
 }
 
-fn julia_n<R: Rng + Sized>(&RealPoint(x, y): &RealPoint, w: f64, power: f64, dist: f64, rng: &mut R) -> RealPoint {
+fn julia_n<R: Rng + Sized>(
+    &RealPoint(x, y): &RealPoint,
+    w: f64,
+    power: f64,
+    dist: f64,
+    rng: &mut R,
+) -> RealPoint {
     let r_n = power.abs();
     let cn = dist / power / 2.0;
 
-    let a = theta(x, y) + 2.0 * PI * rng.gen_range(0.0..r_n) /power;
+    let a = theta(x, y) + 2.0 * PI * rng.gen_range(0.0..r_n) / power;
 
-    let r = w * (x*x+y*y).powf(cn);
+    let r = w * (x * x + y * y).powf(cn);
     RealPoint(r * a.cos(), r * a.sin())
 }

@@ -1,15 +1,14 @@
-use rand::prelude::*;
 use super::histogram::Camera;
-use super::Progress;
 use super::Histogram;
+use super::Progress;
 use super::ProgressReporter;
 use crate::model::builders;
 use crate::model::flame::Flame;
 use crate::util::math::RealPoint;
+use rand::prelude::*;
 
-const SKIP_ITERATIONS : u64 = 20;
-const REPORT_FREQUENCY_PERCENT : u64 = 1;
-
+const SKIP_ITERATIONS: u64 = 20;
+const REPORT_FREQUENCY_PERCENT: u64 = 1;
 
 pub struct RenderTask<T: ProgressReporter + Sized> {
     camera: Camera,
@@ -20,7 +19,7 @@ pub struct RenderTask<T: ProgressReporter + Sized> {
     progress_reporter: T,
 }
 
-impl <T: ProgressReporter + Sized> RenderTask<T> {
+impl<T: ProgressReporter + Sized> RenderTask<T> {
     pub fn new(flame: Flame, iterations: u64, id: usize, progress_reporter: T) -> Self {
         let camera = builders::camera(&flame.camera);
         let canvas = builders::histogram(&flame.render, flame.filter.width);
@@ -62,11 +61,11 @@ impl <T: ProgressReporter + Sized> RenderTask<T> {
 
             if iteration > SKIP_ITERATIONS {
                 let camera_coordinates = self.camera.project(&point);
-                self.canvas.project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
+                self.canvas
+                    .project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
             }
         }
         self.progress_reporter.report(progress);
         self.canvas
     }
 }
-

@@ -1,7 +1,7 @@
-use crate::util::math::RealPoint;
 use crate::model::palette::Palette;
 use crate::render::filter::FilterKernel;
 use crate::transforms::TransformSystem;
+use crate::util::math::RealPoint;
 
 #[derive(Clone, Debug)]
 pub struct Flame {

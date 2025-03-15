@@ -2,6 +2,11 @@
 name = "frustoz-cli"
 version = "0.1.1"
 authors = ["control9"]
+edition = "2021"
+
+[features]
+default = []
+async-rendering = []
 
 [dependencies]
 rayon = "1.10.0"
@@ -13,5 +18,7 @@ pbr = "1.1.1"
 indicatif = "=0.17.8"
 indicatif-log-bridge = "0.2.2"
 
-frustoz-core = { version = "0.1.1", path = "../frustoz-core"}
-frustoz-io = { version = "0.1.1", path = "../frustoz-io"}
+frustoz-core = { version = "0.1.1", path = "../frustoz-core" }
+frustoz-io = { version = "0.1.1", path = "../frustoz-io" }
+
+tokio = { version = "1", features = ["full"] }

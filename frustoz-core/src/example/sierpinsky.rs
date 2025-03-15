@@ -1,32 +1,23 @@
 use crate::example::green_palette;
-use crate::render::filter::FilterType;
 use crate::model::builders::transform;
 use crate::model::filter_builder;
-use crate::model::FilterConfig;
 use crate::model::flame::CameraConfig;
 use crate::model::flame::Flame;
 use crate::model::flame::RenderConfig;
 use crate::model::palette::Palette;
+use crate::model::FilterConfig;
+use crate::render::filter::FilterType;
 use crate::transforms::Transform;
 use crate::transforms::TransformSystem;
 use crate::util::math::RealPoint;
 use crate::variations::Variation::*;
 use crate::variations::Variations;
 
-const S1: [f64; 6] = [
-    0.5, 0.0, 0.0,
-    0.0, 0.5, 0.0
-];
+const S1: [f64; 6] = [0.5, 0.0, 0.0, 0.0, 0.5, 0.0];
 
-const S2: [f64; 6] = [
-    0.5, 0.0, 0.5,
-    0.0, 0.5, 0.0
-];
+const S2: [f64; 6] = [0.5, 0.0, 0.5, 0.0, 0.5, 0.0];
 
-const S3: [f64; 6] = [
-    0.5, 0.0, 0.0,
-    0.0, 0.5, 0.5
-];
+const S3: [f64; 6] = [0.5, 0.0, 0.0, 0.0, 0.5, 0.5];
 
 fn variations() -> Variations {
     Variations::new(vec![Linear(1.0)])
@@ -64,5 +55,11 @@ pub fn get_flame_model() -> Flame {
     let transforms = TransformSystem::new(transforms());
     let palette: Palette = green_palette::palette();
 
-    Flame { render, camera, filter, transforms, palette }
+    Flame {
+        render,
+        camera,
+        filter,
+        transforms,
+        palette,
+    }
 }

@@ -1,7 +1,7 @@
 use super::extract;
 use super::extract_all;
-use std::collections::HashMap;
 use frustoz_core::model::flame::RenderConfig;
+use std::collections::HashMap;
 
 const DEFAULT_SIZE: &str = "1920 1080";
 

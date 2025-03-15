@@ -1,5 +1,5 @@
-use super::ProgressReporter;
 use super::render_task::RenderTask;
+use super::ProgressReporter;
 use crate::model::builders;
 use crate::model::flame::Flame;
 
@@ -14,4 +14,3 @@ pub fn render<T: ProgressReporter>(flame: Flame) -> Vec<u8> {
     let histogram = task.render();
     processor.process_to_raw(vec![histogram])
 }
-

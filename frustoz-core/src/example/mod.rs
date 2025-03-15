@@ -1,9 +1,9 @@
 use crate::model::flame::Flame;
 
-mod sierpinsky;
 mod barnsley;
-mod spark;
 pub mod green_palette;
+mod sierpinsky;
+mod spark;
 
 pub fn sierpinsky() -> Flame {
     sierpinsky::get_flame_model()

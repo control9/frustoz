@@ -1,7 +1,7 @@
-use super::util::math::{TransformMatrix, RealPoint, ProjectivePoint};
+use super::util::math::{ProjectivePoint, RealPoint, TransformMatrix};
 use super::variations::Variations;
 use rand::prelude::*;
-use std::fmt::{Debug, Formatter, Error};
+use std::fmt::{Debug, Error, Formatter};
 
 #[derive(Clone, Debug)]
 pub struct Transform {
@@ -12,11 +12,16 @@ pub struct Transform {
 }
 
 impl Transform {
-    pub fn apply<R: Rng + Sized>(&self, point: &RealPoint, color: f64, rng: &mut R) -> (RealPoint, f64) {
+    pub fn apply<R: Rng + Sized>(
+        &self,
+        point: &RealPoint,
+        color: f64,
+        rng: &mut R,
+    ) -> (RealPoint, f64) {
         let pr: &ProjectivePoint = &point.into();
 
         let result_pr = &(&self.affine * pr);
-        let affine_result : RealPoint = result_pr.into();
+        let affine_result: RealPoint = result_pr.into();
         let result = self.variations.apply(&affine_result, rng);
 
         let result_color = (color + self.color) / 2.0;
@@ -32,11 +37,15 @@ pub struct TransformSystem {
 
 impl TransformSystem {
     pub fn new(transforms: Vec<Transform>) -> Self {
-        let total_weight: f64 = transforms.iter()
-            .map(|&Transform{weight, ..}| weight)
+        let total_weight: f64 = transforms
+            .iter()
+            .map(|&Transform { weight, .. }| weight)
             .sum();
 
-        TransformSystem{transforms, total_weight}
+        TransformSystem {
+            transforms,
+            total_weight,
+        }
     }
 
     pub fn get_transformation(&self, seed: f64) -> &Transform {

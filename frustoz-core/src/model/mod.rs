@@ -1,10 +1,9 @@
 use crate::render::filter::FilterType;
 
-pub mod flame;
 pub mod builders;
-pub mod palette;
 pub mod filter_builder;
-
+pub mod flame;
+pub mod palette;
 
 pub struct FilterConfig {
     pub filter_type: FilterType,

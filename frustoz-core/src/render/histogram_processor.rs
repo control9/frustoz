@@ -1,10 +1,10 @@
-use rayon::prelude::*;
-use super::filter::FilterKernel;
 use super::filter::gamma_filter;
-use super::filter::LogFilter;
 use super::filter::spatial_filter;
+use super::filter::FilterKernel;
+use super::filter::LogFilter;
 use super::HDRPixel;
 use super::Histogram;
+use rayon::prelude::*;
 
 #[derive(Clone)]
 pub struct HistogramProcessor {
@@ -16,19 +16,24 @@ pub struct HistogramProcessor {
 }
 
 impl HistogramProcessor {
-    pub fn new(quality: u32,
-               image_width: u32, image_height: u32,
-               view_width: f64, view_height: f64,
-               oversampling: u32, brightness: f64,
-               spatial_filter: FilterKernel) -> Self {
-        let log_filter = LogFilter::new(
-            quality,
+    pub fn new(
+        quality: u32,
+        image_width: u32,
+        image_height: u32,
+        view_width: f64,
+        view_height: f64,
+        oversampling: u32,
+        brightness: f64,
+        spatial_filter: FilterKernel,
+    ) -> Self {
+        let log_filter = LogFilter::new(quality, oversampling, view_width, view_height, brightness);
+        HistogramProcessor {
+            image_width,
+            image_height,
             oversampling,
-            view_width,
-            view_height,
-            brightness,
-        );
-        HistogramProcessor { image_width, image_height, oversampling, spatial_filter, log_filter }
+            spatial_filter,
+            log_filter,
+        }
     }
 
     pub fn process_to_raw(&self, histograms: Vec<Histogram>) -> Vec<u8> {
@@ -40,15 +45,21 @@ impl HistogramProcessor {
         let (width, height) = (histograms[0].width, histograms[0].height);
         let length = (width * height) as usize;
 
-        let data = (0..length).into_par_iter()
+        let data = (0..length)
+            .into_par_iter()
             .map(|i| {
                 let (mut r, mut b, mut g, mut a) = (0.0, 0.0, 0.0, 0.0);
                 for hist in &histograms {
                     add_pixel(&mut r, &mut g, &mut b, &mut a, &hist.data[i]);
                 }
                 HDRPixel(r, g, b, a as f64)
-            }).collect();
-        Histogram{data, width, height}
+            })
+            .collect();
+        Histogram {
+            data,
+            width,
+            height,
+        }
     }
 
     fn do_process(&self, histogram: Histogram) -> Vec<u8> {
@@ -69,11 +80,15 @@ impl HistogramProcessor {
     }
 
     fn process_pixels(&self, mut histogram: Histogram) -> Histogram {
-        histogram.data = histogram.data.par_iter()
+        histogram.data = histogram
+            .data
+            .par_iter()
             .map(|pixel| self.log_filter.apply(pixel))
             .collect();
 
-        histogram.data = histogram.data.par_iter()
+        histogram.data = histogram
+            .data
+            .par_iter()
             .map(|pixel| gamma_filter::apply(&pixel))
             .collect();
 
@@ -82,17 +97,22 @@ impl HistogramProcessor {
             &histogram,
             self.image_width,
             self.image_height,
-            self.oversampling);
+            self.oversampling,
+        );
 
         histogram
     }
 }
 
-fn add_pixel(r: &mut f64, g: &mut f64, b: &mut f64, a: &mut f64, &HDRPixel(rn, gn, bn, an): &HDRPixel) {
+fn add_pixel(
+    r: &mut f64,
+    g: &mut f64,
+    b: &mut f64,
+    a: &mut f64,
+    &HDRPixel(rn, gn, bn, an): &HDRPixel,
+) {
     *r = *r + rn;
     *g = *g + gn;
     *b = *b + bn;
     *a = *a + an;
 }
-
-

@@ -1,28 +1,35 @@
-use crate::render::filter::FilterType;
 use crate::model::builders::palette;
 use crate::model::builders::transform;
 use crate::model::filter_builder;
-use crate::model::FilterConfig;
 use crate::model::flame::CameraConfig;
 use crate::model::flame::Flame;
 use crate::model::flame::RenderConfig;
 use crate::model::palette::Palette;
+use crate::model::FilterConfig;
+use crate::render::filter::FilterType;
 use crate::transforms::Transform;
 use crate::transforms::TransformSystem;
 use crate::util::math::RealPoint;
-use crate::variations::Variations;
 use crate::variations::Variation::*;
+use crate::variations::Variations;
 
 const T1: [f64; 6] = [
-    0.9398083605003169, -0.8990128677757641, 1.3909810148054664,
-    0.45393094546052914, 0.17251724552817665, 0.8074475159114657,
+    0.9398083605003169,
+    -0.8990128677757641,
+    1.3909810148054664,
+    0.45393094546052914,
+    0.17251724552817665,
+    0.8074475159114657,
 ];
 
 const T2: [f64; 6] = [
-    0.7353743435248136, -0.061067459186581186, -1.119570085087326,
-    -0.2510551099892795, 0.8032270759543487, -0.2239140170174654,
+    0.7353743435248136,
+    -0.061067459186581186,
+    -1.119570085087326,
+    -0.2510551099892795,
+    0.8032270759543487,
+    -0.2239140170174654,
 ];
-
 
 fn variations() -> Variations {
     Variations::new(vec![Linear(1.0)])
@@ -39,7 +46,7 @@ pub fn get_flame_model() -> Flame {
     let mut render: RenderConfig = RenderConfig {
         width: 1024,
         height: 1024,
-        quality: 300,
+        quality: 1200,
         oversampling: 2,
         brightness: 4.0,
         border: 0,
@@ -59,11 +66,16 @@ pub fn get_flame_model() -> Flame {
     let transforms = TransformSystem::new(transforms());
     let palette: Palette = palette(256, PALETTE);
 
-    Flame { render, camera, filter, transforms, palette }
+    Flame {
+        render,
+        camera,
+        filter,
+        transforms,
+        palette,
+    }
 }
 
-const PALETTE: &str =
-    "B9EAEBC1EEEBC5F2EBC9F2EBC9F6EBCDF6EBCDF6EBCDF2EBD1F2EBD2EEEBD1F2E1D6F2EB\
+const PALETTE: &str = "B9EAEBC1EEEBC5F2EBC9F2EBC9F6EBCDF6EBCDF6EBCDF2EBD1F2EBD2EEEBD1F2E1D6F2EB\
 DDF6FED5F2F4F2FAF4E2F2EBDEF2EBD6F2EBD6F2F4D1EEF4D1EEF4CDEEF4CDEEEBC9EEEB\
 C9EEEBC9EEF4C9EEF4C9F2F4CDF2F4D1F2F4D2F2F4D1F6F4CDF2F4C5F2F4BDF2F4BDF2F4\
 B9EEF4B5F2F4BDF2F4C1F2F4C5F2FEC5F2FEBDF2F4B5F2F4B1F2F4B5EEF4BDEAEBBDEAEB\

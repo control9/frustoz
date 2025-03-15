@@ -1,8 +1,8 @@
-use std::fmt::{Debug, Formatter, Error};
+use std::fmt::{Debug, Error, Formatter};
 
+pub mod filter_type;
 pub mod gamma_filter;
 pub mod log_filter;
-pub mod filter_type;
 pub mod spatial_filter;
 
 #[derive(Clone)]

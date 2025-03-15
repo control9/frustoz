@@ -1,6 +1,6 @@
-use std::fmt::{Debug, Formatter, Error};
+use std::fmt::{Debug, Error, Formatter};
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(PartialEq, Copy, Clone, Debug)]
 pub struct RGB(pub f32, pub f32, pub f32);
 
 #[derive(Clone)]
@@ -10,7 +10,6 @@ pub struct Palette {
 }
 
 impl Debug for Palette {
-
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "Palette size [{}]", self.size)
     }
@@ -19,9 +18,16 @@ impl Debug for Palette {
 impl Palette {
     pub fn new(content: &[u8]) -> Self {
         let size = (content.len() / 3) as i32;
-        let colors: Vec<RGB> = content.chunks(3)
+        let colors: Vec<RGB> = content
+            .chunks(3)
             .take(size as usize)
-            .map(|s| RGB(s[0] as f32 / 256.0, s[1] as f32 / 256.0, s[2] as f32 / 256.0))
+            .map(|s| {
+                RGB(
+                    s[0] as f32 / 256.0,
+                    s[1] as f32 / 256.0,
+                    s[2] as f32 / 256.0,
+                )
+            })
             .collect();
         Palette { size, colors }
     }

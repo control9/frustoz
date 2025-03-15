@@ -1,13 +1,13 @@
 pub mod filter;
 pub mod histogram;
-mod render_task;
-pub mod split_render_task;
-pub mod simple_renderer;
 pub mod histogram_processor;
 pub mod multithreaded_renderer;
-pub mod tokio_multithreaded_renderer;
-pub mod progressive_renderer;
 mod progressive_render_task;
+pub mod progressive_renderer;
+mod render_task;
+pub mod simple_renderer;
+pub mod split_render_task;
+pub mod tokio_multithreaded_renderer;
 
 #[derive(Clone)]
 pub struct Histogram {
@@ -31,12 +31,11 @@ pub trait ProgressReporter {
 pub struct NoOpReporter {}
 
 impl ProgressReporter for NoOpReporter {
-    fn new(_: &Vec<u64>) -> Self{
-        NoOpReporter{}
+    fn new(_: &Vec<u64>) -> Self {
+        NoOpReporter {}
     }
 
-    fn report(&mut self, _: Progress) {
-    }
+    fn report(&mut self, _: Progress) {}
 }
 
 fn split(iterations: u64, parts: u32) -> Vec<u64> {
