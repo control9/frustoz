@@ -1,6 +1,6 @@
 [package]
 name = "frustoz-core"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Aleksei Sukontsev <aleksei.sukontsev@gmail.com>"]
 edition = "2021"
 
@@ -10,9 +10,12 @@ edition = "2021"
 hex = "0.4.3"
 log = { version = "0.4.21", features = ["release_max_level_info"] }
 rayon = "1.10.0"
-rand = "0.8.5"
-getrandom = { version = "0.2", features = ["js"] }
-tokio_with_wasm = "0.4.4"
+rand = "0.9.0"
+tokio_with_wasm = { version = "0.8.2" , features = ["macros", "sync", "time", "rt" ]}
+tokio = { version = "1.44.1" , features = ["macros", "sync", "time", "rt"]}
 futures = "0.3.30"
 web-time = "1.1.0"
 image = "0.25.1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.3.2", features = ["wasm_js"] }

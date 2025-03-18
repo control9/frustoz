@@ -1,6 +1,6 @@
 [package]
 name = "frustoz-cli"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["control9"]
 edition = "2021"
 
@@ -15,10 +15,10 @@ log = { version = "0.4.21", features = ["release_max_level_info"] }
 simplelog = "^0.12.2"
 pbr = "1.1.1"
 
-indicatif = "=0.17.8"
-indicatif-log-bridge = "0.2.2"
+indicatif = "=0.17.11"
+indicatif-log-bridge = "0.2.3"
 
 frustoz-core = { version = "0.1.1", path = "../frustoz-core" }
 frustoz-io = { version = "0.1.1", path = "../frustoz-io" }
 
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.44.1", features = ["full"] }

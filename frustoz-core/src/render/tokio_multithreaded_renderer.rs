@@ -10,9 +10,10 @@ use super::ProgressReporter;
 use crate::model::builders;
 use crate::model::flame::Flame;
 use futures::future::join_all;
+
+use tokio_with_wasm::alias as tokio;
 use tokio::task::spawn_blocking;
-use tokio_with_wasm::tokio;
-use tokio_with_wasm::tokio::task::JoinHandle;
+use tokio::task::JoinHandle;
 use web_time::Instant;
 pub struct Renderer {
     pub threads: u32,

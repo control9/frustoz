@@ -4,9 +4,10 @@ use crate::render::histogram::Camera;
 use crate::render::progressive_renderer::{SingleThreadSnapshot, TaskCommand};
 use crate::render::Histogram;
 use crate::util::math::RealPoint;
-use rand::{thread_rng, Rng};
-use tokio_with_wasm::tokio::sync::mpsc::error::TryRecvError;
-use tokio_with_wasm::tokio::sync::mpsc::{Receiver, Sender};
+use rand::{rng, Rng};
+use tokio_with_wasm::alias as tokio;
+use tokio::sync::mpsc::error::TryRecvError;
+use tokio::sync::mpsc::{Receiver, Sender};
 
 pub struct ProgressiveRenderTask {
     camera: Camera,
@@ -39,17 +40,17 @@ impl ProgressiveRenderTask {
     }
 
     pub(crate) fn render(&mut self) {
-        let mut rng = thread_rng();
-        let xstart: f64 = rng.gen_range(0.0..1.0);
-        let ystart: f64 = rng.gen_range(0.0..1.0);
+        let mut rng = rng();
+        let xstart: f64 = rng.random_range(0.0..1.0);
+        let ystart: f64 = rng.random_range(0.0..1.0);
         let mut point = RealPoint(xstart, ystart);
-        let mut color: f64 = rng.gen_range(0.0..1.0);
+        let mut color: f64 = rng.random_range(0.0..1.0);
 
         let mut complete = false;
         let mut iteration = 0;
         info!("Task {} started", self.id);
         while !complete {
-            let transform_seed: f64 = rng.gen_range(0.0..1.0);
+            let transform_seed: f64 = rng.random_range(0.0..1.0);
             let transform = self.flame.transforms.get_transformation(transform_seed);
 
             let (new_point, new_color) = transform.apply(&point, color, &mut rng);

@@ -6,6 +6,7 @@ use crate::model::builders;
 use crate::model::flame::Flame;
 use crate::util::math::RealPoint;
 use rand::prelude::*;
+use rand::rng;
 
 const SKIP_ITERATIONS: u64 = 20;
 const REPORT_FREQUENCY_PERCENT: u64 = 1;
@@ -46,12 +47,12 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
     pub fn render(mut self) -> Histogram {
         let report_frequency = self.iterations / 100 * REPORT_FREQUENCY_PERCENT;
         let mut progress = Progress(0, self.id);
-        let rng = thread_rng();
+        let rng = rng();
         let stt: Vec<State> = (0..SPLIT_FACTOR)
             .map(|_| rng.clone())
             .map(|mut rng| State {
-                point: RealPoint(rng.gen_range(0.0..1.0), rng.gen_range(0.0..1.0)),
-                color: rng.gen_range(0.0..1.0),
+                point: RealPoint(rng.random_range(0.0..1.0), rng.random_range(0.0..1.0)),
+                color: rng.random_range(0.0..1.0),
                 rng: rng.clone(),
             })
             .collect::<Vec<State>>();
@@ -64,7 +65,7 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
                     color,
                     ref mut rng,
                 } = &mut state[i];
-                let trs = rng.gen_range(0.0..1.0);
+                let trs = rng.random_range(0.0..1.0);
                 let tr = self.flame.transforms.get_transformation(trs);
                 let (new_p, new_c) = tr.apply(point, *color, rng);
                 state[i].point = new_p;

@@ -1,9 +1,10 @@
 use futures::future::join_all;
 use image::ImageEncoder;
-use tokio_with_wasm::tokio::sync::mpsc::channel;
-use tokio_with_wasm::tokio::sync::mpsc::Sender;
-use tokio_with_wasm::tokio::task::spawn_blocking;
-use tokio_with_wasm::tokio::time::sleep;
+use tokio_with_wasm::alias as tokio;
+use tokio::sync::mpsc::channel;
+use tokio::sync::mpsc::Sender;
+use tokio::task::spawn_blocking;
+use tokio::time::sleep;
 
 use web_time::Duration;
 use web_time::Instant;

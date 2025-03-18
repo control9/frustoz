@@ -19,7 +19,7 @@ impl Variation {
             Spiral(w) => spiral(point, *w),
             Hyperbolic(w) => hyperbolic(point, *w),
             Diamond(w) => diamond(point, *w),
-            Julia(w) => julia(point, *w, rng.gen()),
+            Julia(w) => julia(point, *w, rng.random()),
             JuliaN(w, power, dist) => julia_n(point, *w, *power, *dist, rng),
         }
     }
@@ -114,7 +114,7 @@ fn julia_n<R: Rng + Sized>(
     let r_n = power.abs();
     let cn = dist / power / 2.0;
 
-    let a = theta(x, y) + 2.0 * PI * rng.gen_range(0.0..r_n) / power;
+    let a = theta(x, y) + 2.0 * PI * rng.random_range(0.0..r_n) / power;
 
     let r = w * (x * x + y * y).powf(cn);
     RealPoint(r * a.cos(), r * a.sin())
