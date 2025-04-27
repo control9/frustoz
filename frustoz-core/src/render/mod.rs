@@ -9,6 +9,8 @@ pub mod simple_renderer;
 pub mod split_render_task;
 pub mod tokio_multithreaded_renderer;
 
+pub mod atomic;
+
 #[derive(Clone)]
 pub struct Histogram {
     data: Vec<HDRPixel>,
