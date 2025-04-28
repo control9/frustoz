@@ -1,10 +1,14 @@
 use futures::future::join_all;
 use image::ImageEncoder;
-use tokio_with_wasm::alias as tokio;
-use tokio::sync::mpsc::channel;
+use std::sync::Arc;
+use std::sync::atomic::AtomicU64;
+use std::sync::atomic::Ordering::Relaxed;
 use tokio::sync::mpsc::Sender;
-use tokio::task::spawn_blocking;
+use tokio::sync::oneshot::error::TryRecvError;
+use tokio::sync::oneshot::Receiver;
+use tokio::task::{spawn_blocking, JoinHandle};
 use tokio::time::sleep;
+use tokio_with_wasm::alias as tokio;
 
 use web_time::Duration;
 use web_time::Instant;
@@ -12,8 +16,7 @@ use web_time::Instant;
 use crate::model::builders;
 use crate::model::flame::Flame;
 use crate::render::progressive_render_task::ProgressiveRenderTask;
-use crate::render::progressive_renderer::TaskCommand::{Completed, FrameExpected};
-use crate::render::{Canvas, CombinedCanvas};
+use crate::render::{Canvas};
 
 pub struct Snapshot {
     pub image_data: Vec<u8>,
@@ -22,15 +25,15 @@ pub struct Snapshot {
     pub complete: bool,
 }
 
-pub struct SingleThreadSnapshot {
-    pub(crate) histogram: Canvas,
-    pub(crate) steps: u64,
+pub enum  Command {
+    CANCEL
 }
 
-pub enum TaskCommand {
-    Completed,
-    FrameExpected,
+pub(crate) struct CanvasState {
+    pub(crate) canvas: Canvas,
+    pub(crate) steps: AtomicU64, // TODO: calculate on task level instead to avoid dependency on 64bit atomics 
 }
+
 const MIN_FRAME_DURATION: Duration = Duration::from_millis(5);
 
 pub async fn render(
@@ -39,6 +42,7 @@ pub async fn render(
     frame_delta: Duration,
     threads: usize,
     snapshot_tx: Sender<Snapshot>,
+    mut command_rx: Receiver<Command>
 ) {
     info!("Beginning rendering");
     let start_time = Instant::now();
@@ -46,17 +50,15 @@ pub async fn render(
     let fl = flame.clone();
     let processor = builders::histogram_processor(&fl);
 
-    let (tx, mut rx) = channel(1);
-
     // create tasks;
     let fl = flame.clone();
-    let (tasks, fr_txs) = spawn_blocking(move || create_tasks(&fl, threads, tx))
-        .await
-        .expect("Tasks should be created");
+    let canvas_state = CanvasState { canvas: builders::canvas(&flame.render, flame.filter.width), steps: AtomicU64::new(0)};
+    let canvas = Arc::new(canvas_state);
+    let tasks = create_tasks(&fl, threads, canvas.clone());
     info!("Created task definitions");
-    tasks.into_iter().for_each(|mut t| {
-        spawn_blocking(move || t.render());
-    });
+    let handles : Vec<JoinHandle<()>> = tasks.into_iter().map(|mut t| {
+        tokio::task::spawn(async move {t.render().await})
+    }).collect();
     info!("Spawned tasks");
 
     let mut frame_start = Instant::now();
@@ -65,24 +67,11 @@ pub async fn render(
     let mut total_iterations = 0;
     while total_iterations < max_steps {
         sleep(adjusted_delta).await;
-        let mut rr = Vec::with_capacity(threads);
-        for i in 0..threads {
-            rr.push(fr_txs[i].send(FrameExpected));
-        }
-        join_all(rr).await;
-
-        // receive
-        let mut histograms = Vec::with_capacity(threads);
-        total_iterations = 0;
-        for _ in 0..threads {
-            let SingleThreadSnapshot { histogram, steps } =
-                rx.recv().await.expect("Task senders closed before ");
-            total_iterations += steps;
-            histograms.push(histogram);
-        }
 
         let pr = processor.clone();
-        let raw = spawn_blocking(move || pr.process_to_raw(histograms))
+        let cc = canvas.clone();
+
+        let raw = spawn_blocking(move || pr.process_to_raw_single(&cc.canvas))
             .await
             .expect("Histogram merging failed");
 
@@ -99,6 +88,14 @@ pub async fn render(
             .await
             .expect("Failed to send snapshot");
 
+        match command_rx.try_recv() {
+            Err(TryRecvError::Empty) => (),
+            _ => {
+                handles.iter().for_each(|h| h.abort());
+                break;
+            }
+        }
+
         if actual_passed > frame_delta {
             let adjustment = actual_passed - frame_delta;
             if frame_delta > (adjustment + MIN_FRAME_DURATION) {
@@ -110,10 +107,11 @@ pub async fn render(
             adjusted_delta = frame_delta;
         }
         frame_start = Instant::now();
+        total_iterations = canvas.steps.load(Relaxed);
     }
-    for i in 0..threads {
-        let _r = fr_txs[i].send(Completed).await;
-    }
+
+    join_all(handles).await;
+
     info!(
         "Rendering took {} seconds",
         start_time.elapsed().as_secs_f64()
@@ -136,14 +134,10 @@ fn encode_image(width: u32, height: u32, raw: Vec<u8>) -> Vec<u8> {
 fn create_tasks(
     flame: &Flame,
     threads: usize,
-    shared_tx: Sender<SingleThreadSnapshot>,
-) -> (Vec<ProgressiveRenderTask>, Vec<Sender<TaskCommand>>) {
+    canvas: Arc<CanvasState>
+) -> Vec<ProgressiveRenderTask> {
     (0..threads)
         .into_iter()
-        .map(|id| (id, flame.clone(), shared_tx.clone()))
-        .map(|_curr| (_curr, channel(2)))
-        .map(|((id, fl, tx), (fr_tx, fr_rx))| {
-            (ProgressiveRenderTask::new(fl, fr_rx, id, tx), fr_tx)
-        })
-        .unzip()
+        .map(|id|  ProgressiveRenderTask::new(flame.clone(), canvas.clone(), id))
+        .collect()
 }

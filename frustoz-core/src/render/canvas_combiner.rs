@@ -1,4 +1,5 @@
-use std::sync::Arc;
+use std::ops::Deref;
+
 use crate::render::FloatPixel;
 use std::sync::atomic::Ordering::Relaxed;
 use super::filter::gamma_filter;
@@ -39,7 +40,9 @@ impl CanvasCombiner {
     }
 
 
-    pub fn process_to_raw_single(&self, canvas: Arc<Canvas>) -> Vec<u8> {
+    pub fn process_to_raw_single<T>(&self, canvas: T) -> Vec<u8> 
+    where T: Deref<Target = Canvas> + Sync
+    {
         let combined_canvas: CombinedCanvas = CanvasCombiner::preprocess(canvas);
         self.do_process(combined_canvas)
     }
@@ -49,7 +52,8 @@ impl CanvasCombiner {
         self.do_process(combined_canvas)
     }
 
-    fn preprocess(canvas: Arc<Canvas>)  -> CombinedCanvas {
+    fn preprocess<T>(canvas: T)  -> CombinedCanvas
+    where T: Deref<Target = Canvas> + Sync{
         let (width, height) = (canvas.width, canvas.height);
         let length = (width * height) as usize;
 
