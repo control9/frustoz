@@ -1,8 +1,8 @@
 use crate::model::builders;
 use crate::model::flame::Flame;
-use crate::render::histogram::Camera;
+use crate::render::canvas::Camera;
 use crate::render::progressive_renderer::{SingleThreadSnapshot, TaskCommand};
-use crate::render::Histogram;
+use crate::render::{Canvas};
 use crate::util::math::RealPoint;
 use rand::{rng, Rng};
 use tokio_with_wasm::alias as tokio;
@@ -11,7 +11,7 @@ use tokio::sync::mpsc::{Receiver, Sender};
 
 pub struct ProgressiveRenderTask {
     camera: Camera,
-    canvas: Histogram,
+    canvas: Canvas,
     flame: Flame,
     id: usize,
     rx: Receiver<TaskCommand>,
@@ -28,7 +28,7 @@ impl ProgressiveRenderTask {
         tx: Sender<SingleThreadSnapshot>,
     ) -> Self {
         let camera = builders::camera(&flame.camera);
-        let canvas = builders::histogram(&flame.render, flame.filter.width);
+        let canvas = builders::canvas(&flame.render, flame.filter.width);
         ProgressiveRenderTask {
             camera,
             canvas,

@@ -1,15 +1,14 @@
 use super::FilterKernel;
-use crate::render::HDRPixel;
-use crate::render::Histogram;
+use crate::render::{CombinedCanvas, FloatPixel};
 use web_time::Instant;
 
 pub fn apply_filter(
     filter: &FilterKernel,
-    histogram: &Histogram,
+    histogram: &CombinedCanvas,
     image_width: u32,
     image_height: u32,
     oversample: u32,
-) -> Histogram {
+) -> CombinedCanvas {
     let now = Instant::now();
     let data = (0..(image_height * image_width))
         .into_iter()
@@ -22,14 +21,14 @@ pub fn apply_filter(
         "Filtering took: {:?}",
         (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
     );
-    Histogram {
+    CombinedCanvas {
         data,
         width: image_width,
         height: image_height,
     }
 }
 
-fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram: &Histogram) -> HDRPixel {
+fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram: &CombinedCanvas) -> FloatPixel {
     let &FilterKernel {
         width: filter_width,
         coefficients: ref kernel,
@@ -40,7 +39,7 @@ fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram: &Histogram) -
         for filter_x in 0..filter_width {
             let k = kernel[(filter_x + filter_y * filter_width) as usize];
             let index = (x + filter_x) + (y + filter_y) * histogram.width;
-            let &HDRPixel(rn, gn, bn, an) = &histogram.data[index as usize];
+            let &FloatPixel(rn, gn, bn, an) = &histogram.data[index as usize];
 
             r += rn * k;
             g += gn * k;
@@ -49,7 +48,7 @@ fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram: &Histogram) -
         }
     }
 
-    HDRPixel(
+    FloatPixel(
         r.min(1.0).max(0.0),
         g.min(1.0).max(0.0),
         b.min(1.0).max(0.0),

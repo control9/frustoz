@@ -1,7 +1,7 @@
 use crate::util::math::RealPoint;
 
 pub mod camera;
-pub mod canvas;
+mod canvas;
 
 pub struct Camera {
     origin: RealPoint,

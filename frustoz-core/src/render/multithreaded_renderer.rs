@@ -1,4 +1,4 @@
-use super::{split, Histogram};
+use super::{split, Canvas};
 use rayon::prelude::*;
 
 // Easier switching between implementations for performance comparison
@@ -44,7 +44,7 @@ impl Renderer {
             (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
         );
 
-        let histograms: Vec<Histogram> = tasks.into_par_iter().map(|t| t.render()).collect();
+        let histograms: Vec<Canvas> = tasks.into_par_iter().map(|t| t.render()).collect();
 
         processor.process_to_raw(histograms)
     }

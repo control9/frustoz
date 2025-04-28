@@ -13,7 +13,7 @@ use crate::model::builders;
 use crate::model::flame::Flame;
 use crate::render::progressive_render_task::ProgressiveRenderTask;
 use crate::render::progressive_renderer::TaskCommand::{Completed, FrameExpected};
-use crate::render::Histogram;
+use crate::render::{Canvas, CombinedCanvas};
 
 pub struct Snapshot {
     pub image_data: Vec<u8>,
@@ -23,7 +23,7 @@ pub struct Snapshot {
 }
 
 pub struct SingleThreadSnapshot {
-    pub(crate) histogram: Histogram,
+    pub(crate) histogram: Canvas,
     pub(crate) steps: u64,
 }
 

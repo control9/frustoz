@@ -1,4 +1,4 @@
-use super::{split, Histogram};
+use super::{split, Canvas};
 
 // Easier switching between implementations for performance comparison
 #[allow(unused_imports)]
@@ -51,13 +51,13 @@ impl Renderer {
             (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
         );
 
-        let handlers: Vec<JoinHandle<Histogram>> = tasks
+        let handlers: Vec<JoinHandle<Canvas>> = tasks
             .into_iter()
             .map(|t| spawn_blocking(move || t.render()))
             .collect();
 
         let hists = join_all(handlers).await;
-        let histograms: Vec<Histogram> = hists.into_iter().filter_map(|r| r.ok()).collect();
+        let histograms: Vec<Canvas> = hists.into_iter().filter_map(|r| r.ok()).collect();
         processor.process_to_raw(histograms)
     }
 }
