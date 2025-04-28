@@ -44,10 +44,10 @@ fn transforms() -> Vec<Transform> {
 
 pub fn get_flame_model() -> Flame {
     let mut render: RenderConfig = RenderConfig {
-        width: 1024,
-        height: 1024,
-        quality: 6400,
-        oversampling: 2,
+        width: 1920,
+        height: 1080,
+        quality: 2000,
+        oversampling: 3,
         brightness: 4.0,
         border: 0,
     };

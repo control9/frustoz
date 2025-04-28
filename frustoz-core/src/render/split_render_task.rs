@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use super::canvas::Camera;
 use super::Canvas;
 use super::Progress;
@@ -15,7 +16,7 @@ const SPLIT_FACTOR: usize = 32;
 
 pub struct SplitRenderTask<T: ProgressReporter + Sized> {
     camera: Camera,
-    canvas: Canvas,
+    canvas: Arc<Canvas>,
     flame: Flame,
     iterations: u64,
     id: usize,
@@ -30,9 +31,9 @@ struct State {
 }
 
 impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
-    pub fn new(flame: Flame, iterations: u64, id: usize, progress_reporter: T) -> Self {
+    pub fn new(flame: Flame, iterations: u64, id: usize, progress_reporter: T, canvas: Arc<Canvas>) -> Self {
         let camera = builders::camera(&flame.camera);
-        let canvas = builders::canvas(&flame.render, flame.filter.width);
+        //let canvas = builders::canvas(&flame.render, flame.filter.width);
 
         SplitRenderTask {
             camera,
@@ -44,7 +45,7 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
         }
     }
 
-    pub fn render(mut self) -> Canvas {
+    pub fn render(mut self) {
         let report_frequency = self.iterations / 100 * REPORT_FREQUENCY_PERCENT;
         let mut progress = Progress(0, self.id);
         let rng = rng();
@@ -87,6 +88,5 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
             }
         }
         self.progress_reporter.report(progress);
-        self.canvas
     }
 }

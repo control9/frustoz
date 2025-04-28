@@ -33,7 +33,7 @@ impl Canvas {
         ))
     }
 
-    pub fn project_and_update(&mut self, coordinates: &CameraCoordinates, color: &RGB) {
+    pub fn project_and_update(&self, coordinates: &CameraCoordinates, color: &RGB) {
         let pixel = self.project(coordinates);
         match pixel {
             Some(p) => self.update(p, color),
@@ -42,13 +42,13 @@ impl Canvas {
     }
 
     // #[inline(never)]
-    fn update(&mut self, CanvasPixel(x, y): CanvasPixel, color: &RGB) {
+    fn update(&self, CanvasPixel(x, y): CanvasPixel, color: &RGB) {
         let pixel_index: usize = (y * self.width + x) as usize;
         self.update_pixel(pixel_index, color);
     }
 
     // #[inline(never)]
-    fn update_pixel(&mut self, index: usize, &RGB(r, g, b): &RGB) {
+    fn update_pixel(&self, index: usize, &RGB(r, g, b): &RGB) {
         self.data[index].add((r as u32, g as u32, b as u32, 1));
     }
 }

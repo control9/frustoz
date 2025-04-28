@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use super::{split, Canvas};
 
 // Easier switching between implementations for performance comparison
@@ -39,25 +40,29 @@ impl Renderer {
             .map(|&i| (i, reporter.clone(), flame.clone()))
             .collect();
 
-        let tasks: Vec<Task<T>> = thread_configs
-            .into_iter()
-            .enumerate()
-            .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep))
-            .collect();
+        let canvas = Arc::new(builders::canvas(&flame.render, flame.filter.width));
 
-        let elapsed = now.elapsed();
-        info!(
-            "Creating tasks took: {:?}",
-            (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
-        );
+        {
+            let canvas = canvas.clone();
+            let tasks: Vec<Task<T>> = thread_configs
+                .into_iter()
+                .enumerate()
+                .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep, canvas.clone()))
+                .collect();
 
-        let handlers: Vec<JoinHandle<Canvas>> = tasks
-            .into_iter()
-            .map(|t| spawn_blocking(move || t.render()))
-            .collect();
+            let elapsed = now.elapsed();
+            info!(
+                "Creating tasks took: {:?}",
+                (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
+            );
 
-        let hists = join_all(handlers).await;
-        let histograms: Vec<Canvas> = hists.into_iter().filter_map(|r| r.ok()).collect();
-        processor.process_to_raw(histograms)
+            let handlers: Vec<JoinHandle<()>> = tasks
+                .into_iter()
+                .map(|t| spawn_blocking(move || t.render()))
+                .collect();
+
+            let _ = join_all(handlers).await;
+        }
+        processor.process_to_raw_single(canvas)
     }
 }

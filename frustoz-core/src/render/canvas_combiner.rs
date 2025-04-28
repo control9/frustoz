@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use crate::render::FloatPixel;
 use std::sync::atomic::Ordering::Relaxed;
 use super::filter::gamma_filter;
@@ -37,11 +38,41 @@ impl CanvasCombiner {
         }
     }
 
+
+    pub fn process_to_raw_single(&self, canvas: Arc<Canvas>) -> Vec<u8> {
+        let combined_canvas: CombinedCanvas = CanvasCombiner::preprocess(canvas);
+        self.do_process(combined_canvas)
+    }
+
     pub fn process_to_raw(&self, canvases: Vec<Canvas>) -> Vec<u8> {
         let combined_canvas: CombinedCanvas = CanvasCombiner::combine(canvases);
         self.do_process(combined_canvas)
     }
 
+    fn preprocess(canvas: Arc<Canvas>)  -> CombinedCanvas {
+        let (width, height) = (canvas.width, canvas.height);
+        let length = (width * height) as usize;
+
+        let data = (0..length)
+            .into_par_iter()
+            .map(|i| {
+                let pixel = &canvas.data[i];
+                
+                FloatPixel(
+                    pixel.0.load(Relaxed) as f64 / 256.0,
+                    pixel.1.load(Relaxed) as f64 / 256.0,
+                    pixel.2.load(Relaxed) as f64 / 256.0,
+                    pixel.3.load(Relaxed) as f64,
+                )
+            })
+            .collect();
+        CombinedCanvas {
+            data,
+            width,
+            height,
+        }
+    }
+    
     fn combine(histograms: Vec<Canvas>) -> CombinedCanvas {
         let (width, height) = (histograms[0].width, histograms[0].height);
         let length = (width * height) as usize;
