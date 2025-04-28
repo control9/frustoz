@@ -1,5 +1,6 @@
 use super::{split, Canvas};
 use rayon::prelude::*;
+use std::sync::Arc;
 
 // Easier switching between implementations for performance comparison
 #[allow(unused_imports)]
@@ -32,20 +33,23 @@ impl Renderer {
             .map(|&i| (i, reporter.clone(), flame.clone()))
             .collect();
 
-        let tasks: Vec<Task<T>> = thread_configs
-            .into_par_iter()
-            .enumerate()
-            .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep))
-            .collect();
+        let canvas = Arc::new(builders::canvas(&flame.render, flame.filter.width));
+        {
+            let canvas = canvas.clone();
+            let tasks: Vec<Task<T>> = thread_configs
+                .into_par_iter()
+                .enumerate()
+                .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep, canvas.clone()))
+                .collect();
 
-        let elapsed = now.elapsed();
-        info!(
-            "Creating tasks took: {:?}",
-            (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
-        );
+            let elapsed = now.elapsed();
+            info!(
+                "Creating tasks took: {:?}",
+                (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
+            );
 
-        let histograms: Vec<Canvas> = tasks.into_par_iter().map(|t| t.render()).collect();
-
-        processor.process_to_raw(histograms)
+            tasks.into_par_iter().for_each(|t| t.render());
+        }
+        processor.process_to_raw_single(canvas.clone())
     }
 }
