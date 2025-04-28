@@ -1,5 +1,5 @@
-use super::histogram::Camera;
-use super::Histogram;
+use super::canvas::Camera;
+use super::Canvas;
 use super::Progress;
 use super::ProgressReporter;
 use crate::model::builders;
@@ -15,7 +15,7 @@ const SPLIT_FACTOR: usize = 32;
 
 pub struct SplitRenderTask<T: ProgressReporter + Sized> {
     camera: Camera,
-    canvas: Histogram,
+    canvas: Canvas,
     flame: Flame,
     iterations: u64,
     id: usize,
@@ -32,7 +32,7 @@ struct State {
 impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
     pub fn new(flame: Flame, iterations: u64, id: usize, progress_reporter: T) -> Self {
         let camera = builders::camera(&flame.camera);
-        let canvas = builders::histogram(&flame.render, flame.filter.width);
+        let canvas = builders::canvas(&flame.render, flame.filter.width);
 
         SplitRenderTask {
             camera,
@@ -44,7 +44,7 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
         }
     }
 
-    pub fn render(mut self) -> Histogram {
+    pub fn render(mut self) -> Canvas {
         let report_frequency = self.iterations / 100 * REPORT_FREQUENCY_PERCENT;
         let mut progress = Progress(0, self.id);
         let rng = rng();

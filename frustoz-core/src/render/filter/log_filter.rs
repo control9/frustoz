@@ -1,5 +1,6 @@
+use crate::render::FloatPixel;
 use super::LogFilter;
-use crate::render::HDRPixel;
+
 
 impl LogFilter {
     pub fn new(quality: u32, oversampling: u32, width: f64, height: f64, brightness: f64) -> Self {
@@ -13,9 +14,9 @@ impl LogFilter {
         LogFilter { k1, k2 }
     }
 
-    pub fn apply(&self, &HDRPixel(r, g, b, a): &HDRPixel) -> HDRPixel {
+    pub fn apply(&self, &FloatPixel(r, g, b, a): &FloatPixel) -> FloatPixel {
         let scale = self.get_scale(a as f64);
-        HDRPixel(r * scale, g * scale, b * scale, a * scale)
+        FloatPixel(r * scale, g * scale, b * scale, a * scale)
     }
 
     pub fn get_scale(&self, x: f64) -> f64 {

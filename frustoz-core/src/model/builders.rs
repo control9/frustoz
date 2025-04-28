@@ -4,9 +4,9 @@ use crate::model::flame::CameraConfig;
 use crate::model::flame::Flame;
 use crate::model::flame::RenderConfig;
 use crate::model::palette::Palette;
-use crate::render::histogram::Camera;
-use crate::render::histogram_processor::HistogramProcessor;
-use crate::render::Histogram;
+use crate::render::canvas::Camera;
+use crate::render::canvas_combiner::CanvasCombiner;
+use crate::render::{Canvas};
 use crate::transforms::Transform;
 use crate::util::math::TransformMatrix;
 use crate::variations::Variations;
@@ -15,8 +15,8 @@ pub fn camera(config: &CameraConfig) -> Camera {
     Camera::new(config.origin, config.scale_x, config.scale_y)
 }
 
-pub fn histogram(config: &RenderConfig, filter_width: u32) -> Histogram {
-    Histogram::new(
+pub fn canvas(config: &RenderConfig, filter_width: u32) -> Canvas {
+    Canvas::new(
         config.width,
         config.height,
         config.oversampling,
@@ -42,10 +42,10 @@ pub fn transform(weight: f64, color: f64, coef: [f64; 6], variations: Variations
     }
 }
 
-pub fn histogram_processor(flame: &Flame) -> HistogramProcessor {
+pub fn histogram_processor(flame: &Flame) -> CanvasCombiner {
     let render = &flame.render;
 
-    HistogramProcessor::new(
+    CanvasCombiner::new(
         render.quality,
         render.width,
         render.height,
@@ -76,7 +76,7 @@ mod palette_builder_test {
 
         let result = super::palette(size, input);
         assert_eq!(
-            &RGB(185.0 / 256.0, 234.0 / 256.0, 235.0 / 256.0),
+            &RGB(185, 234, 235),
             result.get_color(0.0)
         )
     }

@@ -1,9 +1,9 @@
-use crate::render::HDRPixel;
+use crate::render::FloatPixel;
 use crate::util::math::EPSILON;
 
 const GAMMA_FACTOR: f64 = 1.0 / 4.0;
 
-pub fn apply(&HDRPixel(r, g, b, a): &HDRPixel) -> HDRPixel {
+pub fn apply(&FloatPixel(r, g, b, a): &FloatPixel) -> FloatPixel {
     let new_a;
     let gamma_scale;
     if a < EPSILON {
@@ -14,7 +14,7 @@ pub fn apply(&HDRPixel(r, g, b, a): &HDRPixel) -> HDRPixel {
         gamma_scale = new_a / a;
     }
 
-    HDRPixel(r * gamma_scale, g * gamma_scale, b * gamma_scale, new_a)
+    FloatPixel(r * gamma_scale, g * gamma_scale, b * gamma_scale, new_a)
 }
 
 fn apply_gamma(color: f64) -> f64 {

@@ -1,13 +1,14 @@
+use crate::render::FloatPixel;
+use std::sync::atomic::Ordering::Relaxed;
 use super::filter::gamma_filter;
 use super::filter::spatial_filter;
 use super::filter::FilterKernel;
 use super::filter::LogFilter;
-use super::HDRPixel;
-use super::Histogram;
+use super::{Canvas, CombinedCanvas, HDRPixel};
 use rayon::prelude::*;
 
 #[derive(Clone)]
-pub struct HistogramProcessor {
+pub struct CanvasCombiner {
     image_width: u32,
     image_height: u32,
     oversampling: u32,
@@ -15,7 +16,7 @@ pub struct HistogramProcessor {
     log_filter: LogFilter,
 }
 
-impl HistogramProcessor {
+impl CanvasCombiner {
     pub fn new(
         quality: u32,
         image_width: u32,
@@ -27,7 +28,7 @@ impl HistogramProcessor {
         spatial_filter: FilterKernel,
     ) -> Self {
         let log_filter = LogFilter::new(quality, oversampling, view_width, view_height, brightness);
-        HistogramProcessor {
+        CanvasCombiner {
             image_width,
             image_height,
             oversampling,
@@ -36,12 +37,12 @@ impl HistogramProcessor {
         }
     }
 
-    pub fn process_to_raw(&self, histograms: Vec<Histogram>) -> Vec<u8> {
-        let histogram: Histogram = HistogramProcessor::combine(histograms);
-        self.do_process(histogram)
+    pub fn process_to_raw(&self, canvases: Vec<Canvas>) -> Vec<u8> {
+        let combined_canvas: CombinedCanvas = CanvasCombiner::combine(canvases);
+        self.do_process(combined_canvas)
     }
 
-    fn combine(histograms: Vec<Histogram>) -> Histogram {
+    fn combine(histograms: Vec<Canvas>) -> CombinedCanvas {
         let (width, height) = (histograms[0].width, histograms[0].height);
         let length = (width * height) as usize;
 
@@ -52,24 +53,24 @@ impl HistogramProcessor {
                 for hist in &histograms {
                     add_pixel(&mut r, &mut g, &mut b, &mut a, &hist.data[i]);
                 }
-                HDRPixel(r, g, b, a as f64)
+                FloatPixel(r / 256.0, g/ 256.0, b/ 256.0, a as f64)
             })
             .collect();
-        Histogram {
+        CombinedCanvas {
             data,
             width,
             height,
         }
     }
 
-    fn do_process(&self, histogram: Histogram) -> Vec<u8> {
+    fn do_process(&self, histogram: CombinedCanvas) -> Vec<u8> {
         let mut result: Vec<u8> = vec![];
 
-        let histogram = HistogramProcessor::process_pixels(&self, histogram);
+        let histogram = CanvasCombiner::process_pixels(&self, histogram);
 
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let HDRPixel(r, g, b, _a) = histogram.data[(i + j * self.image_width) as usize];
+                let FloatPixel(r, g, b, _a) = histogram.data[(i + j * self.image_width) as usize];
 
                 result.push((r * 256.0).min(255.0) as u8);
                 result.push((g * 256.0).min(255.0) as u8);
@@ -79,28 +80,28 @@ impl HistogramProcessor {
         result
     }
 
-    fn process_pixels(&self, mut histogram: Histogram) -> Histogram {
-        histogram.data = histogram
+    fn process_pixels(&self, mut canvas: CombinedCanvas) -> CombinedCanvas {
+        canvas.data = canvas
             .data
             .par_iter()
             .map(|pixel| self.log_filter.apply(pixel))
             .collect();
 
-        histogram.data = histogram
+        canvas.data = canvas
             .data
             .par_iter()
             .map(|pixel| gamma_filter::apply(&pixel))
             .collect();
 
-        histogram = spatial_filter::apply_filter(
+        canvas = spatial_filter::apply_filter(
             &self.spatial_filter,
-            &histogram,
+            &canvas,
             self.image_width,
             self.image_height,
             self.oversampling,
         );
 
-        histogram
+        canvas
     }
 }
 
@@ -109,10 +110,10 @@ fn add_pixel(
     g: &mut f64,
     b: &mut f64,
     a: &mut f64,
-    &HDRPixel(rn, gn, bn, an): &HDRPixel,
+    pixel: &HDRPixel,
 ) {
-    *r = *r + rn;
-    *g = *g + gn;
-    *b = *b + bn;
-    *a = *a + an;
+    *r = *r + pixel.0.load(Relaxed) as f64;
+    *g = *g + pixel.1.load(Relaxed) as f64;
+    *b = *b + pixel.2.load(Relaxed) as f64;
+    *a = *a + pixel.3.load(Relaxed) as f64;
 }

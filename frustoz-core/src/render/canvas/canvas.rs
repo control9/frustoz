@@ -1,11 +1,11 @@
 use super::super::HDRPixel;
-use super::super::Histogram;
+use super::super::Canvas;
 use crate::model::palette::RGB;
 use crate::util::coordinates::CameraCoordinates;
 use crate::util::coordinates::CanvasPixel;
 use std::f64;
 
-impl Histogram {
+impl Canvas {
     pub fn new(image_width: u32, image_height: u32, oversampling: u32, filter_width: u32) -> Self {
         let border = if oversampling > filter_width {
             0
@@ -18,7 +18,7 @@ impl Histogram {
         Self {
             width,
             height,
-            data: vec![HDRPixel(0.0, 0.0, 0.0, 0.0); (width * height) as usize],
+            data: vec![HDRPixel::zero(); (width * height) as usize],
         }
     }
 
@@ -49,8 +49,7 @@ impl Histogram {
 
     // #[inline(never)]
     fn update_pixel(&mut self, index: usize, &RGB(r, g, b): &RGB) {
-        let &HDRPixel(rc, gc, bc, a) = &self.data[index];
-        self.data[index] = HDRPixel(rc + r as f64, gc + g as f64, bc + b as f64, a + 1.0);
+        self.data[index].add((r as u32, g as u32, b as u32, 1));
     }
 }
 
@@ -60,9 +59,9 @@ fn valid_coordinates(&CameraCoordinates(x, y): &CameraCoordinates) -> bool {
 
 #[cfg(test)]
 mod canvas_test {
-    use super::CameraCoordinates;
-    use super::CanvasPixel;
-    use super::Histogram;
+    use crate::util::coordinates::CameraCoordinates;
+    use crate::util::coordinates::CanvasPixel;
+    use super::Canvas;
     use std::f64;
 
     #[test]
@@ -128,7 +127,7 @@ mod canvas_test {
         CanvasSize(width, height): CanvasSize,
         coordinates: CameraCoordinates,
     ) {
-        let canvas = &Histogram::new(width, height, 1, 0);
+        let canvas = &Canvas::new(width, height, 1, 0);
         let actual = canvas.project(&coordinates);
 
         assert_eq!(Some(expected), actual);
@@ -138,7 +137,7 @@ mod canvas_test {
         CanvasSize(width, height): CanvasSize,
         coordinates: CameraCoordinates,
     ) {
-        let canvas = &Histogram::new(width, height, 1, 0);
+        let canvas = &Canvas::new(width, height, 1, 0);
         let actual = canvas.project(&coordinates);
         assert!(actual.is_none());
     }
