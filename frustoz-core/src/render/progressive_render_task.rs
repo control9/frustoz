@@ -1,22 +1,22 @@
-use std::sync::Arc;
-use std::sync::atomic::Ordering::Relaxed;
 use crate::model::builders;
 use crate::model::flame::Flame;
 use crate::render::canvas::Camera;
-use crate::render::{Canvas};
+use crate::render::progressive_renderer::{Command, TaskUpdateRequest};
+use crate::render::Canvas;
 use crate::util::math::RealPoint;
 use rand::{rng, Rng};
-use tokio_with_wasm::alias as tokio;
-use tokio::sync::mpsc::error::TryRecvError;
-use tokio::sync::mpsc::{Receiver, Sender};
+use std::sync::Arc;
+use tokio::sync::broadcast;
+use tokio::sync::broadcast::error::TryRecvError;
 use tokio::task::yield_now;
-use crate::render::progressive_renderer::CanvasState;
+use tokio_with_wasm::alias as tokio;
 
 pub struct ProgressiveRenderTask {
     camera: Camera,
-    canvas: Arc<CanvasState>,
+    canvas: Arc<Canvas>,
     flame: Flame,
-    id: usize
+    rx: broadcast::Receiver<TaskUpdateRequest>,
+    id: usize,
 }
 
 const SKIP_ITERATIONS: u64 = 20;
@@ -24,7 +24,8 @@ const SKIP_ITERATIONS: u64 = 20;
 impl ProgressiveRenderTask {
     pub(crate) fn new(
         flame: Flame,
-        canvas: Arc<CanvasState>,
+        canvas: Arc<Canvas>,
+        rx: broadcast::Receiver<TaskUpdateRequest>,
         id: usize,
     ) -> Self {
         let camera = builders::camera(&flame.camera);
@@ -32,12 +33,12 @@ impl ProgressiveRenderTask {
             camera,
             canvas,
             flame,
+            rx,
             id,
         }
     }
 
     pub(crate) async fn render(&mut self) -> () {
-        
         let xstart: f64 = rng().random_range(0.0..1.0);
         let ystart: f64 = rng().random_range(0.0..1.0);
         let mut point = RealPoint(xstart, ystart);
@@ -58,10 +59,17 @@ impl ProgressiveRenderTask {
 
             if iteration > SKIP_ITERATIONS {
                 let camera_coordinates = self.camera.project(&point);
-                self.canvas.canvas
+                self.canvas
                     .project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
             }
-            _ = self.canvas.steps.fetch_add(1, Relaxed);
+            
+            match (self.rx.try_recv()) {
+                Ok(TaskUpdateRequest{command: Command::CANCEL, ..})  | Err(TryRecvError::Closed) => break,
+                Ok(TaskUpdateRequest{command: Command::UPDATE, steps_sender}) => 
+                    steps_sender.send(iteration).await.expect("Failed to send update"),
+                _ => {}
+            }
+
             yield_now().await;
         }
     }

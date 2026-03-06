@@ -6,7 +6,7 @@ use crate::model::flame::RenderConfig;
 use crate::model::palette::Palette;
 use crate::render::canvas::Camera;
 use crate::render::canvas_combiner::CanvasCombiner;
-use crate::render::{Canvas};
+use crate::render::Canvas;
 use crate::transforms::Transform;
 use crate::util::math::TransformMatrix;
 use crate::variations::Variations;
@@ -75,9 +75,6 @@ mod palette_builder_test {
         let size = 4;
 
         let result = super::palette(size, input);
-        assert_eq!(
-            &RGB(185, 234, 235),
-            result.get_color(0.0)
-        )
+        assert_eq!(&RGB(185, 234, 235), result.get_color(0.0))
     }
 }

@@ -1,13 +1,13 @@
 use std::ops::Deref;
 
-use crate::render::FloatPixel;
-use std::sync::atomic::Ordering::Relaxed;
 use super::filter::gamma_filter;
 use super::filter::spatial_filter;
 use super::filter::FilterKernel;
 use super::filter::LogFilter;
 use super::{Canvas, CombinedCanvas, HDRPixel};
+use crate::render::FloatPixel;
 use rayon::prelude::*;
+use std::sync::atomic::Ordering::Relaxed;
 
 #[derive(Clone)]
 pub struct CanvasCombiner {
@@ -39,9 +39,9 @@ impl CanvasCombiner {
         }
     }
 
-
-    pub fn process_to_raw_single<T>(&self, canvas: T) -> Vec<u8> 
-    where T: Deref<Target = Canvas> + Sync
+    pub fn process_to_raw_single<T>(&self, canvas: T) -> Vec<u8>
+    where
+        T: Deref<Target = Canvas> + Sync,
     {
         let combined_canvas: CombinedCanvas = CanvasCombiner::preprocess(canvas);
         self.do_process(combined_canvas)
@@ -52,8 +52,10 @@ impl CanvasCombiner {
         self.do_process(combined_canvas)
     }
 
-    fn preprocess<T>(canvas: T)  -> CombinedCanvas
-    where T: Deref<Target = Canvas> + Sync{
+    fn preprocess<T>(canvas: T) -> CombinedCanvas
+    where
+        T: Deref<Target = Canvas> + Sync,
+    {
         let (width, height) = (canvas.width, canvas.height);
         let length = (width * height) as usize;
 
@@ -61,7 +63,7 @@ impl CanvasCombiner {
             .into_par_iter()
             .map(|i| {
                 let pixel = &canvas.data[i];
-                
+
                 FloatPixel(
                     pixel.0.load(Relaxed) as f64 / 256.0,
                     pixel.1.load(Relaxed) as f64 / 256.0,
@@ -76,7 +78,7 @@ impl CanvasCombiner {
             height,
         }
     }
-    
+
     fn combine(histograms: Vec<Canvas>) -> CombinedCanvas {
         let (width, height) = (histograms[0].width, histograms[0].height);
         let length = (width * height) as usize;
@@ -88,7 +90,7 @@ impl CanvasCombiner {
                 for hist in &histograms {
                     add_pixel(&mut r, &mut g, &mut b, &mut a, &hist.data[i]);
                 }
-                FloatPixel(r / 256.0, g/ 256.0, b/ 256.0, a as f64)
+                FloatPixel(r / 256.0, g / 256.0, b / 256.0, a as f64)
             })
             .collect();
         CombinedCanvas {
@@ -140,13 +142,7 @@ impl CanvasCombiner {
     }
 }
 
-fn add_pixel(
-    r: &mut f64,
-    g: &mut f64,
-    b: &mut f64,
-    a: &mut f64,
-    pixel: &HDRPixel,
-) {
+fn add_pixel(r: &mut f64, g: &mut f64, b: &mut f64, a: &mut f64, pixel: &HDRPixel) {
     *r = *r + pixel.0.load(Relaxed) as f64;
     *g = *g + pixel.1.load(Relaxed) as f64;
     *b = *b + pixel.2.load(Relaxed) as f64;

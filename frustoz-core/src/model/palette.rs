@@ -1,6 +1,5 @@
 use std::fmt::{Debug, Error, Formatter};
 
-
 #[derive(PartialEq, Copy, Clone, Debug)]
 pub struct RGB(pub u8, pub u8, pub u8);
 
@@ -22,7 +21,7 @@ impl Palette {
         let colors: Vec<RGB> = content
             .chunks(3)
             .take(size as usize)
-            .map(|s| { RGB(s[0], s[1] , s[2]) })
+            .map(|s| RGB(s[0], s[1], s[2]))
             .collect();
         Palette { size, colors }
     }

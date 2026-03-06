@@ -46,7 +46,8 @@ impl ProgressReporter for MultiProgressBar {
         let iterations: u64 = iterations_per_thread.iter().map(|&x| x as u64).sum();
         let mb = crate::MB.get_or_init(|| MultiProgress::new()).clone();
         mb.clear().expect("Failed to clear progress bar");
-        mb.println("Rendering per thread:").expect("Failed to start reporting progress");
+        mb.println("Rendering per thread:")
+            .expect("Failed to start reporting progress");
 
         let bars: Vec<ProgressBar> = iterations_per_thread
             .iter()
