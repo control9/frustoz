@@ -1,6 +1,5 @@
-use crate::render::FloatPixel;
 use super::LogFilter;
-
+use crate::render::FloatPixel;
 
 impl LogFilter {
     pub fn new(quality: u32, oversampling: u32, width: f64, height: f64, brightness: f64) -> Self {

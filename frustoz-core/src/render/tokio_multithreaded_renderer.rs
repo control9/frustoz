@@ -1,5 +1,5 @@
+use super::{split};
 use std::sync::Arc;
-use super::{split, Canvas};
 
 // Easier switching between implementations for performance comparison
 #[allow(unused_imports)]
@@ -12,9 +12,9 @@ use crate::model::builders;
 use crate::model::flame::Flame;
 use futures::future::join_all;
 
-use tokio_with_wasm::alias as tokio;
 use tokio::task::spawn_blocking;
 use tokio::task::JoinHandle;
+use tokio_with_wasm::alias as tokio;
 use web_time::Instant;
 pub struct Renderer {
     pub threads: u32,
@@ -47,7 +47,9 @@ impl Renderer {
             let tasks: Vec<Task<T>> = thread_configs
                 .into_iter()
                 .enumerate()
-                .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep, canvas.clone()))
+                .map(move |(i, (iters, rep, flame))| {
+                    Task::new(flame, iters, i, rep, canvas.clone())
+                })
                 .collect();
 
             let elapsed = now.elapsed();

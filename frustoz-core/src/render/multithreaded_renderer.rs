@@ -39,7 +39,9 @@ impl Renderer {
             let tasks: Vec<Task<T>> = thread_configs
                 .into_par_iter()
                 .enumerate()
-                .map(move |(i, (iters, rep, flame))| Task::new(flame, iters, i, rep, canvas.clone()))
+                .map(move |(i, (iters, rep, flame))| {
+                    Task::new(flame, iters, i, rep, canvas.clone())
+                })
                 .collect();
 
             let elapsed = now.elapsed();

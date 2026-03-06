@@ -1,5 +1,5 @@
-use super::super::HDRPixel;
 use super::super::Canvas;
+use super::super::HDRPixel;
 use crate::model::palette::RGB;
 use crate::util::coordinates::CameraCoordinates;
 use crate::util::coordinates::CanvasPixel;
@@ -59,9 +59,9 @@ fn valid_coordinates(&CameraCoordinates(x, y): &CameraCoordinates) -> bool {
 
 #[cfg(test)]
 mod canvas_test {
+    use super::Canvas;
     use crate::util::coordinates::CameraCoordinates;
     use crate::util::coordinates::CanvasPixel;
-    use super::Canvas;
     use std::f64;
 
     #[test]

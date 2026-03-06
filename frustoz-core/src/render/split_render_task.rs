@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use super::canvas::Camera;
 use super::Canvas;
 use super::Progress;
@@ -8,6 +7,7 @@ use crate::model::flame::Flame;
 use crate::util::math::RealPoint;
 use rand::prelude::*;
 use rand::rng;
+use std::sync::Arc;
 
 const SKIP_ITERATIONS: u64 = 20;
 const REPORT_FREQUENCY_PERCENT: u64 = 1;
@@ -31,7 +31,13 @@ struct State {
 }
 
 impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
-    pub fn new(flame: Flame, iterations: u64, id: usize, progress_reporter: T, canvas: Arc<Canvas>) -> Self {
+    pub fn new(
+        flame: Flame,
+        iterations: u64,
+        id: usize,
+        progress_reporter: T,
+        canvas: Arc<Canvas>,
+    ) -> Self {
         let camera = builders::camera(&flame.camera);
         //let canvas = builders::canvas(&flame.render, flame.filter.width);
 

@@ -1,9 +1,9 @@
 use std::sync::atomic::AtomicU32;
 use std::sync::atomic::Ordering::Relaxed;
 
-pub mod filter;
 pub mod canvas;
 pub mod canvas_combiner;
+pub mod filter;
 pub mod multithreaded_renderer;
 mod progressive_render_task;
 pub mod progressive_renderer;
@@ -11,7 +11,6 @@ mod render_task;
 pub mod simple_renderer;
 pub mod split_render_task;
 pub mod tokio_multithreaded_renderer;
-
 
 #[derive(Clone)]
 pub struct Canvas {
@@ -31,7 +30,7 @@ impl HDRPixel {
         )
     }
 
-    fn add(&self, (a,b,c,d): (u32, u32, u32, u32)) {
+    fn add(&self, (a, b, c, d): (u32, u32, u32, u32)) {
         _ = &self.0.fetch_add(a, Relaxed);
         _ = &self.1.fetch_add(b, Relaxed);
         _ = &self.2.fetch_add(c, Relaxed);
@@ -56,7 +55,6 @@ impl Clone for HDRPixel {
     }
 }
 
-
 #[derive(Clone)]
 pub struct CombinedCanvas {
     data: Vec<FloatPixel>,
@@ -66,7 +64,6 @@ pub struct CombinedCanvas {
 
 #[derive(Copy, Clone)]
 pub struct FloatPixel(pub f64, pub f64, pub f64, pub f64);
-
 
 #[derive(Copy, Clone)]
 pub struct Progress(pub u64, pub usize);
@@ -78,7 +75,6 @@ pub trait ProgressReporter {
 
 #[derive(Copy, Clone)]
 pub struct NoOpReporter {}
-
 
 impl ProgressReporter for NoOpReporter {
     fn new(_: &Vec<u64>) -> Self {
