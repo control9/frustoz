@@ -1,14 +1,13 @@
 use std::sync::atomic::AtomicU32;
 use std::sync::atomic::Ordering::Relaxed;
+use crate::model::palette::RGB;
 
 pub mod canvas;
-pub mod canvas_combiner;
+pub mod canvas_processor;
 pub mod filter;
 pub mod multithreaded_renderer;
 mod progressive_render_task;
 pub mod progressive_renderer;
-mod render_task;
-pub mod simple_renderer;
 pub mod split_render_task;
 pub mod tokio_multithreaded_renderer;
 
@@ -30,11 +29,11 @@ impl HDRPixel {
         )
     }
 
-    fn add(&self, (a, b, c, d): (u32, u32, u32, u32)) {
-        _ = &self.0.fetch_add(a, Relaxed);
-        _ = &self.1.fetch_add(b, Relaxed);
-        _ = &self.2.fetch_add(c, Relaxed);
-        _ = &self.3.fetch_add(d, Relaxed);
+    fn add(&self, color: &RGB) {
+        _ = self.0.fetch_add(color.0.into(), Relaxed);
+        _ = self.1.fetch_add(color.1.into(), Relaxed);
+        _ = self.2.fetch_add(color.2.into(), Relaxed);
+        _ = self.3.fetch_add(1, Relaxed);
     }
 }
 
@@ -56,14 +55,26 @@ impl Clone for HDRPixel {
 }
 
 #[derive(Clone)]
-pub struct CombinedCanvas {
+pub struct NormalizedCanvas {
     data: Vec<FloatPixel>,
     width: u32,
+    #[allow(unused)]
     height: u32,
 }
 
 #[derive(Copy, Clone)]
 pub struct FloatPixel(pub f64, pub f64, pub f64, pub f64);
+
+impl FloatPixel {
+    fn from_hdr_pixel(pixel: &HDRPixel) -> Self {
+        FloatPixel(
+            pixel.0.load(Relaxed) as f64 / 256.0,
+            pixel.1.load(Relaxed) as f64 / 256.0,
+            pixel.2.load(Relaxed) as f64 / 256.0,
+            pixel.3.load(Relaxed) as f64,
+        )
+    }
+}
 
 #[derive(Copy, Clone)]
 pub struct Progress(pub u64, pub usize);

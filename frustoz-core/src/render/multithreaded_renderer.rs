@@ -1,11 +1,7 @@
-use super::{split, Canvas};
+use super::split;
 use rayon::prelude::*;
 use std::sync::Arc;
 
-// Easier switching between implementations for performance comparison
-#[allow(unused_imports)]
-use super::render_task::RenderTask;
-#[allow(unused_imports)]
 use super::split_render_task::SplitRenderTask;
 
 use super::ProgressReporter;
@@ -22,7 +18,7 @@ impl Renderer {
     pub fn render<T: ProgressReporter + Clone + Send>(&self, flame: Flame) -> Vec<u8> {
         let now = Instant::now();
 
-        let processor = builders::histogram_processor(&flame);
+        let processor = builders::canvas_processor(&flame);
 
         let iterations = builders::iterations(&flame.render);
         let iterations_per_thread = split(iterations, self.threads);

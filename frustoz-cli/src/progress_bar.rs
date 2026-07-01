@@ -6,31 +6,6 @@ use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use std::thread;
 
-pub struct SingleProgressBar {
-    remaining: u64,
-    pb: ProgressBar,
-}
-
-impl ProgressReporter for SingleProgressBar {
-    fn new(iterations_per_thread: &Vec<u64>) -> Self {
-        let iterations = iterations_per_thread.iter().map(|&x| x as u64).sum();
-        SingleProgressBar {
-            remaining: iterations,
-            pb: ProgressBar::new(iterations),
-        }
-    }
-
-    fn report(&mut self, progress: Progress) {
-        let mut increment = progress.0 as u64;
-        increment = increment.min(self.remaining);
-        self.pb.inc(increment);
-        self.remaining -= increment;
-        if self.remaining == 0 {
-            self.pb.finish_with_message("Rendering completed");
-        }
-    }
-}
-
 #[derive(Clone)]
 pub struct MultiProgressBar {
     tx: Sender<Progress>,

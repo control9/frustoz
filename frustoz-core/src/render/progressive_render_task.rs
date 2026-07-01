@@ -39,9 +39,9 @@ impl ProgressiveRenderTask {
     }
 
     pub(crate) async fn render(&mut self) -> () {
-        let xstart: f64 = rng().random_range(0.0..1.0);
-        let ystart: f64 = rng().random_range(0.0..1.0);
-        let mut point = RealPoint(xstart, ystart);
+        let x_start: f64 = rng().random_range(0.0..1.0);
+        let y_start: f64 = rng().random_range(0.0..1.0);
+        let mut point = RealPoint(x_start, y_start);
         let mut color: f64 = rng().random_range(0.0..1.0);
 
         let mut iteration = 0;
@@ -63,7 +63,7 @@ impl ProgressiveRenderTask {
                     .project_and_update(&camera_coordinates, self.flame.palette.get_color(color));
             }
             
-            match (self.rx.try_recv()) {
+            match self.rx.try_recv() {
                 Ok(TaskUpdateRequest{command: Command::CANCEL, ..})  | Err(TryRecvError::Closed) => break,
                 Ok(TaskUpdateRequest{command: Command::UPDATE, steps_sender}) => 
                     steps_sender.send(iteration).await.expect("Failed to send update"),
