@@ -3,7 +3,6 @@ use super::super::HDRPixel;
 use crate::model::palette::RGB;
 use crate::util::coordinates::CameraCoordinates;
 use crate::util::coordinates::CanvasPixel;
-use std::f64;
 
 impl Canvas {
     pub fn new(image_width: u32, image_height: u32, oversampling: u32, filter_width: u32) -> Self {
@@ -34,22 +33,14 @@ impl Canvas {
     }
 
     pub fn project_and_update(&self, coordinates: &CameraCoordinates, color: &RGB) {
-        let pixel = self.project(coordinates);
-        match pixel {
-            Some(p) => self.update(p, color),
-            None => (),
+        if let Some(pixel) = self.project(coordinates) {
+            self.update(pixel, color)
         }
     }
 
-    // #[inline(never)]
     fn update(&self, CanvasPixel(x, y): CanvasPixel, color: &RGB) {
         let pixel_index: usize = (y * self.width + x) as usize;
-        self.update_pixel(pixel_index, color);
-    }
-
-    // #[inline(never)]
-    fn update_pixel(&self, index: usize, &RGB(r, g, b): &RGB) {
-        self.data[index].add((r as u32, g as u32, b as u32, 1));
+        self.data[pixel_index].add(color);
     }
 }
 
@@ -62,7 +53,6 @@ mod canvas_test {
     use super::Canvas;
     use crate::util::coordinates::CameraCoordinates;
     use crate::util::coordinates::CanvasPixel;
-    use std::f64;
 
     #[test]
     pub fn should_accept_camera_coordinates_between_zero_and_one() {

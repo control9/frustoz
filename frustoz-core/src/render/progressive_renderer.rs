@@ -1,7 +1,4 @@
 use futures::future::join_all;
-use image::ImageEncoder;
-use std::sync::atomic::AtomicU64;
-use std::sync::atomic::Ordering::Relaxed;
 use std::sync::Arc;
 use tokio::sync::oneshot::error::TryRecvError;
 use tokio::sync::{broadcast, mpsc, oneshot};
@@ -51,8 +48,7 @@ pub async fn render(
     info!("Beginning rendering");
     let start_time = Instant::now();
 
-    let fl = flame.clone();
-    let processor = builders::histogram_processor(&fl);
+    let processor = builders::canvas_processor(&flame);
 
     // create tasks;
     let fl = flame.clone();
@@ -74,7 +70,7 @@ pub async fn render(
         sleep(adjusted_delta).await;
 
         let pr = processor.clone();
-        let total_iterations = request_steps(&mut tx, threads).await;
+        total_iterations = request_steps(&mut tx, threads).await;
 
         let raw = {
             let canvas = canvas.clone();
@@ -83,7 +79,6 @@ pub async fn render(
                 .expect("Histogram merging failed")
         };
 
-        //let image_data = encode_image(flame.render.width, flame.render.height, raw);
         let actual_passed = frame_start.elapsed();
         let complete = total_iterations >= max_steps;
         snapshot_tx
@@ -137,19 +132,6 @@ async fn request_steps(sender: &mut broadcast::Sender<TaskUpdateRequest>, thread
         total_steps += rx.recv().await.expect("Failed to receive update");
     }
     total_steps
-}
-
-fn encode_image(width: u32, height: u32, raw: Vec<u8>) -> Vec<u8> {
-    let mut image_data: Vec<u8> = Vec::new();
-    let encoder = image::codecs::png::PngEncoder::new(&mut image_data);
-    let result = encoder.write_image(
-        raw.as_slice(),
-        width,
-        height,
-        image::ExtendedColorType::Rgb8,
-    );
-    result.expect("Failed to encode image");
-    image_data
 }
 
 fn create_tasks(

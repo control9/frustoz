@@ -1,3 +1,4 @@
+use std::array;
 use super::canvas::Camera;
 use super::Canvas;
 use super::Progress;
@@ -39,7 +40,6 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
         canvas: Arc<Canvas>,
     ) -> Self {
         let camera = builders::camera(&flame.camera);
-        //let canvas = builders::canvas(&flame.render, flame.filter.width);
 
         SplitRenderTask {
             camera,
@@ -54,16 +54,18 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
     pub fn render(mut self) {
         let report_frequency = self.iterations / 100 * REPORT_FREQUENCY_PERCENT;
         let mut progress = Progress(0, self.id);
-        let rng = rng();
-        let stt: Vec<State> = (0..SPLIT_FACTOR)
-            .map(|_| rng.clone())
-            .map(|mut rng| State {
-                point: RealPoint(rng.random_range(0.0..1.0), rng.random_range(0.0..1.0)),
-                color: rng.random_range(0.0..1.0),
-                rng: rng.clone(),
-            })
-            .collect::<Vec<State>>();
-        let mut state: [State; SPLIT_FACTOR] = stt.try_into().expect("AAA");
+        let mut rng = rng();
+
+        let mut state : [State; SPLIT_FACTOR] = array::from_fn(
+            |_ | {
+                State {
+                    point: RealPoint(rng.random_range(0.0..1.0), rng.random_range(0.0..1.0)),
+                    color: rng.random_range(0.0..1.0),
+                    rng: rng.clone(),
+                }
+
+            }
+        );
 
         for iteration in (0..self.iterations).step_by(SPLIT_FACTOR) {
             for i in 0..SPLIT_FACTOR {

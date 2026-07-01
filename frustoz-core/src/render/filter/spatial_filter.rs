@@ -1,34 +1,34 @@
 use super::FilterKernel;
-use crate::render::{CombinedCanvas, FloatPixel};
+use crate::render::{NormalizedCanvas, FloatPixel};
 use web_time::Instant;
 
 pub fn apply_filter(
     filter: &FilterKernel,
-    histogram: &CombinedCanvas,
+    canvas: &NormalizedCanvas,
     image_width: u32,
     image_height: u32,
     oversample: u32,
-) -> CombinedCanvas {
+) -> NormalizedCanvas {
     let now = Instant::now();
     let data = (0..(image_height * image_width))
         .into_iter()
         .map(|i| (i % image_width, i / image_width))
         .map(|(x, y)| (x * oversample, y * oversample))
-        .map(|(x, y)| process_point(x, y, filter, histogram))
+        .map(|(x, y)| process_point(x, y, filter, canvas))
         .collect();
     let elapsed = now.elapsed();
     info!(
         "Filtering took: {:?}",
         (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0)
     );
-    CombinedCanvas {
+    NormalizedCanvas {
         data,
         width: image_width,
         height: image_height,
     }
 }
 
-fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram: &CombinedCanvas) -> FloatPixel {
+fn process_point(x: u32, y: u32, filter: &FilterKernel, canvas: &NormalizedCanvas) -> FloatPixel {
     let &FilterKernel {
         width: filter_width,
         coefficients: ref kernel,
@@ -38,8 +38,8 @@ fn process_point(x: u32, y: u32, filter: &FilterKernel, histogram: &CombinedCanv
     for filter_y in 0..filter_width {
         for filter_x in 0..filter_width {
             let k = kernel[(filter_x + filter_y * filter_width) as usize];
-            let index = (x + filter_x) + (y + filter_y) * histogram.width;
-            let &FloatPixel(rn, gn, bn, an) = &histogram.data[index as usize];
+            let index = (x + filter_x) + (y + filter_y) * canvas.width;
+            let &FloatPixel(rn, gn, bn, an) = &canvas.data[index as usize];
 
             r += rn * k;
             g += gn * k;

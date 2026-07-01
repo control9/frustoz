@@ -1,10 +1,6 @@
 use super::{split};
 use std::sync::Arc;
 
-// Easier switching between implementations for performance comparison
-#[allow(unused_imports)]
-use super::render_task::RenderTask;
-#[allow(unused_imports)]
 use super::split_render_task::SplitRenderTask;
 
 use super::ProgressReporter;
@@ -29,7 +25,7 @@ impl Renderer {
     ) -> Vec<u8> {
         let now = Instant::now();
 
-        let processor = builders::histogram_processor(&flame);
+        let processor = builders::canvas_processor(&flame);
 
         let iterations = builders::iterations(&flame.render);
         let iterations_per_thread = split(iterations, self.threads);

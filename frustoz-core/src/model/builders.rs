@@ -5,7 +5,7 @@ use crate::model::flame::Flame;
 use crate::model::flame::RenderConfig;
 use crate::model::palette::Palette;
 use crate::render::canvas::Camera;
-use crate::render::canvas_combiner::CanvasCombiner;
+use crate::render::canvas_processor::CanvasProcessor;
 use crate::render::Canvas;
 use crate::transforms::Transform;
 use crate::util::math::TransformMatrix;
@@ -42,10 +42,10 @@ pub fn transform(weight: f64, color: f64, coef: [f64; 6], variations: Variations
     }
 }
 
-pub fn histogram_processor(flame: &Flame) -> CanvasCombiner {
+pub fn canvas_processor(flame: &Flame) -> CanvasProcessor {
     let render = &flame.render;
 
-    CanvasCombiner::new(
+    CanvasProcessor::new(
         render.quality,
         render.width,
         render.height,

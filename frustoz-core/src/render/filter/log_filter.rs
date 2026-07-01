@@ -14,7 +14,7 @@ impl LogFilter {
     }
 
     pub fn apply(&self, &FloatPixel(r, g, b, a): &FloatPixel) -> FloatPixel {
-        let scale = self.get_scale(a as f64);
+        let scale = self.get_scale(a);
         FloatPixel(r * scale, g * scale, b * scale, a * scale)
     }
 
@@ -22,6 +22,6 @@ impl LogFilter {
         if x == 0.0 {
             return 0.0;
         }
-        (self.k1 * (1.0 + self.k2 * x as f64).log10()) / (x as f64)
+        (self.k1 * (1.0 + self.k2 * x).log10()) / (x)
     }
 }
