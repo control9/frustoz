@@ -72,7 +72,7 @@ impl<T: ProgressReporter + Sized> SplitRenderTask<T> {
                 let State {
                     point,
                     color,
-                    ref mut rng,
+                    rng,
                 } = &mut state[i];
                 let trs = rng.random_range(0.0..1.0);
                 let tr = self.flame.transforms.get_transformation(trs);

@@ -1,21 +1,18 @@
 [package]
 name = "frustoz-core"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Aleksei Sukontsev <aleksei.sukontsev@gmail.com>"]
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2024"
 
 [dependencies]
-hex = "0.4.3"
-log = { version = "0.4.21", features = ["release_max_level_info"] }
-rayon = "1.10.0"
-rand = "0.9.0"
-tokio_with_wasm = { version = "0.8.2" , features = ["macros", "sync", "time", "rt" ]}
-tokio = { version = "1.44.1" , features = ["macros", "sync", "time", "rt"]}
-futures = "0.3.30"
-web-time = "1.1.0"
-image = "0.25.1"
+hex = "^0.4.3"
+log = { version = "^0.4.33", features = ["release_max_level_info"] }
+rayon = "^1.12.0"
+rand = "^0.10.1"
+tokio_with_wasm = { version = "^0.9.0", features = ["macros", "sync", "time", "rt" ]}
+tokio = { version = "^1.52.3" , features = ["macros", "sync", "time", "rt"]}
+futures = "^0.3.32"
+web-time = "^1.1.0"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { version = "0.3.2", features = ["wasm_js"] }
+getrandom = { version = "^0.4.3", features = ["wasm_js"] }

@@ -1,7 +1,7 @@
 use super::Variation;
 use super::Variation::*;
 use crate::util::math::{rad2, radius, theta, RealPoint, EPSILON};
-use rand::Rng;
+use rand::{Rng, RngExt};
 use std::f64::consts::PI;
 
 impl Variation {

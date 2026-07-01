@@ -4,7 +4,7 @@ use crate::render::canvas::Camera;
 use crate::render::progressive_renderer::{Command, TaskUpdateRequest};
 use crate::render::Canvas;
 use crate::util::math::RealPoint;
-use rand::{rng, Rng};
+use rand::{rng, RngExt};
 use std::sync::Arc;
 use tokio::sync::broadcast;
 use tokio::sync::broadcast::error::TryRecvError;
